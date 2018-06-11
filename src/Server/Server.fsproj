@@ -15,85 +15,85 @@
         <Compile Include="Templates\NotFound.fs" />
         <Compile Include="Templates\InternalError.fs" />
 
-        <Compile Include="Verifications/VerificationsModel.fs" />
-        <Compile Include="Verifications/VerificationsViews.fs" />
-        <Compile Include="Verifications/VerificationsRepository.fs" />
-        <Compile Include="Verifications/VerificationsController.fs" />
+        <Compile Include="Entities\Verifications/VerificationsModel.fs" />
+        <Compile Include="Entities\Verifications/VerificationsViews.fs" />
+        <Compile Include="Entities\Verifications/VerificationsRepository.fs" />
+        <Compile Include="Entities\Verifications/VerificationsController.fs" />
 
-        <Compile Include="CryptoCurrencies\CryptoCurrenciesModel.fs" />
-        <Compile Include="CryptoCurrencies\CryptoCurrenciesViews.fs" />
-        <Compile Include="CryptoCurrencies\CryptoCurrenciesRepository.fs" />
-        <Compile Include="CryptoCurrencies\CryptoCurrenciesController.fs" />
+        <Compile Include="Entities\CryptoCurrencies\CryptoCurrenciesModel.fs" />
+        <Compile Include="Entities\CryptoCurrencies\CryptoCurrenciesViews.fs" />
+        <Compile Include="Entities\CryptoCurrencies\CryptoCurrenciesRepository.fs" />
+        <Compile Include="Entities\CryptoCurrencies\CryptoCurrenciesController.fs" />
 
-        <Compile Include="SaleTokens\SaleTokensModel.fs" />
-        <Compile Include="SaleTokens\SaleTokensViews.fs" />
-        <Compile Include="SaleTokens\SaleTokensRepository.fs" />
-        <Compile Include="SaleTokens\SaleTokensController.fs" />
+        <Compile Include="Entities\SaleTokens\SaleTokensModel.fs" />
+        <Compile Include="Entities\SaleTokens\SaleTokensViews.fs" />
+        <Compile Include="Entities\SaleTokens\SaleTokensRepository.fs" />
+        <Compile Include="Entities\SaleTokens\SaleTokensController.fs" />
         
-        <Compile Include="TokenSaleDeals\TokenSaleDealsModel.fs" />
-        <Compile Include="TokenSaleDeals\TokenSaleDealsViews.fs" />
-        <Compile Include="TokenSaleDeals\TokenSaleDealsRepository.fs" />
-        <Compile Include="TokenSaleDeals\TokenSaleDealsController.fs" />
+        <Compile Include="Entities\TokenSaleDeals\TokenSaleDealsModel.fs" />
+        <Compile Include="Entities\TokenSaleDeals\TokenSaleDealsViews.fs" />
+        <Compile Include="Entities\TokenSaleDeals\TokenSaleDealsRepository.fs" />
+        <Compile Include="Entities\TokenSaleDeals\TokenSaleDealsController.fs" />
         
-        <Compile Include="TokenSales\TokenSalesModel.fs" />
-        <Compile Include="TokenSales\TokenSalesViews.fs" />
-        <Compile Include="TokenSales\TokenSalesRepository.fs" />
-        <Compile Include="TokenSales\TokenSalesController.fs" />
+        <Compile Include="Entities\TokenSales\TokenSalesModel.fs" />
+        <Compile Include="Entities\TokenSales\TokenSalesViews.fs" />
+        <Compile Include="Entities\TokenSales\TokenSalesRepository.fs" />
+        <Compile Include="Entities\TokenSales\TokenSalesController.fs" />
         
-        <Compile Include="TokenSaleStatusIds\TokenSaleStatusIdsModel.fs" />
-        <Compile Include="TokenSaleStatusIds\TokenSaleStatusIdsViews.fs" />
-        <Compile Include="TokenSaleStatusIds\TokenSaleStatusIdsRepository.fs" />
-        <Compile Include="TokenSaleStatusIds\TokenSaleStatusIdsController.fs" />
+        <Compile Include="Entities\TokenSaleStatusIds\TokenSaleStatusIdsModel.fs" />
+        <Compile Include="Entities\TokenSaleStatusIds\TokenSaleStatusIdsViews.fs" />
+        <Compile Include="Entities\TokenSaleStatusIds\TokenSaleStatusIdsRepository.fs" />
+        <Compile Include="Entities\TokenSaleStatusIds\TokenSaleStatusIdsController.fs" />
 
-        <Compile Include="TokenSaleStages\TokenSaleStagesModel.fs" />
-        <Compile Include="TokenSaleStages\TokenSaleStagesViews.fs" />
-        <Compile Include="TokenSaleStages\TokenSaleStagesRepository.fs" />
-        <Compile Include="TokenSaleStages\TokenSaleStagesController.fs" />
+        <Compile Include="Entities\TokenSaleStages\TokenSaleStagesModel.fs" />
+        <Compile Include="Entities\TokenSaleStages\TokenSaleStagesViews.fs" />
+        <Compile Include="Entities\TokenSaleStages\TokenSaleStagesRepository.fs" />
+        <Compile Include="Entities\TokenSaleStages\TokenSaleStagesController.fs" />
         
-        <Compile Include="TokenSaleStageStatusIds\TokenSaleStageStatusIdsModel.fs" />
-        <Compile Include="TokenSaleStageStatusIds\TokenSaleStageStatusIdsViews.fs" />
-        <Compile Include="TokenSaleStageStatusIds\TokenSaleStageStatusIdsRepository.fs" />
-        <Compile Include="TokenSaleStageStatusIds\TokenSaleStageStatusIdsController.fs" />
+        <Compile Include="Entities\TokenSaleStageStatusIds\TokenSaleStageStatusIdsModel.fs" />
+        <Compile Include="Entities\TokenSaleStageStatusIds\TokenSaleStageStatusIdsViews.fs" />
+        <Compile Include="Entities\TokenSaleStageStatusIds\TokenSaleStageStatusIdsRepository.fs" />
+        <Compile Include="Entities\TokenSaleStageStatusIds\TokenSaleStageStatusIdsController.fs" />
         
-        <Compile Include="TokenSaleStageStatuses\TokenSaleStageStatusesModel.fs" />
-        <Compile Include="TokenSaleStageStatuses\TokenSaleStageStatusesViews.fs" />
-        <Compile Include="TokenSaleStageStatuses\TokenSaleStageStatusesRepository.fs" />
-        <Compile Include="TokenSaleStageStatuses\TokenSaleStageStatusesController.fs" />
+        <Compile Include="Entities\TokenSaleStageStatuses\TokenSaleStageStatusesModel.fs" />
+        <Compile Include="Entities\TokenSaleStageStatuses\TokenSaleStageStatusesViews.fs" />
+        <Compile Include="Entities\TokenSaleStageStatuses\TokenSaleStageStatusesRepository.fs" />
+        <Compile Include="Entities\TokenSaleStageStatuses\TokenSaleStageStatusesController.fs" />
         
-        <Compile Include="TokenSaleStatuses\TokenSaleStatusesModel.fs" />
-        <Compile Include="TokenSaleStatuses\TokenSaleStatusesViews.fs" />
-        <Compile Include="TokenSaleStatuses\TokenSaleStatusesRepository.fs" />
-        <Compile Include="TokenSaleStatuses\TokenSaleStatusesController.fs" />
+        <Compile Include="Entities\TokenSaleStatuses\TokenSaleStatusesModel.fs" />
+        <Compile Include="Entities\TokenSaleStatuses\TokenSaleStatusesViews.fs" />
+        <Compile Include="Entities\TokenSaleStatuses\TokenSaleStatusesRepository.fs" />
+        <Compile Include="Entities\TokenSaleStatuses\TokenSaleStatusesController.fs" />
         
-        <Compile Include="CryptoCurrencyPrices\CryptoCurrencyPricesModel.fs" />
-        <Compile Include="CryptoCurrencyPrices\CryptoCurrencyPricesViews.fs" />
-        <Compile Include="CryptoCurrencyPrices\CryptoCurrencyPricesRepository.fs" />
-        <Compile Include="CryptoCurrencyPrices\CryptoCurrencyPricesController.fs" />
+        <Compile Include="Entities\CryptoCurrencyPrices\CryptoCurrencyPricesModel.fs" />
+        <Compile Include="Entities\CryptoCurrencyPrices\CryptoCurrencyPricesViews.fs" />
+        <Compile Include="Entities\CryptoCurrencyPrices\CryptoCurrencyPricesRepository.fs" />
+        <Compile Include="Entities\CryptoCurrencyPrices\CryptoCurrencyPricesController.fs" />
         
-        <Compile Include="Customers\CustomersModel.fs" />
-        <Compile Include="Customers\CustomersViews.fs" />
-        <Compile Include="Customers\CustomersRepository.fs" />
-        <Compile Include="Customers\CustomersController.fs" />
+        <Compile Include="Entities\Customers\CustomersModel.fs" />
+        <Compile Include="Entities\Customers\CustomersViews.fs" />
+        <Compile Include="Entities\Customers\CustomersRepository.fs" />
+        <Compile Include="Entities\Customers\CustomersController.fs" />
         
-        <Compile Include="CustomerPreferences\CustomerPreferencesModel.fs" />
-        <Compile Include="CustomerPreferences\CustomerPreferencesViews.fs" />
-        <Compile Include="CustomerPreferences\CustomerPreferencesRepository.fs" />
-        <Compile Include="CustomerPreferences\CustomerPreferencesController.fs" />
+        <Compile Include="Entities\CustomerPreferences\CustomerPreferencesModel.fs" />
+        <Compile Include="Entities\CustomerPreferences\CustomerPreferencesViews.fs" />
+        <Compile Include="Entities\CustomerPreferences\CustomerPreferencesRepository.fs" />
+        <Compile Include="Entities\CustomerPreferences\CustomerPreferencesController.fs" />
         
-        <Compile Include="CustomerVerificationEvents\CustomerVerificationEventsModel.fs" />
-        <Compile Include="CustomerVerificationEvents\CustomerVerificationEventsViews.fs" />
-        <Compile Include="CustomerVerificationEvents\CustomerVerificationEventsRepository.fs" />
-        <Compile Include="CustomerVerificationEvents\CustomerVerificationEventsController.fs" />
+        <Compile Include="Entities\CustomerVerificationEvents\CustomerVerificationEventsModel.fs" />
+        <Compile Include="Entities\CustomerVerificationEvents\CustomerVerificationEventsViews.fs" />
+        <Compile Include="Entities\CustomerVerificationEvents\CustomerVerificationEventsRepository.fs" />
+        <Compile Include="Entities\CustomerVerificationEvents\CustomerVerificationEventsController.fs" />
         
-        <Compile Include="InvestmentTranStatusIds\InvestmentTranStatusIdsModel.fs" />
-        <Compile Include="InvestmentTranStatusIds\InvestmentTranStatusIdsViews.fs" />
-        <Compile Include="InvestmentTranStatusIds\InvestmentTranStatusIdsRepository.fs" />
-        <Compile Include="InvestmentTranStatusIds\InvestmentTranStatusIdsController.fs" />
+        <Compile Include="Entities\InvestmentTranStatusIds\InvestmentTranStatusIdsModel.fs" />
+        <Compile Include="Entities\InvestmentTranStatusIds\InvestmentTranStatusIdsViews.fs" />
+        <Compile Include="Entities\InvestmentTranStatusIds\InvestmentTranStatusIdsRepository.fs" />
+        <Compile Include="Entities\InvestmentTranStatusIds\InvestmentTranStatusIdsController.fs" />
         
-        <Compile Include="Investments\InvestmentsModel.fs" />
-        <Compile Include="Investments\InvestmentsViews.fs" />
-        <Compile Include="Investments\InvestmentsRepository.fs" />
-        <Compile Include="Investments\InvestmentsController.fs" />
+        <Compile Include="Entities\Investments\InvestmentsModel.fs" />
+        <Compile Include="Entities\Investments\InvestmentsViews.fs" />
+        <Compile Include="Entities\Investments\InvestmentsRepository.fs" />
+        <Compile Include="Entities\Investments\InvestmentsController.fs" />
         
         <Compile Include="Router.fs" />
         <Compile Include="Server.fs" />
