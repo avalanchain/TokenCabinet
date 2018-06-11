@@ -5,8 +5,6 @@
         <TargetFramework>netcoreapp2.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="..\Shared\Shared.fs" />
-
         <Compile Include="Database.fs" />
         <Compile Include="Config.fs" />
 
@@ -95,6 +93,8 @@
         <Compile Include="Entities\Investments\InvestmentsRepository.fs" />
         <Compile Include="Entities\Investments\InvestmentsController.fs" />
         
+        <Compile Include="..\Shared\Shared.fs" />
+
         <Compile Include="Router.fs" />
         <Compile Include="Server.fs" />
 

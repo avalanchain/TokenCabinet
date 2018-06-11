@@ -12,14 +12,38 @@ open Shared
 open Fulma
 
 open Fulma.FontAwesome
+open Fable.Core
+open Fable.Import.RemoteDev
 
-type Model = Counter option
+// open W3
+open Fable.Core.JsInterop
+
+//let w3:W3 = !!createNew W3 () 
+
+// [<Emit("$0")>]
+// let web3: W3 = jsNative
+
+type Model = {
+    Counter: Counter option
+
+    CryptoCurrencies: CryptoCurrencies.CryptoCurrency list
+}
+
+type RemotingError =
+    | CommunicationError of exn
+    | ServerError of ServerError
 
 type Msg =
-| Increment
-| Decrement
-| Init of Result<Counter, exn>
+    | Increment
+    | Decrement
+    | Init of Result<Counter, exn>
 
+    | ErrorMsg of Model * Msg
+
+    | InitDb
+    | InitDbCompleted of Result<unit, exn>
+
+    | GetCryptoCurrenciesCompleted of Result<CryptoCurrencies.CryptoCurrency list, RemotingError>
 
 module Server =
 
@@ -27,30 +51,65 @@ module Server =
     open Fable.Remoting.Client
 
     /// A proxy you can use to talk to server directly
-    let api : ICounterProtocol =
-        Proxy.remoting<ICounterProtocol> {
+    let adminApi : IAdminProtocol =
+        Proxy.remoting<IAdminProtocol> {
             use_route_builder Route.builder
         }
 
+    let tokenSaleApi : ITokenSaleProtocol =
+        Proxy.remoting<ITokenSaleProtocol> {
+            use_route_builder Route.builder
+        }        
+
 
 let init () : Model * Cmd<Msg> =
-    let model = None
-    let cmd =
+    let model = {   Counter = None
+                    CryptoCurrencies = [] 
+                }
+    let cmdInitCounter =
         Cmd.ofAsync
-            Server.api.getInitCounter
+            Server.adminApi.getInitCounter
             ()
             (Ok >> Init)
-            (Error >> Init)
-    model, cmd
+            (fun exn -> printfn "Exception during InitCounter() call: '%A'" exn
+                        exn |> Error |> Init)
+    let cmdGetCryptoCurrencies =
+        Cmd.ofAsync
+            Server.tokenSaleApi.getCryptoCurrencies
+            ()
+            (fun res -> match res with
+                        | Ok cc -> cc |> Ok |> GetCryptoCurrenciesCompleted
+                        | Error serverError -> serverError |> ServerError |> Error |> GetCryptoCurrenciesCompleted
+                        )
+            (fun exn -> printfn "Exception during GetCryptoCurrencies() call: '%A'" exn
+                        exn |> CommunicationError |> Error |> GetCryptoCurrenciesCompleted)
+    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
-    let model' =
-        match model,  msg with
-        | Some x, Increment -> Some (x + 1)
-        | Some x, Decrement -> Some (x - 1)
-        | None, Init (Ok x) -> Some x
-        | _ -> None
-    model', Cmd.none
+    let (model', cmd') : Model * Cmd<Msg> =  
+                        match model, msg with
+                        | { Counter = None }  , Init (Ok x) -> { model with Counter = Some x }      , Cmd.none
+                        | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
+                        | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
+
+                        | model, InitDb -> model, Cmd.ofAsync
+                                                    Server.adminApi.initDb
+                                                    ()
+                                                    (Ok >> InitDbCompleted)
+                                                    (fun exn -> printfn "Exception during InitDb() call: '%A'" exn
+                                                                exn |> Error |> InitDbCompleted)
+                        | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
+
+                        | model, GetCryptoCurrenciesCompleted ccRes -> 
+                            match ccRes with 
+                            | Ok (cc) -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
+                            | Error(error) -> failwith "Not Implemented" // TODO: Implement
+
+                        | model, ErrorMsg(m, msg) -> 
+                            printfn "Unhandled Msg '%A' on Model '%A'" msg m
+                            model, Cmd.none
+                        | model, msg -> model, (model, msg) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
+    model', cmd'
 
 let safeComponents =
     let intersperse sep ls =
@@ -85,7 +144,7 @@ let navBrand =
         [ Container.container [ ]
             [ Navbar.Brand.div [ ]
                 [ Navbar.Item.a [ Navbar.Item.CustomClass "brand-text" ]
-                      [ str "SAFE Admin" ]
+                      [ str "TOKEN SALE" ]
                   Navbar.burger [ ]
                       [ span [ ] [ ]
                         span [ ] [ ]
@@ -160,7 +219,7 @@ let hero =
         [ Hero.body [ ]
             [ Container.container [ ]
                 [ Heading.h1 [ ]
-                      [ str "Purchase tokens" ]
+                      [ str ("Purchase tokens " (*+ (string web3.version) *) ) ]
                   Heading.h4 [ Heading.IsSubtitle ]
                       [ safeComponents ] ] ] ]
 
@@ -198,10 +257,15 @@ let info =
 
 let counter (model : Model) (dispatch : Msg -> unit) =
     Field.div [ Field.IsGrouped ]
-        [ Control.p [ Control.IsExpanded ]
+        [ Control.p [ ]
+            [ Button.a
+                [ Button.Color IsInfo
+                  Button.OnClick (fun _ -> dispatch InitDb) ]
+                [ str "Init Db" ] ]
+          Control.p [ Control.IsExpanded ]
             [ Input.text
                 [ Input.Disabled true
-                  Input.Value (show model) ] ]
+                  Input.Value (show model.Counter) ] ]
           Control.p [ ]
             [ Button.a
                 [ Button.Color IsInfo
@@ -229,14 +293,14 @@ let columns (model : Model) (dispatch : Msg -> unit) =
                               [ Table.IsFullWidth
                                 Table.IsStriped ]
                               [ tbody [ ]
-                                  [ for _ in 1..10 ->
+                                  [ for cc in model.CryptoCurrencies ->
                                       tr [ ]
                                           [ td [ Style [ Width "5%" ] ]
                                               [ Icon.faIcon
                                                   [ ]
                                                   [ Fa.icon Fa.I.BellO ] ]
                                             td [ ]
-                                                [ str "Lorem ipsum dolor aire" ]
+                                                [ str (cc.Id + " -2- " + cc.Name) ]
                                             td [ ]
                                                 [ Button.a
                                                     [ Button.Size IsSmall

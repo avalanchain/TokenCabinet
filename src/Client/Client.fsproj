@@ -4,7 +4,25 @@
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="..\Shared\Entities\VerificationsModel.fs" />
+        <Compile Include="..\Shared\Entities\CryptoCurrenciesModel.fs" />
+        <Compile Include="..\Shared\Entities\SaleTokensModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSaleDealsModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSalesModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSaleStatusIdsModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSaleStagesModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSaleStageStatusIdsModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSaleStageStatusesModel.fs" />
+        <Compile Include="..\Shared\Entities\TokenSaleStatusesModel.fs" />
+        <Compile Include="..\Shared\Entities\CryptoCurrencyPricesModel.fs" />
+        <Compile Include="..\Shared\Entities\CustomersModel.fs" />
+        <Compile Include="..\Shared\Entities\CustomerPreferencesModel.fs" />
+        <Compile Include="..\Shared\Entities\CustomerVerificationEventsModel.fs" />
+        <Compile Include="..\Shared\Entities\InvestmentTranStatusIdsModel.fs" />
+        <Compile Include="..\Shared\Entities\InvestmentsModel.fs" />
+
         <Compile Include="..\Shared\Shared.fs" />
+        <!--<Compile Include="lib\W3.fs" /> -->
         <Compile Include="Client.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
