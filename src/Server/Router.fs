@@ -13,7 +13,8 @@ let browser = pipeline {
 }
 
 let defaultView = scope {
-    get "/" (htmlView Index.layout)
+    //get "/" (htmlView Index.layout)
+    get "/" (htmlFile "../index.html")
     get "/index.html" (redirectTo false "/")
     get "/default.html" (redirectTo false "/")
 }
