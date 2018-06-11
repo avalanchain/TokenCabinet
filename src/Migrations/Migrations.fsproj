@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+
+    <Compile Include="201806092051.Verification.fs" />
+    <Compile Include="201806092130.CryptoCurrency.fs" />
+    <Compile Include="201806101820.SaleToken.fs" />
+    <Compile Include="201806101821.TokenSaleDeal.fs" />
+    <Compile Include="201806101822.TokenSale.fs" />
+    <Compile Include="201806101827.TokenSaleStage.fs" />
+    <Compile Include="201806101828.TokenSaleStageStatus.fs" />
+    <Compile Include="201806101830.TokenSaleStatus.fs" />
+    <Compile Include="201806101831.CryptoCurrencyPrice.fs" />
+    <Compile Include="201806101832.Customer.fs" />
+    <Compile Include="201806101833.CustomerPreference.fs" />
+    <Compile Include="201806101834.CustomerVerificationEvent.fs" />
+    <Compile Include="201806101835.InvestmentTranStatusId.fs" />
+    <Compile Include="201806101836.Investment.fs" />
+    <Compile Include="201806101841.TokenSaleStatusId.fs" />
+    <Compile Include="201806101923.TokenSaleStageStatusId.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
