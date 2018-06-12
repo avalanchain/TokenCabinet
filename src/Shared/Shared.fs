@@ -62,8 +62,8 @@ module Route =
 /// Every record field must have the type : 'a -> Async<'b> where 'a can also be `unit`
 /// Add more such fields, implement them on the server and they be directly available on client
 type IAdminProtocol = {   
-    getInitCounter  : unit -> Async<Counter> 
-    initDb          : unit -> Async<unit> 
+    getInitCounter      : unit -> Async<ServerResult<Counter>>
+    initDb              : unit -> Async<unit> 
 }
 
 type ITokenSaleProtocol = {   

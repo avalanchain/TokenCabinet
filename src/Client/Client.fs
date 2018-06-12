@@ -41,7 +41,7 @@ type RemotingError =
 type Msg =
     | Increment
     | Decrement
-    | Init of Result<Counter, exn>
+    | Init of Result<Counter, RemotingError>
 
     | ErrorMsg of Model * Msg
 
@@ -67,39 +67,26 @@ module Server =
             use_route_builder Route.builder
         }        
 
+let cmdServerCall apiFunc args completeMsg serverMethodName =
+    Cmd.ofAsync
+        apiFunc
+        args
+        (fun res -> match res with
+                    | Ok cc -> cc |> Ok |> completeMsg
+                    | Error serverError -> serverError |> ServerError |> Error |> completeMsg
+                    )
+        (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
+                    exn |> CommunicationError |> Error |> GetCryptoCurrenciesCompleted)
 
 let init () : Model * Cmd<Msg> =
     let model = {   Counter = None
                     CryptoCurrencies = []
                     TokenSale = None 
                 }
-    let cmdInitCounter =
-        Cmd.ofAsync
-            Server.adminApi.getInitCounter
-            ()
-            (Ok >> Init)
-            (fun exn -> console.error(sprintf "Exception during InitCounter() call: '%A'" exn)
-                        exn |> Error |> Init)
-    let cmdGetCryptoCurrencies =
-        Cmd.ofAsync
-            Server.tokenSaleApi.getCryptoCurrencies
-            ()
-            (fun res -> match res with
-                        | Ok cc -> cc |> Ok |> GetCryptoCurrenciesCompleted
-                        | Error serverError -> serverError |> ServerError |> Error |> GetCryptoCurrenciesCompleted
-                        )
-            (fun exn -> console.error(sprintf "Exception during GetCryptoCurrencies() call: '%A'" exn)
-                        exn |> CommunicationError |> Error |> GetCryptoCurrenciesCompleted)
-    let cmdGetTokenSale =
-        Cmd.ofAsync
-            Server.tokenSaleApi.getTokenSale
-            ()
-            (fun res -> match res with
-                        | Ok cc -> cc |> Ok |> GetTokenSaleCompleted
-                        | Error serverError -> serverError |> ServerError |> Error |> GetTokenSaleCompleted
-                        )
-            (fun exn -> console.error(sprintf "Exception during GetCryptoCurrencies() call: '%A'" exn)
-                        exn |> CommunicationError |> Error |> GetTokenSaleCompleted)
+    let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () Init "getInitCounter()"
+    let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () GetCryptoCurrenciesCompleted "getCryptoCurrencies()"
+    let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () GetTokenSaleCompleted "getTokenSale()"
+
     model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =

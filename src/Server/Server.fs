@@ -15,7 +15,7 @@ open Shared.ViewModels
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
 
-let getInitCounter () : Task<Counter> = task { return 42 }
+let getInitCounter () : Task<ServerResult<Counter>> = task { return Ok 42 }
 let initDb () = task { printfn "\n\ninitDb() called\n\n" 
                 }
 
@@ -30,6 +30,30 @@ let getCryptoCurrencies config () = task {
 
 let getTokenSale config () = task { 
     printfn "getTokenSale() called"
+
+    // let saleToken: SaleTokens.SaleToken = { Id = "AIM"
+    //                                         Name = "AIM Network"
+    //                                         LogoUrl = "assets/AIMLogo.jpg"
+    //                                         UpdateUrl = "NOT_USED" }
+
+    // let tokenSale = {
+    //     Id = 1
+    //     SaleToken = saleToken
+    //     SoftCapEth = 10_000_000M
+    //     HardCapEth = 50_000_000M
+    //     SoftCapUsd = 10_000_000M
+    //     HardCapUsd = 50_000_000M
+    //     Expectations: decimal
+    //     StartDate: System.DateTime
+    //     EndDate: System.DateTime
+        
+    //     TokenSaleStatus: TokenSaleStatus
+
+    //     TokenSaleStages: Set<TokenSaleStage>
+    //     TokenSaleStatusIds: Set<TokenSaleStatusIds.TokenSaleStatusId>
+    //     TokenSaleStageStatusIds: Set<TokenSaleStageStatusIds.TokenSaleStageStatusId>
+    // }
+
     return NotImplementedError |> Error
 }                                
 
