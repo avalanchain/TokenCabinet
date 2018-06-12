@@ -30,6 +30,8 @@ type Model = {
     Counter: Counter option
 
     CryptoCurrencies: CryptoCurrencies.CryptoCurrency list
+
+    TokenSale: ViewModels.TokenSale option
 }
 
 type RemotingError =
@@ -47,6 +49,7 @@ type Msg =
     | InitDbCompleted of Result<unit, exn>
 
     | GetCryptoCurrenciesCompleted of Result<CryptoCurrencies.CryptoCurrency list, RemotingError>
+    | GetTokenSaleCompleted of Result<ViewModels.TokenSale, RemotingError>
 
 module Server =
 
@@ -67,7 +70,8 @@ module Server =
 
 let init () : Model * Cmd<Msg> =
     let model = {   Counter = None
-                    CryptoCurrencies = [] 
+                    CryptoCurrencies = []
+                    TokenSale = None 
                 }
     let cmdInitCounter =
         Cmd.ofAsync
@@ -86,7 +90,17 @@ let init () : Model * Cmd<Msg> =
                         )
             (fun exn -> console.error(sprintf "Exception during GetCryptoCurrencies() call: '%A'" exn)
                         exn |> CommunicationError |> Error |> GetCryptoCurrenciesCompleted)
-    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies])
+    let cmdGetTokenSale =
+        Cmd.ofAsync
+            Server.tokenSaleApi.getTokenSale
+            ()
+            (fun res -> match res with
+                        | Ok cc -> cc |> Ok |> GetTokenSaleCompleted
+                        | Error serverError -> serverError |> ServerError |> Error |> GetTokenSaleCompleted
+                        )
+            (fun exn -> console.error(sprintf "Exception during GetCryptoCurrencies() call: '%A'" exn)
+                        exn |> CommunicationError |> Error |> GetTokenSaleCompleted)
+    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
@@ -107,6 +121,11 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                         | model, GetCryptoCurrenciesCompleted ccRes -> 
                             match ccRes with 
                             | Ok (cc) -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
+                            | Error(error) -> failwith "Not Implemented" // TODO: Implement
+
+                        | model, GetTokenSaleCompleted tcRes -> 
+                            match tcRes with 
+                            | Ok (tc) -> { model with TokenSale = Some (tc) } , Cmd.none
                             | Error(error) -> failwith "Not Implemented" // TODO: Implement
 
                         | model, ErrorMsg(m, msg) -> 
@@ -227,14 +246,14 @@ let hero =
                   Heading.h4 [ Heading.IsSubtitle ]
                       [ safeComponents ] ] ] ]
 
-let info =
+let info (model : Model) (dispatch : Msg -> unit) =
     section [ Class "info-tiles" ]
         [ Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Fulma.Screen.All, TextAlignment.Centered) ] ]
             [ Tile.parent [ ]
                   [ Tile.child [ ]
                       [ Box.box' [ ]
                           [ Heading.p [ ]
-                                [ str "439k" ]
+                                [ str (string model.TokenSale.Value.StartDate) ]
                             Heading.p [ Heading.IsSubtitle ]
                                 [ str "Users" ] ] ] ]
               Tile.parent [ ]
@@ -357,7 +376,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                     Column.column [ Column.Width (Fulma.Screen.All, Column.Is9) ]
                       [ //breadcrump
                         hero
-                        info
+                        info model dispatch
                         columns model dispatch ] ] ] ]
 
 
