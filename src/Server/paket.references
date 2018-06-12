@@ -4,5 +4,7 @@ group Server
     Fable.Remoting.Giraffe
     Dapper
     Microsoft.Data.Sqlite
+    FSharp.Data
+    SQLProvider
     
     dotnet-saturn

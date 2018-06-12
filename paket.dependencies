@@ -10,6 +10,9 @@ group Server
     nuget Simple.Migrations
     nuget Microsoft.Data.Sqlite
 
+    nuget FSharp.Data = 3.0.0-beta3
+    nuget SQLProvider
+
     clitool dotnet-saturn
 
 group Client

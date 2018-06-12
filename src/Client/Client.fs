@@ -12,16 +12,19 @@ open Shared
 open Fulma
 
 open Fulma.FontAwesome
+open Fable
 open Fable.Core
 open Fable.Import.RemoteDev
+open Fable.Import.Browser
+open JsInterop
 
 // open W3
 open Fable.Core.JsInterop
 
-//let w3:W3 = !!createNew W3 () 
-
-// [<Emit("$0")>]
-// let web3: W3 = jsNative
+// let W3 = importDefault<W3> "W3"
+// console.log("W3: " + (string W3))
+// let web3 = W3.web3
+// console.log("web3: " + (string W3.web3))
 
 type Model = {
     Counter: Counter option
@@ -71,7 +74,7 @@ let init () : Model * Cmd<Msg> =
             Server.adminApi.getInitCounter
             ()
             (Ok >> Init)
-            (fun exn -> printfn "Exception during InitCounter() call: '%A'" exn
+            (fun exn -> console.error(sprintf "Exception during InitCounter() call: '%A'" exn)
                         exn |> Error |> Init)
     let cmdGetCryptoCurrencies =
         Cmd.ofAsync
@@ -81,11 +84,12 @@ let init () : Model * Cmd<Msg> =
                         | Ok cc -> cc |> Ok |> GetCryptoCurrenciesCompleted
                         | Error serverError -> serverError |> ServerError |> Error |> GetCryptoCurrenciesCompleted
                         )
-            (fun exn -> printfn "Exception during GetCryptoCurrencies() call: '%A'" exn
+            (fun exn -> console.error(sprintf "Exception during GetCryptoCurrencies() call: '%A'" exn)
                         exn |> CommunicationError |> Error |> GetCryptoCurrenciesCompleted)
     model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
+    // console.log(sprintf "Msg: '%A', Model: '%A'")
     let (model', cmd') : Model * Cmd<Msg> =  
                         match model, msg with
                         | { Counter = None }  , Init (Ok x) -> { model with Counter = Some x }      , Cmd.none
@@ -96,7 +100,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                                                     Server.adminApi.initDb
                                                     ()
                                                     (Ok >> InitDbCompleted)
-                                                    (fun exn -> printfn "Exception during InitDb() call: '%A'" exn
+                                                    (fun exn -> console.error(sprintf "Exception during InitDb() call: '%A'" exn)
                                                                 exn |> Error |> InitDbCompleted)
                         | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
 
@@ -106,7 +110,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                             | Error(error) -> failwith "Not Implemented" // TODO: Implement
 
                         | model, ErrorMsg(m, msg) -> 
-                            printfn "Unhandled Msg '%A' on Model '%A'" msg m
+                            console.error(sprintf "Unhandled Msg '%A' on Model '%A'" msg m)
                             model, Cmd.none
                         | model, msg -> model, (model, msg) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
     model', cmd'
@@ -136,8 +140,8 @@ let safeComponents =
           components ]
 
 let show = function
-| Some x -> string x
-| None -> "Loading..."
+            | Some x -> string x
+            | None -> "Loading..."
 
 let navBrand =
     Navbar.navbar [ Navbar.Color IsWhite ]
@@ -219,13 +223,13 @@ let hero =
         [ Hero.body [ ]
             [ Container.container [ ]
                 [ Heading.h1 [ ]
-                      [ str ("Purchase tokens " (*+ (string web3.version) *) ) ]
+                      [ str ("Purchase tokens " (*+ (string W3.version)*) ) ]
                   Heading.h4 [ Heading.IsSubtitle ]
                       [ safeComponents ] ] ] ]
 
 let info =
     section [ Class "info-tiles" ]
-        [ Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Screen.All, TextAlignment.Centered) ] ]
+        [ Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Fulma.Screen.All, TextAlignment.Centered) ] ]
             [ Tile.parent [ ]
                   [ Tile.child [ ]
                       [ Box.box' [ ]
@@ -279,7 +283,7 @@ let counter (model : Model) (dispatch : Msg -> unit) =
 
 let columns (model : Model) (dispatch : Msg -> unit) =
     Columns.columns [ ]
-        [ Column.column [ Column.Width (Screen.All, Column.Is6) ]
+        [ Column.column [ Column.Width (Fulma.Screen.All, Column.Is6) ]
             [ Card.card [ CustomClass "events-card" ]
                 [ Card.header [ ]
                     [ Card.Header.title [ ]
@@ -309,7 +313,7 @@ let columns (model : Model) (dispatch : Msg -> unit) =
                   Card.footer [ ]
                       [ Card.Footer.item [ ]
                           [ str "View All" ] ] ] ]
-          Column.column [ Column.Width (Screen.All, Column.Is6) ]
+          Column.column [ Column.Width (Fulma.Screen.All, Column.Is6) ]
               [ Card.card [ ]
                   [ Card.header [ ]
                       [ Card.Header.title [ ]
@@ -348,10 +352,10 @@ let view (model : Model) (dispatch : Msg -> unit) =
         [ navBrand
           Container.container [ ]
               [ Columns.columns [ ]
-                  [ Column.column [ Column.Width (Screen.All, Column.Is3) ]
+                  [ Column.column [ Column.Width (Fulma.Screen.All, Column.Is3) ]
                       [ menu ]
-                    Column.column [ Column.Width (Screen.All, Column.Is9) ]
-                      [ breadcrump
+                    Column.column [ Column.Width (Fulma.Screen.All, Column.Is9) ]
+                      [ //breadcrump
                         hero
                         info
                         columns model dispatch ] ] ] ]

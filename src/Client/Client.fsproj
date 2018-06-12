@@ -22,7 +22,7 @@
         <Compile Include="..\Shared\Entities\InvestmentsModel.fs" />
 
         <Compile Include="..\Shared\Shared.fs" />
-        <!--<Compile Include="lib\W3.fs" /> -->
+        <!-- <Compile Include="lib\W3.fs" /> -->
         <Compile Include="Client.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
