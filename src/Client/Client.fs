@@ -5,7 +5,6 @@ open Elmish.React
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fable.PowerPack.Fetch
 
 open Shared
 
@@ -235,36 +234,22 @@ let hero =
 
 let info (model : Model) (dispatch : Msg -> unit) =
     let tiles =
-        match model.TokenSale with
-            | Some v -> 
-                // [   "Sale Start Date", string v.StartDate
-                //     "Sale End Date"  , string v.EndDate
-                //     "Soft Cap USD"   , string v.SoftCapUsd
-                //     "Hard Cap USD"   , string v.HardCapUsd ] 
-                // |> List.map (fun (label, value) -> 
-                //                 Tile.parent [ ]
-                //                   [ Tile.child [ ]
-                //                       [ Box.box' [ ]
-                //                           [ Heading.p [ ]
-                //                                 [ str value ]
-                //                             Heading.p [ Heading.IsSubtitle ]
-                //                                 [ str label ] ] ] ] )
-                
-                let fieldPairs = [  "Sale Start Date", string v.StartDate
-                                    "Sale End Date"  , string v.EndDate
-                                    "Soft Cap USD"   , string v.SoftCapUsd
-                                    "Hard Cap USD"   , string v.HardCapUsd ]
+        let fieldPairs = 
+            match model.TokenSale with
+                | Some v -> [   "Sale Start Date", v.StartDate.ToShortDateString()
+                                "Sale End Date"  , v.EndDate.ToShortDateString()
+                                "Soft Cap USD"   , v.SoftCapUsd.ToString()
+                                "Hard Cap USD"   , v.HardCapUsd.ToString() ]
+                | None -> [ "", "" ]
 
-                [ for (label, value) in fieldPairs -> 
-                    Tile.parent [ ]
-                      [ Tile.child [ ]
-                          [ Box.box' [ ]
-                              [ Heading.p [ ]
-                                    [ str value ]
-                                Heading.p [ Heading.IsSubtitle ]
-                                    [ str label ] ] ] ] ]
-
-            | None -> [] 
+        [ for (label, value) in fieldPairs -> 
+            Tile.parent [ ]
+              [ Tile.child [ ]
+                  [ Box.box' [ ]
+                      [ Heading.p [ ]
+                            [ str label ]
+                        Heading.p [ Heading.IsSubtitle ]
+                            [ str value ] ] ] ] ]                                    
 
     section [ Class "info-tiles" ]
         [ Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Fulma.Screen.All, TextAlignment.Centered) ] ]

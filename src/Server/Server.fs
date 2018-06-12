@@ -11,6 +11,7 @@ open Shared
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Shared.ViewModels
+open TokenSaleStageStatuses
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
@@ -31,30 +32,55 @@ let getCryptoCurrencies config () = task {
 let getTokenSale config () = task { 
     printfn "getTokenSale() called"
 
-    // let saleToken: SaleTokens.SaleToken = { Id = "AIM"
-    //                                         Name = "AIM Network"
-    //                                         LogoUrl = "assets/AIMLogo.jpg"
-    //                                         UpdateUrl = "NOT_USED" }
+    let saleToken: SaleToken = {    Symbol = "AIM"
+                                    Name = "AIM Network"
+                                    LogoUrl = "assets/AIMLogo.jpg"
+                                    TotalSupply = 100_000_000M }
 
-    // let tokenSale = {
-    //     Id = 1
-    //     SaleToken = saleToken
-    //     SoftCapEth = 10_000_000M
-    //     HardCapEth = 50_000_000M
-    //     SoftCapUsd = 10_000_000M
-    //     HardCapUsd = 50_000_000M
-    //     Expectations: decimal
-    //     StartDate: System.DateTime
-    //     EndDate: System.DateTime
-        
-    //     TokenSaleStatus: TokenSaleStatus
+    let privateSaleStage: TokenSaleStage = {Id = 1
+                                            CapEth = 300M
+                                            CapUsd = 150_000M
+                                            StartDate = System.DateTime.Today
+                                            EndDate = System.DateTime.Today.AddMonths 1
+                                            Status = TokenSaleStageStatus.Completed }
 
-    //     TokenSaleStages: Set<TokenSaleStage>
-    //     TokenSaleStatusIds: Set<TokenSaleStatusIds.TokenSaleStatusId>
-    //     TokenSaleStageStatusIds: Set<TokenSaleStageStatusIds.TokenSaleStageStatusId>
-    // }
+    let preICOStage: TokenSaleStage =   {   Id = 2
+                                            CapEth = 1000M
+                                            CapUsd = 500_000M
+                                            StartDate = System.DateTime.Today.AddMonths 1
+                                            EndDate = System.DateTime.Today.AddMonths 2
+                                            Status = TokenSaleStageStatus.Active }
 
-    return NotImplementedError |> Error
+    let ICOStage: TokenSaleStage =      {   Id = 3
+                                            CapEth = 30000M
+                                            CapUsd = 15_000_000M
+                                            StartDate = System.DateTime.Today.AddMonths 2
+                                            EndDate = System.DateTime.Today.AddMonths 3
+                                            Status = TokenSaleStageStatus.Expectation }
+
+    let tokenSaleState: TokenSaleState = {  TokenSaleStatus = TokenSaleStatus.Active
+                                            ActiveStage = preICOStage
+                                            PriceUsd = 5M
+                                            PriceEth = 0.01M
+                                            BonusPercent = 20M
+                                            BonusTokens = 100M
+                                            StartDate = privateSaleStage.StartDate
+                                            EndDate = ICOStage.EndDate }
+
+    let tokenSale: TokenSale =          {   SaleToken   = saleToken
+                                            SoftCapEth  = 10_000_000M
+                                            HardCapEth  = 50_000_000M
+                                            SoftCapUsd  = 10_000_000M
+                                            HardCapUsd  = 50_000_000M
+                                            Expectations = 50_000_000M
+                                            StartDate   = System.DateTime.Today
+                                            EndDate     = System.DateTime.Today.AddMonths 3
+                                            
+                                            TokenSaleState = tokenSaleState
+
+                                            TokenSaleStages = [ privateSaleStage; preICOStage; ICOStage ] }
+
+    return tokenSale |> Ok
 }                                
 
 let getFullCustomer config () = task { 

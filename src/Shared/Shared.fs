@@ -11,8 +11,8 @@ type ServerResult<'T> = Result<'T, ServerError>
 
 module ViewModels = 
     type TokenSale = {
-        Id: int
-        SaleToken: SaleTokens.SaleToken
+        SaleToken: SaleToken
+
         SoftCapEth: decimal
         HardCapEth: decimal
         SoftCapUsd: decimal
@@ -21,16 +21,19 @@ module ViewModels =
         StartDate: System.DateTime
         EndDate: System.DateTime
         
-        TokenSaleStatus: TokenSaleStatus
+        TokenSaleState: TokenSaleState
 
-        TokenSaleStages: Set<TokenSaleStage>
-        TokenSaleStatusIds: Set<TokenSaleStatusIds.TokenSaleStatusId>
-        TokenSaleStageStatusIds: Set<TokenSaleStageStatusIds.TokenSaleStageStatusId>
+        TokenSaleStages: TokenSaleStage list
     }
-    and TokenSaleStatus = {
-        Id: int
-        TokenSaleStatus: int
-        ActiveStageId: int
+    and SaleToken = {
+        Symbol: string
+        Name: string
+        LogoUrl: string
+        TotalSupply: decimal
+    }
+    and TokenSaleState = {
+        TokenSaleStatus: TokenSaleStatus
+        ActiveStage: TokenSaleStage
         PriceUsd: decimal
         PriceEth: decimal
         BonusPercent: decimal
@@ -44,7 +47,21 @@ module ViewModels =
         CapUsd: decimal
         StartDate: System.DateTime
         EndDate: System.DateTime
+        Status: TokenSaleStageStatus
     }
+    and [<RequireQualifiedAccess>] TokenSaleStatus = 
+        | NotStarted
+        | Active
+        | TokenDistribution
+        | Completed
+        | Paused
+        | Suspended
+    and [<RequireQualifiedAccess>] TokenSaleStageStatus =
+        | Expectation
+        | Active
+        | Completed
+        | Cancelled
+        | Paused
 
     type FullCustomer = {
         Customer: Customers.Customer
