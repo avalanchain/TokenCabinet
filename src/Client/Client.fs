@@ -237,36 +237,35 @@ let info (model : Model) (dispatch : Msg -> unit) =
     let tiles =
         match model.TokenSale with
             | Some v -> 
-                [ Tile.parent [ ]
+                // [   "Sale Start Date", string v.StartDate
+                //     "Sale End Date"  , string v.EndDate
+                //     "Soft Cap USD"   , string v.SoftCapUsd
+                //     "Hard Cap USD"   , string v.HardCapUsd ] 
+                // |> List.map (fun (label, value) -> 
+                //                 Tile.parent [ ]
+                //                   [ Tile.child [ ]
+                //                       [ Box.box' [ ]
+                //                           [ Heading.p [ ]
+                //                                 [ str value ]
+                //                             Heading.p [ Heading.IsSubtitle ]
+                //                                 [ str label ] ] ] ] )
+                
+                let fieldPairs = [  "Sale Start Date", string v.StartDate
+                                    "Sale End Date"  , string v.EndDate
+                                    "Soft Cap USD"   , string v.SoftCapUsd
+                                    "Hard Cap USD"   , string v.HardCapUsd ]
+
+                [ for (label, value) in fieldPairs -> 
+                    Tile.parent [ ]
                       [ Tile.child [ ]
                           [ Box.box' [ ]
                               [ Heading.p [ ]
-                                    [ str (string v.StartDate)]
+                                    [ str value ]
                                 Heading.p [ Heading.IsSubtitle ]
-                                    [ str "Users" ] ] ] ]
-                  Tile.parent [ ]
-                      [ Tile.child [ ]
-                          [ Box.box' [ ]
-                              [ Heading.p [ ]
-                                    [ str (string v.EndDate) ]
-                                Heading.p [ Heading.IsSubtitle ]
-                                    [ str "Products" ] ] ] ]
-                  Tile.parent [ ]
-                      [ Tile.child [ ]
-                          [ Box.box' [ ]
-                              [ Heading.p [ ]
-                                    [ str (string v.SoftCapUsd) ]
-                                Heading.p [ Heading.IsSubtitle ]
-                                    [ str "Open Orders" ] ] ] ]
-                  Tile.parent [ ]
-                      [ Tile.child [ ]
-                          [ Box.box' [ ]
-                              [ Heading.p [ ]
-                                    [ str (string v.SoftCapUsd) ]
-                                Heading.p [ Heading.IsSubtitle ]
-                                    [ str "Exceptions" ] ] ] ] ] 
+                                    [ str label ] ] ] ] ]
+
             | None -> [] 
-            
+
     section [ Class "info-tiles" ]
         [ Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Fulma.Screen.All, TextAlignment.Centered) ] ]
             tiles                       
