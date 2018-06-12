@@ -89,7 +89,7 @@ let init () : Model * Cmd<Msg> =
     model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
-    // console.log(sprintf "Msg: '%A', Model: '%A'")
+    console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
     let (model', cmd') : Model * Cmd<Msg> =  
                         match model, msg with
                         | { Counter = None }  , Init (Ok x) -> { model with Counter = Some x }      , Cmd.none

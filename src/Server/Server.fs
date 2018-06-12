@@ -27,14 +27,26 @@ let getCryptoCurrencies config () = task {
                                                                 exn |> InternalError |> Error
                                 }
 
+let getTokenSale config () = task { 
+                                        printfn "getTokenSale() called"
+                                        return NotImplementedError |> Error
+                                }                                
+
+let getFullCustomer config () = task { 
+                                        printfn "getFullCustomer() called"
+                                        return NotImplementedError |> Error
+                                }                                
+
 
 let webApp config =
     let adminProtocol =
         {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
             initDb          = initDb            >> Async.AwaitTask }
     let tokenSaleProtocol =
-        {   getCryptoCurrencies = getCryptoCurrencies config >> Async.AwaitTask
-            }
+        {   getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
+            getTokenSale        = getTokenSale          config    >> Async.AwaitTask
+            getFullCustomer     = getFullCustomer       config    >> Async.AwaitTask
+        }
         
     choose [
         remoting adminProtocol {

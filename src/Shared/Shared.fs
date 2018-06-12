@@ -5,6 +5,7 @@ type Counter = int
 type ServerError =
     | AuthError
     | InternalError of exn
+    | NotImplementedError
 
 type ServerResult<'T> = Result<'T, ServerError>
 
@@ -45,6 +46,12 @@ module ViewModels =
         EndDate: System.DateTime
     }
 
+    type FullCustomer = {
+        Customer: Customers.Customer
+        IsVerified: bool
+        VerificationEvent: CustomerVerificationEvents.CustomerVerificationEvent option
+        CustomerPreference: CustomerPreferences.CustomerPreference
+    }
 
 module Route =
     /// Defines how routes are generated on server and mapped from client
@@ -61,4 +68,7 @@ type IAdminProtocol = {
 
 type ITokenSaleProtocol = {   
     getCryptoCurrencies : unit -> Async<ServerResult<CryptoCurrencies.CryptoCurrency list>> 
+
+    getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
+    getFullCustomer     : unit -> Async<ServerResult<ViewModels.FullCustomer>> 
 }
