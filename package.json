@@ -6,7 +6,9 @@
         "react": "16.3.2",
         "react-bootstrap": "0.32.1",
         "react-dom": "16.3.2",
-        "remotedev": "0.2.7"
+        "remotedev": "0.2.7",
+	"web3": "0.20.5",
+        "soltsice": "0.10.10"
     },
     "devDependencies": {
         "babel-core": "6.26.3",

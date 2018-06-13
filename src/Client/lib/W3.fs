@@ -3,10 +3,12 @@ module rec W3
 open System
 open Fable.Core
 open Fable.Import.JS
+open Fable.Import
 
-type JsonRPCRequest = __jsonrpc.JsonRPCRequest
-type JsonRPCResponse = __jsonrpc.JsonRPCResponse
-type BigNumber = Bignumber_js.BigNumber
+// type JsonRPCRequest = __jsonrpc.JsonRPCRequest
+// type JsonRPCResponse = __jsonrpc.JsonRPCResponse
+open BigNumber
+open jsonrpc
 
 type [<AllowNullLiteral>] IExports =
     /// Convert number or hex string to BigNumber 
@@ -223,7 +225,7 @@ module W3 =
         let asFloat (v: BlockType) = match v with U4.Case4 o -> Some o | _ -> None
 
     type [<AllowNullLiteral>] BatchRequest =
-        abstract add: request: Request -> unit
+        abstract add: request: obj -> unit
         abstract execute: unit -> unit
 
     type [<AllowNullLiteral>] Iban =

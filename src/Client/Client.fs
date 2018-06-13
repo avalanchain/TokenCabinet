@@ -15,12 +15,25 @@ open Fable
 open Fable.Core
 open Fable.Import.RemoteDev
 open Fable.Import.Browser
+open Fable.Import
 open JsInterop
 
-// open W3
+open web3Impl
 open Fable.Core.JsInterop
 
-// let W3 = importDefault<W3> "W3"
+open Client
+
+let ethHost = match Utils.load<string> "EthereumHost" with
+                | Some eh -> eh
+                | None -> 
+                    let defaultHost = "http://127.0.0.1:8545"
+                    Utils.save "EthereumHost" defaultHost
+                    defaultHost
+
+let web3: Web3Impl = !!createNew web3 (createNew httpProvider ethHost)
+Browser.console.log web3
+
+//let W3 = importDefault<Web3> "soltsice"
 // console.log("W3: " + (string W3))
 // let web3 = W3.web3
 // console.log("web3: " + (string W3.web3))
