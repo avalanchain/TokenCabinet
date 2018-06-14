@@ -1,7 +1,7 @@
 namespace Shared
 
 type Counter = int
-
+ 
 type ServerError =
     | AuthError
     | InternalError of exn
@@ -69,6 +69,8 @@ module ViewModels =
         VerificationEvent: CustomerVerificationEvents.CustomerVerificationEvent option
         CustomerPreference: CustomerPreferences.CustomerPreference
     }
+
+    
 
 module Route =
     /// Defines how routes are generated on server and mapped from client
