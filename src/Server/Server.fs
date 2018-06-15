@@ -17,8 +17,8 @@ let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
 
 let getInitCounter () : Task<ServerResult<Counter>> = task { return Ok 42 }
-let initDb () = task { printfn "\n\ninitDb() called\n\n" 
-                }
+let initDb () = task {  printfn "\n\ninitDb() called\n\n" 
+                        return Ok () }
 
 let getCryptoCurrencies config () = task { 
     printfn "getCryptoCurrencies() called"
@@ -110,7 +110,33 @@ let getFullCustomer config () = task {
             CustomerPreference = customerPreference
         }
     return fullCustomer |> Ok
-}                                
+}                   
+
+open CryptoCurrencyPrices
+let getPriceTick config i = task {
+    return 
+        [
+            "BTC", {    CryptoCurrencyPrice.Id = 1
+                        CryptoCurrencyName = "Bitcoin"
+                        PriceUsd = 7000UL + i |> decimal
+                        PriceEth = 15UL + i |> decimal
+                        PriceAt = System.DateTime.Now
+                        CreatedOn = System.DateTime.Now
+                        CreatedBy = System.DateTime.Now // TODO: Fix type error
+                        Proof = "ALL_GOOD" }
+            "ETH", {    CryptoCurrencyPrice.Id = 2
+                        CryptoCurrencyName = "Ethereum"
+                        PriceUsd = 500UL + i |> decimal
+                        PriceEth = 1UL + i |> decimal
+                        PriceAt = System.DateTime.Now
+                        CreatedOn = System.DateTime.Now
+                        CreatedBy = System.DateTime.Now // TODO: Fix type error
+                        Proof = "ALL_GOOD" }
+        ]
+        |> Map.ofList
+        |> ViewModels.CurrencyPriceTick
+        |> Ok
+}
 
 
 let webApp config =
@@ -121,6 +147,7 @@ let webApp config =
         {   getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
             getTokenSale        = getTokenSale          config    >> Async.AwaitTask
             getFullCustomer     = getFullCustomer       config    >> Async.AwaitTask
+            getPriceTick        = getPriceTick          config    >> Async.AwaitTask
         }
         
     choose [

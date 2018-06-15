@@ -46,16 +46,18 @@ type RemotingError =
 type Msg =
     | Increment
     | Decrement
-    | Init of Result<Counter, RemotingError>
+    | Init of Counter
 
+    | ServerErrorMsg of RemotingError
     | ErrorMsg of Model * Msg
 
     | InitDb
-    | InitDbCompleted of Result<unit, exn>
+    | InitDbCompleted of unit
 
-    | GetCryptoCurrenciesCompleted of Result<CryptoCurrencies.CryptoCurrency list, RemotingError>
-    | GetTokenSaleCompleted of Result<ViewModels.TokenSale, RemotingError>
+    | GetCryptoCurrenciesCompleted  of CryptoCurrencies.CryptoCurrency list
+    | GetTokenSaleCompleted         of ViewModels.TokenSale
+    | PriceTick                     of ViewModels.CurrencyPriceTick
     
-    | PriceTick of ViewModels.CurrencyPriceTick
+    | Tick of uint64
 
     | MenuSelected of MenuMediator

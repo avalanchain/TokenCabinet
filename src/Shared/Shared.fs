@@ -83,7 +83,7 @@ module Route =
 /// Add more such fields, implement them on the server and they be directly available on client
 type IAdminProtocol = {   
     getInitCounter      : unit -> Async<ServerResult<Counter>>
-    initDb              : unit -> Async<unit> 
+    initDb              : unit -> Async<ServerResult<unit>> 
 }
 
 type ITokenSaleProtocol = {   
@@ -91,4 +91,6 @@ type ITokenSaleProtocol = {
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
     getFullCustomer     : unit -> Async<ServerResult<ViewModels.FullCustomer>> 
+
+    getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }

@@ -58,16 +58,16 @@ module Server =
             use_route_builder Route.builder
         }        
 
-let cmdServerCall apiFunc args completeMsg serverMethodName =
+let cmdServerCall apiFunc args (completeMsg: 'T -> Msg) serverMethodName =
     Cmd.ofAsync
         apiFunc
         args
         (fun res -> match res with
-                    | Ok cc -> cc |> Ok |> completeMsg
-                    | Error serverError -> serverError |> ServerError |> Error |> completeMsg
+                    | Ok cc -> cc |> completeMsg
+                    | Error serverError -> serverError |> ServerError |> ServerErrorMsg
                     )
         (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
-                    exn |> CommunicationError |> Error |> GetCryptoCurrenciesCompleted)
+                    exn |> CommunicationError |> ServerErrorMsg)
 
 let init () : Model * Cmd<Msg> =
     let model = {   Counter = None
@@ -86,27 +86,15 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
     let (model', cmd') : Model * Cmd<Msg> =  
         match model, msg with
-        | { Counter = None }  , Init (Ok x) -> { model with Counter = Some x }      , Cmd.none
+        | { Counter = None }  , Init x      -> { model with Counter = Some x }      , Cmd.none
         | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
         | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
 
-        | model, InitDb -> model, Cmd.ofAsync
-                                    Server.adminApi.initDb
-                                    ()
-                                    (Ok >> InitDbCompleted)
-                                    (fun exn -> console.error(sprintf "Exception during InitDb() call: '%A'" exn)
-                                                exn |> Error |> InitDbCompleted)
+        | model, InitDb -> model, cmdServerCall (Server.adminApi.initDb) () InitDbCompleted "InitDb()"
         | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
 
-        | model, GetCryptoCurrenciesCompleted ccRes -> 
-            match ccRes with 
-            | Ok (cc) -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
-            | Error(error) -> failwith "Not Implemented" // TODO: Implement
-
-        | model, GetTokenSaleCompleted tcRes -> 
-            match tcRes with 
-            | Ok (tc) -> { model with TokenSale = Some (tc) } , Cmd.none
-            | Error(error) -> failwith "Not Implemented" // TODO: Implement
+        | model, GetCryptoCurrenciesCompleted cc ->  { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
+        | model, GetTokenSaleCompleted tc -> { model with TokenSale = Some (tc) } , Cmd.none
 
         | model, MenuSelected mm -> 
             let cmd =   Toastr.message (sprintf "Menu selected: '%A'" mm)
@@ -116,8 +104,12 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                         |> Toastr.success
             { model with MenuMediator = mm } , cmd  
 
+        | model, Tick i -> model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i PriceTick "getPriceTick()"
         | model, PriceTick tick -> { model with CurrenciesCurentPrices = tick }, Cmd.none
 
+        | model, ServerErrorMsg serverError -> 
+            console.error(sprintf "Server error '%A'" serverError)
+            model, Cmd.none
         | model, ErrorMsg(m, msg) -> 
             console.error(sprintf "Unhandled Msg '%A' on Model '%A'" msg m)
             model, Cmd.none
@@ -162,31 +154,9 @@ let view (model : Model) (dispatch : Msg -> unit) =
 open CryptoCurrencyPrices
 let timer initial =
     let sub dispatch = 
-        let mutable i = 0
-        let prices i = 
-            [
-                "BTC", {    CryptoCurrencyPrice.Id = 1
-                            CryptoCurrencyName = "Bitcoin"
-                            PriceUsd = 7000 + i |> decimal
-                            PriceEth = 15 + i |> decimal
-                            PriceAt = System.DateTime.Now
-                            CreatedOn = System.DateTime.Now
-                            CreatedBy = System.DateTime.Now // TODO: Fix type error
-                            Proof = "ALL_GOOD" }
-                "ETH", {    CryptoCurrencyPrice.Id = 2
-                            CryptoCurrencyName = "Ethereum"
-                            PriceUsd = 500 + i |> decimal
-                            PriceEth = 1 + i |> decimal
-                            PriceAt = System.DateTime.Now
-                            CreatedOn = System.DateTime.Now
-                            CreatedBy = System.DateTime.Now // TODO: Fix type error
-                            Proof = "ALL_GOOD" }
-            ]
-            |> Map.ofList
-            |> ViewModels.CurrencyPriceTick
-
-        window.setInterval((fun _ ->    i <- i + 1
-                                        prices i |> PriceTick |> dispatch)
+        let mutable i = 0UL
+        window.setInterval((fun _ ->    i <- i + 1UL
+                                        i |> Tick |> dispatch)
                                     , 1000) |> ignore
     Cmd.ofSub sub
 
