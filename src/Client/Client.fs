@@ -287,14 +287,10 @@ let view (model : Model) (dispatch : Msg -> unit) =
     div [ ]
         [ NavBrand.navBrand model dispatch
           Container.container [ ]
-              [ Columns.columns [ ]
-                  [ Column.column [ Column.Width (Fulma.Screen.All, Column.Is3) ]
-                      [ NavMenu.menu ]
-                    Column.column [ Column.Width (Fulma.Screen.All, Column.Is9) ]
-                      [ //breadcrump
+              [ //breadcrump
                         HeroTile.hero
                         info model dispatch
-                        columns model dispatch ] ] ] ]
+                        columns model dispatch ] ]
 
 
 #if DEBUG
