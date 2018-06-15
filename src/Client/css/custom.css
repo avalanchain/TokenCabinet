@@ -1,0 +1,22 @@
+.react-bs-table {
+    border-radius: 0!important;
+}
+
+.react-bs-table-bordered {
+    border-radius: 0!important;
+}
+
+.Select-control {
+    border-radius: 0!important;
+}
+
+table {
+    border-radius: 0!important;
+}
+
+.tooltip-inner {
+    max-width: 350px;
+    /* If max-width does not work, try using width instead */
+    width: 350px; 
+    text-align:left;
+}

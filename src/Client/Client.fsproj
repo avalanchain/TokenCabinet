@@ -21,11 +21,63 @@
     <Compile Include="../Shared/Entities/InvestmentsModel.fs" />
     <Compile Include="../Shared/Shared.fs" />
 
-    <Compile Include="lib/BigNumber.fs" />
-    <Compile Include="lib/jsonrpc.fs" />
-    <Compile Include="lib/Web3.fs" />
+    <Compile Include="Imports/jsonrpc.fs" />
+
+    <Compile Include="Imports/Fable.Import.ReactHelpers.fs" />
+    <Compile Include="Imports/Fable.Import.ReactStrap.fs" />
+    <Compile Include="Imports/Fable.Import.ReactBootstrapTable.fs" />
+    <Compile Include="Imports/Fable.Import.ReactJsonSchemaForm.fs" />
+    <Compile Include="Imports/Fable.Import.ReactSelect.fs" />
+    <Compile Include="Imports/Fable.Import.Moment.fs" />
+    <Compile Include="Imports/Fable.Helpers.Moment.fs" />
+    <Compile Include="Imports/Fable.Import.ReactDatePicker.fs" />
+    <Compile Include="Imports/BigNumber.fs" />
+    <Compile Include="Imports/Web3.fs" />
+
+    <Compile Include="../Shared/Utils.fs" />
+    <Compile Include="../Shared/Result.fs" />
+    <Compile Include="../Shared/Schema.fs" />
+    <Compile Include="../Shared/Domain.fs" />
+    <Compile Include="../Shared/EntityList.fs" />
+    <Compile Include="../Shared/Commodities.fs" />
+
     <Compile Include="Utils.fs" />
-    <Compile Include="Client.fs" />
+    <Compile Include="Style.fs" />
+    <Compile Include="Proxy.fs" />
+    <Compile Include="Forms/Collapsable.fs" />
+    <Compile Include="Forms/ReadonlyViews.fs" />
+    <Compile Include="Forms/CustomControls.fs" />
+    <Compile Include="Forms/FormHelpers.fs" />
+    <Compile Include="Forms/ModalForm.fs" />
+    <Compile Include="Forms/DealEntryForm.fs" />
+    <Compile Include="Forms/RejectionForm.fs" />
+    <Compile Include="Forms/RejectNominationForm.fs" />
+    <Compile Include="Forms/VesselProgressForm.fs" />
+    <Compile Include="Forms/VesselOfferForm.fs" />
+    <Compile Include="Forms/VesselNominateForm.fs" />
+    <Compile Include="Forms/InspectionForm.fs" />
+    <Compile Include="Forms/TerminalDocumentsForm.fs" />
+    
+    <Compile Include="Pages/DomainView.fs" />
+    <Compile Include="Pages/Entity.fs" />
+    <Compile Include="Messages.fs" />
+    <Compile Include="Examples.fs" />
+    <Compile Include="Pages/EntityDefs.fs" />
+    <Compile Include="Pages/Home.fs" />
+    <Compile Include="Pages/Login.fs" />
+    <Compile Include="Pages/Statics.fs" />
+    <Compile Include="Pages/Trading.fs" />
+    <Compile Include="Pages/Admin.fs" />
+    <Compile Include="Pages/Model.fs" />
+    <Compile Include="Pages/Web3Factory.fs" />
+    <Compile Include="Pages/Menu.fs" />
+    <Compile Include="Pages/AppComponents.fs" />
+    <Compile Include="App.fs" />
+
+
+
+    <!-- <Compile Include="Client.fs" /> -->
+
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
