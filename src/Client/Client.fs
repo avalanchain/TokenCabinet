@@ -2,6 +2,7 @@ module Client.Main
 
 open Elmish
 open Elmish.React
+open Elmish.Toastr
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
@@ -71,6 +72,7 @@ let cmdServerCall apiFunc args completeMsg serverMethodName =
 let init () : Model * Cmd<Msg> =
     let model = {   Counter = None
                     CryptoCurrencies = []
+                    CurrenciesCurentPrices = ViewModels.CurrencyPriceTick Map.empty
                     TokenSale = None
                     MenuMediator = PurchaseToken 
                 }
@@ -83,35 +85,43 @@ let init () : Model * Cmd<Msg> =
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
     let (model', cmd') : Model * Cmd<Msg> =  
-                        match model, msg with
-                        | { Counter = None }  , Init (Ok x) -> { model with Counter = Some x }      , Cmd.none
-                        | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
-                        | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
+        match model, msg with
+        | { Counter = None }  , Init (Ok x) -> { model with Counter = Some x }      , Cmd.none
+        | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
+        | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
 
-                        | model, InitDb -> model, Cmd.ofAsync
-                                                    Server.adminApi.initDb
-                                                    ()
-                                                    (Ok >> InitDbCompleted)
-                                                    (fun exn -> console.error(sprintf "Exception during InitDb() call: '%A'" exn)
-                                                                exn |> Error |> InitDbCompleted)
-                        | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
+        | model, InitDb -> model, Cmd.ofAsync
+                                    Server.adminApi.initDb
+                                    ()
+                                    (Ok >> InitDbCompleted)
+                                    (fun exn -> console.error(sprintf "Exception during InitDb() call: '%A'" exn)
+                                                exn |> Error |> InitDbCompleted)
+        | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
 
-                        | model, GetCryptoCurrenciesCompleted ccRes -> 
-                            match ccRes with 
-                            | Ok (cc) -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
-                            | Error(error) -> failwith "Not Implemented" // TODO: Implement
+        | model, GetCryptoCurrenciesCompleted ccRes -> 
+            match ccRes with 
+            | Ok (cc) -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
+            | Error(error) -> failwith "Not Implemented" // TODO: Implement
 
-                        | model, GetTokenSaleCompleted tcRes -> 
-                            match tcRes with 
-                            | Ok (tc) -> { model with TokenSale = Some (tc) } , Cmd.none
-                            | Error(error) -> failwith "Not Implemented" // TODO: Implement
+        | model, GetTokenSaleCompleted tcRes -> 
+            match tcRes with 
+            | Ok (tc) -> { model with TokenSale = Some (tc) } , Cmd.none
+            | Error(error) -> failwith "Not Implemented" // TODO: Implement
 
-                        | model, MenuSelected mm -> { model with MenuMediator = mm } , Cmd.none  
+        | model, MenuSelected mm -> 
+            let cmd =   Toastr.message (sprintf "Menu selected: '%A'" mm)
+                        |> Toastr.withProgressBar
+                        |> Toastr.position BottomRight
+                        |> Toastr.timeout 1000
+                        |> Toastr.success
+            { model with MenuMediator = mm } , cmd  
 
-                        | model, ErrorMsg(m, msg) -> 
-                            console.error(sprintf "Unhandled Msg '%A' on Model '%A'" msg m)
-                            model, Cmd.none
-                        | model, msg -> model, (model, msg) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
+        | model, PriceTick tick -> { model with CurrenciesCurentPrices = tick }, Cmd.none
+
+        | model, ErrorMsg(m, msg) -> 
+            console.error(sprintf "Unhandled Msg '%A' on Model '%A'" msg m)
+            model, Cmd.none
+        | model, msg -> model, (model, msg) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
     model', cmd'
 
 
@@ -149,6 +159,36 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         
                          ]
 
+open CryptoCurrencyPrices
+let timer initial =
+    let sub dispatch = 
+        let mutable i = 0
+        let prices i = 
+            [
+                "BTC", {    CryptoCurrencyPrice.Id = 1
+                            CryptoCurrencyName = "Bitcoin"
+                            PriceUsd = 7000 + i |> decimal
+                            PriceEth = 15 + i |> decimal
+                            PriceAt = System.DateTime.Now
+                            CreatedOn = System.DateTime.Now
+                            CreatedBy = System.DateTime.Now // TODO: Fix type error
+                            Proof = "ALL_GOOD" }
+                "ETH", {    CryptoCurrencyPrice.Id = 2
+                            CryptoCurrencyName = "Ethereum"
+                            PriceUsd = 500 + i |> decimal
+                            PriceEth = 1 + i |> decimal
+                            PriceAt = System.DateTime.Now
+                            CreatedOn = System.DateTime.Now
+                            CreatedBy = System.DateTime.Now // TODO: Fix type error
+                            Proof = "ALL_GOOD" }
+            ]
+            |> Map.ofList
+            |> ViewModels.CurrencyPriceTick
+
+        window.setInterval((fun _ ->    i <- i + 1
+                                        prices i |> PriceTick |> dispatch)
+                                    , 1000) |> ignore
+    Cmd.ofSub sub
 
 #if DEBUG
 open Elmish.Debug
@@ -156,6 +196,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram init update view
+|> Program.withSubscription timer
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withHMR

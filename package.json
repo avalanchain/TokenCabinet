@@ -6,13 +6,13 @@
         "bulma": "^0.7.1",
         "bulma-extensions": "^2.2.0",
         "bulma-steps": "^2.2.1",
-        "bulma-steps-component": "^0.5.3",
+        "react": "16.4.0",
         "date-fns": "^1.29.0",
-        "react": "16.3.2",
         "react-bootstrap": "0.32.1",
-        "react-dom": "16.3.2",
+        "react-dom": "16.4.0",
         "remotedev": "0.2.7",
         "soltsice": "0.10.10",
+        "toastr": "^2.1.4",
         "web3": "0.20.5"
     },
     "devDependencies": {
@@ -29,8 +29,9 @@
         "node-sass": "^4.5.3",
         "sass-loader": "^6.0.6",
         "style-loader": "^0.18.2",
-        "webpack": "4.6.0",
-        "webpack-cli": "^2.1.2",
+        "ts-loader": "^4.4.1",
+        "webpack": "4.10.2",
+        "webpack-cli": "^3.0.2",
         "webpack-dev-server": "3.1.4"
     },
     "scripts": {

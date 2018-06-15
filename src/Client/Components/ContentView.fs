@@ -17,7 +17,10 @@ let myInvestmentsView  (model : Model) (dispatch : Msg -> unit) =
         [ str "myInvestmentsView" ]
 let referralProgramView  (model : Model) (dispatch : Msg -> unit) =
     div [ ]
-        [ str "referralProgramView" ]
+        [   str "referralProgramView" 
+            br []
+            str (string model.CurrenciesCurentPrices)
+        ]
 
 let contactsView  (model : Model) (dispatch : Msg -> unit) =
     div [ ]

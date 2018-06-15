@@ -26,6 +26,7 @@ group Client
     nuget Fable.Remoting.Client ~> 2.4
     nuget Fulma
     nuget Fable.DateFunctions
+    nuget Elmish.Toastr
 
     clitool dotnet-fable
 

@@ -20,6 +20,7 @@ open JsInterop
 
 
 open Fable.Core.JsInterop
+open CryptoCurrencyPrices
 
 type MenuMediator =
     | Verification
@@ -32,6 +33,7 @@ type Model = {
     Counter: Counter option
 
     CryptoCurrencies: CryptoCurrencies.CryptoCurrency list
+    CurrenciesCurentPrices: ViewModels.CurrencyPriceTick
 
     TokenSale: ViewModels.TokenSale option
     MenuMediator: MenuMediator  
@@ -54,4 +56,6 @@ type Msg =
     | GetCryptoCurrenciesCompleted of Result<CryptoCurrencies.CryptoCurrency list, RemotingError>
     | GetTokenSaleCompleted of Result<ViewModels.TokenSale, RemotingError>
     
+    | PriceTick of ViewModels.CurrencyPriceTick
+
     | MenuSelected of MenuMediator
