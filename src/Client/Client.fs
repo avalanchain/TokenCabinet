@@ -1,4 +1,4 @@
-module Client
+module Client.Main
 
 open Elmish
 open Elmish.React
@@ -24,7 +24,8 @@ open Fable.Core.JsInterop
 open Client
 open ClientModelMsg
 open System.ComponentModel
-
+importAll "../../node_modules/bulma/bulma.sass"
+importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
 let ethHost = match Utils.load<string> "EthereumHost" with
                 | Some eh -> eh
                 | None -> 
@@ -104,6 +105,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                             match tcRes with 
                             | Ok (tc) -> { model with TokenSale = Some (tc) } , Cmd.none
                             | Error(error) -> failwith "Not Implemented" // TODO: Implement
+
+                        | model, MenuSelected mm -> { model with MenuMediator = mm } , Cmd.none  
 
                         | model, ErrorMsg(m, msg) -> 
                             console.error(sprintf "Unhandled Msg '%A' on Model '%A'" msg m)
@@ -288,9 +291,13 @@ let view (model : Model) (dispatch : Msg -> unit) =
         [ NavBrand.navBrand model dispatch
           Container.container [ ]
               [ //breadcrump
-                        HeroTile.hero
-                        info model dispatch
-                        columns model dispatch ] ]
+                        // HeroTile.hero
+                        // info model dispatch
+                        // columns model dispatch 
+                        ContentView.contentView model dispatch
+                        ]
+                        
+                         ]
 
 
 #if DEBUG
