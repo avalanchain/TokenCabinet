@@ -112,29 +112,20 @@ let getFullCustomer config () = task {
     return fullCustomer |> Ok
 }                   
 
-open CryptoCurrencyPrices
 let getPriceTick config i = task {
-    return 
-        [
-            "BTC", {    CryptoCurrencyPrice.Id = 1
-                        CryptoCurrencyName = "Bitcoin"
-                        PriceUsd = 7000UL + i |> decimal
-                        PriceEth = 15UL + i |> decimal
-                        PriceAt = System.DateTime.Now
-                        CreatedOn = System.DateTime.Now
-                        CreatedBy = System.DateTime.Now // TODO: Fix type error
-                        Proof = "ALL_GOOD" }
-            "ETH", {    CryptoCurrencyPrice.Id = 2
-                        CryptoCurrencyName = "Ethereum"
-                        PriceUsd = 500UL + i |> decimal
-                        PriceEth = 1UL + i |> decimal
-                        PriceAt = System.DateTime.Now
-                        CreatedOn = System.DateTime.Now
-                        CreatedBy = System.DateTime.Now // TODO: Fix type error
-                        Proof = "ALL_GOOD" }
-        ]
-        |> Map.ofList
-        |> ViewModels.CurrencyPriceTick
+    return {    Prices =
+                    [
+                        {   Symbol = "BTC"
+                            CryptoCurrencyName = "Bitcoin"
+                            PriceUsd = 7000UL + i |> decimal
+                            PriceEth = 15UL + i |> decimal
+                            PriceAt = System.DateTime.Now }
+                        {   Symbol = "ETH"
+                            CryptoCurrencyName = "Ethereum"
+                            PriceUsd = 500UL + i |> decimal
+                            PriceEth = 1UL + i |> decimal
+                            PriceAt = System.DateTime.Now }
+                    ] }
         |> Ok
 }
 

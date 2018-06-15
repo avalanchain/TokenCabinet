@@ -9,6 +9,7 @@ open Shared.ViewModels
 open Fable.DateFunctions
 open Fulma.FontAwesome
 open System
+open Client.Helpers
 
  
 let show = function
@@ -16,29 +17,21 @@ let show = function
             | None -> "Loading..."
 
 let info (model : Model) (dispatch : Msg -> unit) =
-    let tiles =
-        let fieldPairs = 
-            match model.TokenSale with
-                | Some v -> [   "Sale Start Date", v.StartDate.ToShortDateString()
-                                "Sale End Date"  , v.EndDate.ToShortDateString()
-                                "Soft Cap USD"   , v.SoftCapUsd.ToString()
-                                "Hard Cap USD"   , v.HardCapUsd.ToString() ]
-                | None -> [ "", "" ]
+    let fieldPairs = 
+        match model.TokenSale with
+            | Some v -> [   "Sale Start Date", v.StartDate.ToShortDateString()
+                            "Sale End Date"  , v.EndDate.ToShortDateString()
+                            "Soft Cap USD"   , v.SoftCapUsd.ToString()
+                            "Hard Cap USD"   , v.HardCapUsd.ToString() ]
+            | None -> [ "", "" ]
+    fieldPairs |> toTiles         
 
-        [ for (label, value) in fieldPairs -> 
-            Tile.parent [ ]
-              [ Tile.child [ ]
-                  [ Box.box' [ ]
-                      [ Heading.p [ ]
-                            [ str label ]
-                        Heading.p [ Heading.IsSubtitle ]
-                            [ str value ] ] ] ] ]                                    
+let currencies (model : Model) (dispatch : Msg -> unit) =
+    let fieldPairs = 
+        [ for price in model.CurrenciesCurentPrices.Prices -> price.Symbol, price.PriceUsd.ToString() ]
+    fieldPairs |> toTiles         
 
-    section [ Class "info-tiles" ]
-        [ Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Fulma.Screen.All, TextAlignment.Centered) ] ]
-            tiles                       
-        ]        
-                
+
 let counter (model : Model) (dispatch : Msg -> unit) =
     Field.div [ Field.IsGrouped ]
         [ Control.p [ ]
@@ -173,9 +166,10 @@ let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
 
 let purchaseTokenView  (model : Model) (dispatch : Msg -> unit) = 
     div [ ]
-        [ HeroTile.hero
-          tokenSaleStages model dispatch
-          info model dispatch
-          columns model dispatch
+        [   HeroTile.hero
+            tokenSaleStages   model dispatch
+            info              model dispatch
+            currencies        model dispatch
+            columns           model dispatch
           ]
 

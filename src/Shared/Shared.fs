@@ -71,7 +71,15 @@ module ViewModels =
         CustomerPreference: CustomerPreferences.CustomerPreference
     }
 
-    type CurrencyPriceTick = CurrencyPriceTick of Map<string, CryptoCurrencyPrices.CryptoCurrencyPrice>
+    type CryptoCurrencyPrice = {
+        Symbol: string
+        CryptoCurrencyName: string
+        PriceUsd: decimal
+        PriceEth: decimal
+        PriceAt: System.DateTime
+    }
+
+    type CurrencyPriceTick = { Prices: CryptoCurrencyPrice list } 
 
 module Route =
     /// Defines how routes are generated on server and mapped from client

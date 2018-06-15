@@ -48,16 +48,15 @@ type Msg =
     | Decrement
     | Init of Counter
 
-    | ServerErrorMsg of RemotingError
-    | ErrorMsg of Model * Msg
+    | ServerErrorMsg    of RemotingError
+    | ErrorMsg          of Model * Msg
 
     | InitDb
-    | InitDbCompleted of unit
+    | InitDbCompleted               of unit
 
     | GetCryptoCurrenciesCompleted  of CryptoCurrencies.CryptoCurrency list
     | GetTokenSaleCompleted         of ViewModels.TokenSale
     | PriceTick                     of ViewModels.CurrencyPriceTick
     
-    | Tick of uint64
-
-    | MenuSelected of MenuMediator
+    | Tick          of uint64
+    | MenuSelected  of MenuMediator

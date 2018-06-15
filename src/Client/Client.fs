@@ -72,7 +72,7 @@ let cmdServerCall apiFunc args (completeMsg: 'T -> Msg) serverMethodName =
 let init () : Model * Cmd<Msg> =
     let model = {   Counter = None
                     CryptoCurrencies = []
-                    CurrenciesCurentPrices = ViewModels.CurrencyPriceTick Map.empty
+                    CurrenciesCurentPrices = { Prices = [] }
                     TokenSale = None
                     MenuMediator = PurchaseToken 
                 }
@@ -151,7 +151,6 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         
                          ]
 
-open CryptoCurrencyPrices
 let timer initial =
     let sub dispatch = 
         let mutable i = 0UL
