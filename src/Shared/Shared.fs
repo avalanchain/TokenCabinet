@@ -43,6 +43,7 @@ module ViewModels =
     }
     and TokenSaleStage = {
         Id: int
+        Name: string
         CapEth: decimal
         CapUsd: decimal
         StartDate: System.DateTime
@@ -56,7 +57,7 @@ module ViewModels =
         | Completed
         | Paused
         | Suspended
-    and [<RequireQualifiedAccess>] TokenSaleStageStatus =
+    and TokenSaleStageStatus =
         | Expectation
         | Active
         | Completed

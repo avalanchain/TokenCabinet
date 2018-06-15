@@ -38,6 +38,7 @@ let getTokenSale config () = task {
                                     TotalSupply = 100_000_000M }
 
     let privateSaleStage: TokenSaleStage = {Id = 1
+                                            Name = "Private Sale"
                                             CapEth = 300M
                                             CapUsd = 150_000M
                                             StartDate = System.DateTime.Today
@@ -45,6 +46,7 @@ let getTokenSale config () = task {
                                             Status = TokenSaleStageStatus.Completed }
 
     let preICOStage: TokenSaleStage =   {   Id = 2
+                                            Name = "Pre ICO"
                                             CapEth = 1000M
                                             CapUsd = 500_000M
                                             StartDate = System.DateTime.Today.AddMonths 1
@@ -52,6 +54,7 @@ let getTokenSale config () = task {
                                             Status = TokenSaleStageStatus.Active }
 
     let ICOStage: TokenSaleStage =      {   Id = 3
+                                            Name = "ICO"
                                             CapEth = 30000M
                                             CapUsd = 15_000_000M
                                             StartDate = System.DateTime.Today.AddMonths 2

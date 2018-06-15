@@ -4,6 +4,7 @@ group Client
     Fable.Elmish.React
     Fable.Elmish.HMR
     Fable.Core
+    Fable.DateFunctions
     dotnet-fable
     Fulma
     Fable.Remoting.Client
