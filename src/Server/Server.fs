@@ -109,6 +109,7 @@ let getFullCustomer config () = task {
             IsVerified = false
             VerificationEvent = None
             CustomerPreference = customerPreference
+            CustomerTier = Tier1
         }
     return fullCustomer |> Ok
 }   

@@ -21,20 +21,27 @@
     <Compile Include="../Shared/Entities/InvestmentsModel.fs" />
     <Compile Include="../Shared/Shared.fs" />
 
+    <Compile Include="lib/BigNumber.fs" />
+    <Compile Include="lib/jsonrpc.fs" />
+    <Compile Include="lib/Web3.fs" />
+    <Compile Include="lib/W3.fs" />
+    <Compile Include="lib/Fable.Recharts.fs" />
+    <Compile Include="Utils.fs" />
+
     <Compile Include="ClientModelMsg.fs" />
 
     <Compile Include="Components/HeroTile.fs" />
     <Compile Include="Components/Helpers.fs" />
-    <Compile Include="Components/PurchaseToken.fs" />
-    <Compile Include="Components/Verification.fs" />
-    <Compile Include="Components/ContentView.fs" />
     <Compile Include="Components/Breadcrumb.fs" />
     <Compile Include="Components/NavBrand.fs" />
     <Compile Include="Components/Menu.fs" />
-    <Compile Include="lib/BigNumber.fs" />
-    <Compile Include="lib/jsonrpc.fs" />
-    <Compile Include="lib/Web3.fs" />
-    <Compile Include="Utils.fs" />
+
+    <Compile Include="Views/PurchaseTokenView.fs" />
+    <Compile Include="Views/VerificationView.fs" />
+    <Compile Include="Views/MyInvestmentsView.fs" />
+    <Compile Include="Views/ReferralProgramView.fs" />
+    <Compile Include="Views/ContactsView.fs" />
+    <Compile Include="Views/ContentView.fs" />
 
     <Compile Include="Client.fs" />
   </ItemGroup>

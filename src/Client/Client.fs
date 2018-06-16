@@ -37,6 +37,11 @@ let ethHost = match Utils.load<string> "EthereumHost" with
 let web3: Web3Impl = !!createNew web3 (createNew httpProvider ethHost)
 Browser.console.log web3
 
+// open W3
+// let w3 = !!createNew W3 ()
+// Browser.console.log "W3"
+// Browser.console.log w3
+
 //let W3 = importDefault<Web3> "soltsice"
 // console.log("W3: " + (string W3))
 // let web3 = W3.web3
@@ -135,7 +140,6 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         //         [ Button.Color IsInfo
         //           Button.OnClick (fun _ -> dispatch Decrement) ]
         //         [ str "-" ] ] 
-                
 
 
 let view (model : Model) (dispatch : Msg -> unit) =
@@ -146,6 +150,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         // HeroTile.hero
                         // info model dispatch
                         // columns model dispatch 
+                        
                         ContentView.contentView model dispatch
                         ]
                         

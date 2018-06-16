@@ -1,10 +1,11 @@
-module Client.PurchaseToken
+module Client.PurchaseTokenView
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.DateFunctions
 open Fulma
 open ClientModelMsg
+open Fable
 open Fable
 open Shared.ViewModels
 
@@ -65,7 +66,7 @@ let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
     
 
 
-let purchaseTokenView  (model : Model) (dispatch : Msg -> unit) = 
+let view  (model : Model) (dispatch : Msg -> unit) = 
     div [ ]
         [   HeroTile.hero
             tokenSaleStages   model dispatch

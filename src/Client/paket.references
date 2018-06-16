@@ -5,7 +5,10 @@ group Client
     Fable.Elmish.HMR
     Fable.Core
     Fable.DateFunctions
-    dotnet-fable
-    Fulma
+    Fable.React
     Fable.Remoting.Client
+
+    Fulma
     Elmish.Toastr
+
+    dotnet-fable

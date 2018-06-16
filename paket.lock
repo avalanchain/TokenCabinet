@@ -60,7 +60,7 @@ NUGET
       Fable.Core (>= 1.3.8) - restriction: >= netstandard1.6
       Fable.Import.Browser (>= 1.0) - restriction: >= netstandard1.6
       FSharp.Core (>= 4.2.3) - restriction: >= netstandard1.6
-    Fable.React (3.1.3) - restriction: >= netstandard1.6
+    Fable.React (3.1.3)
       Fable.Core (>= 1.3.12) - restriction: >= netstandard1.6
       Fable.Import.Browser (>= 1.1.1) - restriction: >= netstandard1.6
     Fable.Remoting.Client (2.5.1)

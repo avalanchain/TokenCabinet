@@ -1,4 +1,4 @@
-module Client.ContentView
+module Client.MyInvestmentsView
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
@@ -8,14 +8,10 @@ open ClientModelMsg
 open Fable
 open Verifications
 
-let verificationView  = Verification.verificationView
-
-
-let purchaseTokenView = PurchaseToken.purchaseTokenView        
-
 let show = function
             | Some x -> string x
             | None -> "Loading..."
+
 
 let counter (model : Model) (dispatch : Msg -> unit) =
     Field.div [ Field.IsGrouped ]
@@ -38,6 +34,7 @@ let counter (model : Model) (dispatch : Msg -> unit) =
                 [ Button.Color IsInfo
                   Button.OnClick (fun _ -> dispatch Decrement) ]
                 [ str "-" ] ] ]
+
 
 let columns (model : Model) (dispatch : Msg -> unit) =
     Columns.columns [ ]
@@ -113,25 +110,8 @@ let columns (model : Model) (dispatch : Msg -> unit) =
                                   [ Fa.icon Fa.I.AngleDown ] ] ]
                       ] ] ]
 
-let myInvestmentsView  (model : Model) (dispatch : Msg -> unit) =
+
+let view  (model : Model) (dispatch : Msg -> unit) =
     div [ ]
         [   columns           model dispatch 
         ]
-let referralProgramView  (model : Model) (dispatch : Msg -> unit) =
-    div [ ]
-        [   str "referralProgramView" 
-            br []
-            str (string model.CurrenciesCurentPrices)
-        ]
-
-let contactsView  (model : Model) (dispatch : Msg -> unit) =
-    div [ ]
-        [ str "Contacts" ]
-        
-let contentView  (model : Model) (dispatch : Msg -> unit) =
-    match model.MenuMediator with 
-    | Verification -> verificationView model dispatch
-    | PurchaseToken -> purchaseTokenView model dispatch
-    | MyInvestments -> myInvestmentsView model dispatch
-    | ReferralProgram -> referralProgramView model dispatch
-    | Contacts -> contactsView model dispatch

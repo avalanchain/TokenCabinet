@@ -1,4 +1,4 @@
-module Client.Verification
+module Client.VerificationView
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
@@ -6,7 +6,7 @@ open Fulma
 open ClientModelMsg
 open Fable
 
-let verificationView  (model : Model) (dispatch : Msg -> unit) =
+let view (model : Model) (dispatch : Msg -> unit) =
     div [ ]
         [ str "verificationView" 
           div [ Class "steps"

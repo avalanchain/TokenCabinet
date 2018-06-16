@@ -1,5 +1,6 @@
 namespace Shared
 
+open System
 type Counter = int
  
 type ServerError =
@@ -68,8 +69,31 @@ module ViewModels =
         Customer: Customers.Customer
         IsVerified: bool
         VerificationEvent: CustomerVerificationEvents.CustomerVerificationEvent option
+        CustomerTier: CustomerTier
         CustomerPreference: CustomerPreferences.CustomerPreference
     }
+    and CustomerTier = 
+        | Tier1
+        | Tier2
+        | Tier3
+    and InvestmentHistory = InvestmentHistoryItem list
+    and InvestmentHistoryItem = {
+        Date: DateTime
+        AmountTokens: decimal
+        PricePaidUsd: decimal
+        PricePaidEth: decimal
+        TokenSaleDeal: TokenSaleDeals.TokenSaleDeal
+        Status: InvestmentHistoryItemStatus
+    }
+    and InvestmentHistoryItemStatus =
+        | Expected
+        | Transferred
+    and Referals = Referal list
+    and Referal = {
+        DateRegistered: DateTime
+        FullName: string
+        Email: string
+    } 
 
     type CryptoCurrencyPrice = {
         Symbol: string

@@ -23,7 +23,7 @@ let navBrand  (model : Model) (dispatch : Msg -> unit)=
                   [ Navbar.Start.div [ ]
                       [ navItem "Verification" Verification
                         navItem "Purchase token" PurchaseToken
-                        navItem "My investments" MyInvestments
+                        navItem "My Investments" MyInvestments
                         navItem "Referral Program" ReferralProgram
                         navItem "Contacts" Contacts
                       ] ] ] ]
