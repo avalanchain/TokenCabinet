@@ -2,21 +2,26 @@ module Client.PurchaseToken
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
+open Fable.DateFunctions
 open Fulma
 open ClientModelMsg
 open Fable
 open Shared.ViewModels
-open Fable.DateFunctions
 
 open System
 open Client.Helpers
+open Fable.Core.JsInterop
 
+let formatOptions = createEmpty<IDistanceInWordsOptions>
+formatOptions.includeSeconds <- false
+formatOptions.addSuffix <- true
+formatOptions.locale <- DateTime.Locales.Russian
 
 let info (model : Model) (dispatch : Msg -> unit) =
     let fieldPairs = 
         match model.TokenSale with
-            | Some v -> [   "Sale Start Date", v.StartDate.ToShortDateString()
-                            "Sale End Date"  , v.EndDate.ToShortDateString()
+            | Some v -> [   "Sale Start Date", ExternalDateFns.formatWithStrAndOptions v.StartDate "Do MMM YYYY" formatOptions
+                            "Sale End Date"  , ExternalDateFns.formatWithStr v.EndDate "Do MMM YYYY" 
                             "Soft Cap USD"   , v.SoftCapUsd.ToString()
                             "Hard Cap USD"   , v.HardCapUsd.ToString() ]
             | None -> [ "", "" ]
@@ -29,7 +34,7 @@ let currencies (model : Model) (dispatch : Msg -> unit) =
 
 let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
 
-    let convertDateTime (dt : DateTime) = dt.ToShortDateString()
+    let convertDateTime (dt : DateTime) = ExternalDateFns.formatWithStr dt "Do MMM YYYY" 
     let getStatus = function    
                         | Expectation -> ""
                         | Active -> "is-active"
