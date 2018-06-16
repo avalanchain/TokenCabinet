@@ -1,5 +1,6 @@
 open System.IO
 open System.Threading.Tasks
+open FSharp.Data
 
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
@@ -110,9 +111,87 @@ let getFullCustomer config () = task {
             CustomerPreference = customerPreference
         }
     return fullCustomer |> Ok
-}                   
+}   
+
+module PriceUpdater = 
+    let [<Literal>] private CCUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BTG,LTC,BCH,DASH,ETC&tsyms=USD,EUR,ETH,BTC"
+    type private PriceSource = JsonProvider<CCUrl>
+
+    let private getPriceTick() = async {
+        let! prices = PriceSource.AsyncLoad(CCUrl) 
+        return {    Prices =
+                        [
+                            {   Symbol = "BTC"
+                                CryptoCurrencyName = "Bitcoin"
+                                PriceUsd = prices.Btc.Usd |> decimal
+                                PriceEth = prices.Btc.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                            {   Symbol = "ETH"
+                                CryptoCurrencyName = "Ethereum"
+                                PriceUsd = prices.Ltc.Usd |> decimal
+                                PriceEth = prices.Ltc.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                            {   Symbol = "LTC"
+                                CryptoCurrencyName = "Litecoin"
+                                PriceUsd = prices.Ltc.Usd |> decimal
+                                PriceEth = prices.Ltc.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                            {   Symbol = "BCH"
+                                CryptoCurrencyName = "Bitcoin Cash"
+                                PriceUsd = prices.Bch.Usd |> decimal
+                                PriceEth = prices.Bch.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                            {   Symbol = "BTG"
+                                CryptoCurrencyName = "Bitcoin Gold"
+                                PriceUsd = prices.Btg.Usd |> decimal
+                                PriceEth = prices.Btg.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                            {   Symbol = "ETC"
+                                CryptoCurrencyName = "Ethereum Classic"
+                                PriceUsd = prices.Etc.Usd |> decimal
+                                PriceEth = prices.Etc.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                            {   Symbol = "DASH"
+                                CryptoCurrencyName = "Dash"
+                                PriceUsd = prices.Dash.Usd |> decimal
+                                PriceEth = prices.Dash.Eth |> decimal
+                                PriceAt = System.DateTime.Now }
+                        ] }
+    }
+
+    type private PriceLoadingMsg =
+        | LoadPrices
+        | GetPrices of AsyncReplyChannel<ViewModels.CurrencyPriceTick> 
+
+    let private priceLoadingAgent = MailboxProcessor.Start(fun inbox-> 
+        let rec messageLoop prices = async {
+            let! msg = inbox.Receive()
+            match msg with
+            | LoadPrices ->
+                let! prices = getPriceTick()
+                printfn "Prices loaded"
+                return! messageLoop prices
+            | GetPrices replyChannel -> 
+                replyChannel.Reply prices
+                return! messageLoop prices 
+        }
+        // start the loop 
+        messageLoop { Prices = [] } 
+    )
+
+    // Starts background price loading
+    async { while true do 
+                priceLoadingAgent.Post LoadPrices 
+                do! Async.Sleep 5000 } |> Async.Start
+
+    let getLatestPrices() = priceLoadingAgent.PostAndAsyncReply (GetPrices, 3000)
 
 let getPriceTick config i = task {
+        let! prices = PriceUpdater.getLatestPrices() |> Async.StartAsTask
+        return prices |> Ok
+}
+
+let getPriceTick2 config i = task {
     return {    Prices =
                     [
                         {   Symbol = "BTC"
@@ -128,7 +207,6 @@ let getPriceTick config i = task {
                     ] }
         |> Ok
 }
-
 
 let webApp config =
     let adminProtocol =

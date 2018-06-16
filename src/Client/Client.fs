@@ -80,7 +80,7 @@ let init () : Model * Cmd<Msg> =
     let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () GetCryptoCurrenciesCompleted "getCryptoCurrencies()"
     let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () GetTokenSaleCompleted "getTokenSale()"
 
-    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale])
+    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; Cmd.ofMsg (Tick 0UL) ])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
@@ -156,7 +156,7 @@ let timer initial =
         let mutable i = 0UL
         window.setInterval((fun _ ->    i <- i + 1UL
                                         i |> Tick |> dispatch)
-                                    , 1000) |> ignore
+                                    , 2000) |> ignore
     Cmd.ofSub sub
 
 #if DEBUG
