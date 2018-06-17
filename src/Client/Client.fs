@@ -170,7 +170,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram init update view
-|> Program.withSubscription timer
+// |> Program.withSubscription timer
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withHMR

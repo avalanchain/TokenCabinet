@@ -8,6 +8,7 @@ open ClientModelMsg
 open Fable
 open Fable.Core
 open Fable.Core.JsInterop
+open Fable.Import.React
 
 module ChartsPG =
     open Fable.Recharts   
@@ -83,6 +84,7 @@ module ChartsPG =
                 ]
             ]
     
+// let GaugeChart : unit -> ReactElement = import "GaugeChart" "../GaugeChart.jsx"
 
 
 let view  (model : Model) (dispatch : Msg -> unit) =
@@ -90,4 +92,5 @@ let view  (model : Model) (dispatch : Msg -> unit) =
         [   str "Contacts" 
             ChartsPG.lineChartSample()
                         // ChartsPG.radialChartSample()
+            ofImport "GaugeChart" "../GaugeChart.jsx" (createEmpty) [] //GaugeChart()          
         ]
