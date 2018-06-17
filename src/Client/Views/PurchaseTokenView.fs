@@ -21,7 +21,7 @@ formatOptions.locale <- DateTime.Locales.Russian
 let info (model : Model) (dispatch : Msg -> unit) =
     let fieldPairs = 
         match model.TokenSale with
-            | Some v -> [   "Sale Start Date", ExternalDateFns.formatWithStrAndOptions v.StartDate "Do MMM YYYY" formatOptions
+            | Some v -> [   "Sale Start Date", ExternalDateFns.formatWithStr v.StartDate "Do MMM YYYY" 
                             "Sale End Date"  , ExternalDateFns.formatWithStr v.EndDate "Do MMM YYYY" 
                             "Soft Cap USD"   , v.SoftCapUsd.ToString()
                             "Hard Cap USD"   , v.HardCapUsd.ToString() ]
@@ -30,7 +30,7 @@ let info (model : Model) (dispatch : Msg -> unit) =
 
 let currencies (model : Model) (dispatch : Msg -> unit) =
     let fieldPairs = 
-        [ for price in model.CurrenciesCurentPrices.Prices -> price.Symbol, price.PriceUsd.ToString() ]
+        [ for price in model.CurrenciesCurentPrices.Prices -> price.Symbol, price.PriceUsd.ToString()+ " $" ]
     fieldPairs |> Helpers.toTiles   
 
 let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
