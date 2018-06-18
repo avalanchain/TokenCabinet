@@ -95,6 +95,5 @@ let view  (model : Model) (dispatch : Msg -> unit) =
         [   str "Contacts" 
             ChartsPG.lineChartSample()
             // ChartsPG.radialChartSample()
-                        // ChartsPG.radialChartSample()
-            // ofImport "GaugeChart" "../GaugeChart.jsx" (createEmpty) [] //GaugeChart()          
+            ofFunction GaugeChart { width = 500 } []
         ]
