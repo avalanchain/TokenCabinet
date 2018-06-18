@@ -1,8 +1,9 @@
 import React from 'react';
 import { Sector, Cell, PieChart, Pie } from 'recharts';
 
-const GaugeChart = () => {
-        const width = 500;
+const GaugeChart = props => {
+        const width = props.width; 
+        // const width = 500;
         const chartValue = 180;
         const colorData = [{
                 value: 40, // Meaning span is 0 to 40
