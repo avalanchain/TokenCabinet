@@ -84,13 +84,15 @@ module ChartsPG =
                 ]
             ]
     
-// let GaugeChart : unit -> ReactElement = import "GaugeChart" "../GaugeChart.jsx"
+
+type [<Pojo>] GaugeChartProps = { width: int }
+let GaugeChart : GaugeChartProps -> ReactElement = importDefault "../GaugeChart.jsx"
 
 
 let view  (model : Model) (dispatch : Msg -> unit) =
     div [ ]
         [   str "Contacts" 
             ChartsPG.lineChartSample()
-                        // ChartsPG.radialChartSample()
-            ofImport "GaugeChart" "../GaugeChart.jsx" (createEmpty) [] //GaugeChart()          
+            ChartsPG.radialChartSample()
+            ofFunction GaugeChart { width = 500 } []           
         ]
