@@ -77,7 +77,7 @@ module ChartsPG =
                     Chart.EndAngle 0.
                     Chart.InnerRadius 60.
                     Chart.OuterRadius 80.
-                    // Cell.Fill "#8884d8"
+                    // Custom ("fill", "#8884d8")
                     Polar.PaddingAngle 5. ]
                 [
                     cell [ !!(Cell.Fill "#8884d8") ] []
@@ -95,5 +95,6 @@ let view  (model : Model) (dispatch : Msg -> unit) =
         [   str "Contacts" 
             ChartsPG.lineChartSample()
             // ChartsPG.radialChartSample()
-            ofFunction GaugeChart { width = 500 } []
+            ofFunction GaugeChart { width = 500 } [ p[] [ str "asasdasdasdasd"]]
+            GaugeChart { width = 500 }
         ]
