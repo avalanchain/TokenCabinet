@@ -4637,9 +4637,9 @@ ol {
 }
 
 @media screen and (min-width: 600px) {
-    .responsive-table tr:hover:not(: first-child) {
+    /* .responsive-table tr:hover:not(: first-child) {
         background-color: #f2f2f2
-    }
+    } */
     .responsive-table td:before {
         display: none
     }

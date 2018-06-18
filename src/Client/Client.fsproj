@@ -34,7 +34,10 @@
     <Compile Include="Components/Helpers.fs" />
     <Compile Include="Components/Footer.fs" />
     <Compile Include="Components/Breadcrumb.fs" />
+    <Compile Include="Components/ChildMenu.fs" />
+    <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Components/NavBrand.fs" />
+    <Compile Include="Components/LeftMenu.fs" />
     <Compile Include="Components/Menu.fs" />
 
     <Compile Include="Views/DashboardView.fs" />

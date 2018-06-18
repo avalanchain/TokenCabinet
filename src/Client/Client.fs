@@ -25,8 +25,10 @@ open Fable.Core.JsInterop
 open Client
 open ClientModelMsg
 open System.ComponentModel
-importAll "../../node_modules/bulma/bulma.sass"
+// importAll "../../node_modules/bulma/bulma.sass"
 importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
+importAll "../Client/lib/css/dashboard.css"
+// importAll "../Client/lib/js/dashboard.js"
 let ethHost = match Utils.load<string> "EthereumHost" with
                 | Some eh -> eh
                 | None -> 
@@ -145,6 +147,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
 let view (model : Model) (dispatch : Msg -> unit) =
     div [ ]
         [ NavBrand.navBrand model dispatch
+          LeftMenu.LeftMenu model dispatch
+          ChildMenu.childMenu model dispatch
+        //   TopNavbar.navBar model dispatch
           Container.container [ ]
               [ //breadcrump
                         // HeroTile.hero

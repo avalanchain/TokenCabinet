@@ -7,10 +7,14 @@ open Fulma
 open ClientModelMsg
 open JsInterop
 
+importAll "../lib/css/icons.min.css"
 importAll "../lib/css/dashboard.css"
 
+// let view  =
+//   div []
+//       []
 let view  =
-    div [ Id "dashboard-wrapper" 
+    div [ Id "" 
           Class "columns" ]
         [ div [ Class "column" ]
             [ ]
@@ -160,7 +164,7 @@ let view  =
                                                        HTMLAttr.Custom ("r", "15.91549431") ]
                                                 [ ] ]
                                           div [ Class "chart-avatar" ]
-                                            [ img [ Src "assets/images/avatars/helen.jpg"
+                                            [ img [ Src "lib/images/avatars/helen.jpg"
                                                     Alt "" ] ]
                                           div [ Class "ring-title has-text-centered" ]
                                             [ span [ ]
@@ -222,7 +226,7 @@ let view  =
                                           ul [ Class "user-list" ]
                                             [ li [ ]
                                                 [ div [ Class "user-list-avatar" ]
-                                                    [ img [ Src "assets/images/avatars/terry.jpg"
+                                                    [ img [ Src "lib/images/avatars/terry.jpg"
                                                             Alt "" ] ]
                                                   div [ Class "user-list-info" ]
                                                     [ div [ Class "name" ]
@@ -233,7 +237,7 @@ let view  =
                                                     [ ] ]
                                               li [ ]
                                                 [ div [ Class "user-list-avatar" ]
-                                                    [ img [ Src "assets/images/avatars/carolin.png"
+                                                    [ img [ Src "lib/images/avatars/carolin.png"
                                                             Alt "" ] ]
                                                   div [ Class "user-list-info" ]
                                                     [ div [ Class "name" ]
@@ -244,7 +248,7 @@ let view  =
                                                     [ ] ]
                                               li [ ]
                                                 [ div [ Class "user-list-avatar" ]
-                                                    [ img [ Src "assets/images/avatars/ben.jpg"
+                                                    [ img [ Src "lib/images/avatars/ben.jpg"
                                                             Alt "" ] ]
                                                   div [ Class "user-list-info" ]
                                                     [ div [ Class "name" ]
@@ -255,7 +259,7 @@ let view  =
                                                     [ ] ]
                                               li [ ]
                                                 [ div [ Class "user-list-avatar" ]
-                                                    [ img [ Src "assets/images/avatars/melany.jpg"
+                                                    [ img [ Src "lib/images/avatars/melany.jpg"
                                                             Alt "" ] ]
                                                   div [ Class "user-list-info" ]
                                                     [ div [ Class "name" ]
@@ -266,7 +270,7 @@ let view  =
                                                     [ ] ]
                                               li [ ]
                                                 [ div [ Class "user-list-avatar" ]
-                                                    [ img [ Src "assets/images/avatars/helen.jpg"
+                                                    [ img [ Src "lib/images/avatars/helen.jpg"
                                                             Alt "" ] ]
                                                   div [ Class "user-list-info" ]
                                                     [ div [ Class "name" ]
