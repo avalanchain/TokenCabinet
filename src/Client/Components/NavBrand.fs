@@ -26,4 +26,5 @@ let navBrand  (model : Model) (dispatch : Msg -> unit)=
                         navItem "My Investments" MyInvestments
                         navItem "Referral Program" ReferralProgram
                         navItem "Contacts" Contacts
+                        navItem "Dashboard" Dashboard
                       ] ] ] ]

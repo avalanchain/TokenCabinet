@@ -28,6 +28,7 @@ type MenuMediator =
     | MyInvestments
     | ReferralProgram
     | Contacts
+    | Dashboard
 
 type Model = {
     Counter: Counter option

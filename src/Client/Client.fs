@@ -153,7 +153,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         
                         ContentView.contentView model dispatch
                         ]
-                        
+          Footer.footer             
                          ]
 
 let timer initial =

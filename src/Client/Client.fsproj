@@ -32,10 +32,12 @@
 
     <Compile Include="Components/HeroTile.fs" />
     <Compile Include="Components/Helpers.fs" />
+    <Compile Include="Components/Footer.fs" />
     <Compile Include="Components/Breadcrumb.fs" />
     <Compile Include="Components/NavBrand.fs" />
     <Compile Include="Components/Menu.fs" />
 
+    <Compile Include="Views/DashboardView.fs" />
     <Compile Include="Views/PurchaseTokenView.fs" />
     <Compile Include="Views/VerificationView.fs" />
     <Compile Include="Views/MyInvestmentsView.fs" />

@@ -13,3 +13,4 @@ let contentView  (model : Model) (dispatch : Msg -> unit) =
     | MyInvestments -> MyInvestmentsView.view model dispatch
     | ReferralProgram -> ReferralProgramView.view model dispatch
     | Contacts -> ContactsView.view model dispatch
+    | Dashboard -> DashboardView.view
