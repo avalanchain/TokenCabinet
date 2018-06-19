@@ -1,5 +1,6 @@
 module Client.ContactsView
 
+open System.Linq
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
@@ -9,6 +10,7 @@ open Fable
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import.React
+open ReactChartJs2
 
 module ChartsPG =
     open Fable.Recharts   
@@ -89,10 +91,25 @@ type [<Pojo>] GaugeChartProps = { width: int }
 let GaugeChart : GaugeChartProps -> ReactElement = importDefault "../GaugeChart.jsx"
 // let GaugeChart : unit -> ReactElement = import "GaugeChart" "../GaugeChart.jsx"
 
+let datasets = jsOptions<ChartJs.Chart.ChartDataSets>(fun o -> 
+    o.data <- [| 300.; 50.; 100. |] |> U2.Case1 |> Some
+    o.backgroundColor <- [| "#FF6384"; "#36A2EB"; "#FFCE56" |] |> Array.map U4.Case1 |> U2.Case2 |> Some
+    o.hoverBackgroundColor <- [| "#FF6484"; "#36A3EB"; "#FFCF56" |] |> U2.Case2 |> Some
+)
+
+let chartJsData: ChartJs.Chart.ChartData = {
+    labels = [| "Red"; "Green"; "Yellow" |] |> Array.map U2.Case1  
+    datasets = [| datasets |] 
+}
+
+let chartProps = jsOptions<ChartComponentProps>(fun o -> 
+    o.data <- chartJsData |> ChartData.ofT );
 
 let view  (model : Model) (dispatch : Msg -> unit) =
     div [ ]
-        [   str "Contacts" 
+        [   str "Contacts"
+            ofImport "Doughnut" "react-chartjs-2" chartProps []
+
             ChartsPG.lineChartSample()
             // ChartsPG.radialChartSample()
             ofFunction GaugeChart { width = 500 } [ p[] [ str "asasdasdasdasd"]]

@@ -9,7 +9,6 @@ open Fable.Import.JS
 open Fable.Helpers.React
 open Fable.Import.ReactHelpers
 
-
 module ReactSelect =
     type [<AllowNullLiteral>] [<Pojo>] AutocompleteResult =
         abstract options: Option[] with get, set
