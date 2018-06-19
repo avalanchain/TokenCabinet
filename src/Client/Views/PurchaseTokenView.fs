@@ -68,7 +68,7 @@ let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
 let datasets = jsOptions<ChartJs.Chart.ChartDataSets>(fun o -> 
     o.data <- [| 300.; 50.; 100. |] |> U2.Case1 |> Some
     o.backgroundColor <- [| "#23d160"; "#00D1B2"; "#b5b5b5" |] |> Array.map U4.Case1 |> U2.Case2 |> Some
-    o.hoverBackgroundColor <- [| "#23d160"; "#b5b5b5" |] |> U2.Case2 |> Some
+    o.hoverBackgroundColor <- [| "#23d160";  "#00D1B2"; "#b5b5b5" |] |> U2.Case2 |> Some
 )
 
 let chartJsData: ChartJs.Chart.ChartData = {
