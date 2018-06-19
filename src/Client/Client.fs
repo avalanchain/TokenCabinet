@@ -146,11 +146,14 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
 
 let view (model : Model) (dispatch : Msg -> unit) =
     div [ ]
-        [ NavBrand.navBrand model dispatch
+        [ 
+        //   NavBrand.navBrand model dispatch
           LeftMenu.LeftMenu model dispatch
-          ChildMenu.childMenu model dispatch
-        //   TopNavbar.navBar model dispatch
-          Container.container [ ]
+        //   ChildMenu.childMenu model dispatch
+          TopNavbar.navBar model dispatch
+        //   Container.container [ ]
+          div[ Id "dashboard-wrapper"
+               Class "columns"]
               [ //breadcrump
                         // HeroTile.hero
                         // info model dispatch
