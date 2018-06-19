@@ -6,13 +6,14 @@ open Fable.DateFunctions
 open Fulma
 open ClientModelMsg
 open Fable
-open Fable
+
+open Fable.Core
 open Shared.ViewModels
 
 open System
 open Client.Helpers
 open Fable.Core.JsInterop
-
+open ReactChartJs2
 let formatOptions = createEmpty<IDistanceInWordsOptions>
 formatOptions.includeSeconds <- false
 formatOptions.addSuffix <- true
@@ -63,14 +64,45 @@ let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
                                       p [ Class "is-size-7" ]
                                         [ str ( convertDateTime a.StartDate.Date + " - " + convertDateTime a.EndDate) ]] ] )
     |> div [ Class "steps is-medium"] 
-    
+ //////Chart zone   
+let datasets = jsOptions<ChartJs.Chart.ChartDataSets>(fun o -> 
+    o.data <- [| 300.; 50.; 100. |] |> U2.Case1 |> Some
+    o.backgroundColor <- [| "#23d160"; "#00D1B2"; "#b5b5b5" |] |> Array.map U4.Case1 |> U2.Case2 |> Some
+    o.hoverBackgroundColor <- [| "#23d160"; "#b5b5b5" |] |> U2.Case2 |> Some
+)
 
+let chartJsData: ChartJs.Chart.ChartData = {
+    labels = [| "Completed"; "Active"; "Waiting" |] |> Array.map U2.Case1  
+    datasets = [| datasets |] 
+}
 
+let chartProps = jsOptions<ChartComponentProps>(fun o -> 
+    o.data <- chartJsData |> ChartData.ofT );
+
+let chart = div [ Id "doughnut-card"
+                  Class "flex-card light-bordered card-overflow light-raised" ]
+                [ h3 [ Class "card-heading is-absolute" ]
+                     [ str "ICO progress" ]
+                  
+                  ofImport "Doughnut" "react-chartjs-2" chartProps []
+                  
+                  div [ Class "has-text-centered mt-50" ]
+                    [ a [ Class "button btn-dash secondary-btn btn-dash is-raised rounded ripple"
+                          HTMLAttr.Custom ("data-ripple-color", "") ]
+                        [ str "See all data" ] ] ]
+ //////Chart zone  end 
 let view  (model : Model) (dispatch : Msg -> unit) = 
-    div [ ]
+    div [ Class "dashboard-wrapper" ]
         [   HeroTile.hero
             tokenSaleStages   model dispatch
             info              model dispatch
-            currencies        model dispatch
+           
+            div [ Class "columns"]
+                [
+                    div [ Class "column is-9"]
+                        [ currencies model dispatch]
+                    div [ Class "column is-3"]
+                        [ chart ]
+                ]
           ]
 

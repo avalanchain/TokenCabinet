@@ -112,6 +112,6 @@ let columns (model : Model) (dispatch : Msg -> unit) =
 
 
 let view  (model : Model) (dispatch : Msg -> unit) =
-    div [ ]
+    div [ Class "dashboard-wrapper" ]
         [   columns           model dispatch 
         ]

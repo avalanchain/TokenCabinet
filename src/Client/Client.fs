@@ -154,13 +154,12 @@ let view (model : Model) (dispatch : Msg -> unit) =
         //   Container.container [ ]
           div[ Id "dashboard-wrapper"
                Class "columns"]
-              [ //breadcrump
-                        // HeroTile.hero
-                        // info model dispatch
-                        // columns model dispatch 
-                        
-                        ContentView.contentView model dispatch
-                        ]
+              [ div [ Class "columns"]
+                    [ div [ Class "column"] 
+                          []
+                      div [ Class "content column is-11"] 
+                          [ContentView.contentView model dispatch]
+                       ]]
           Footer.footer             
                          ]
 

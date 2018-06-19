@@ -15,4 +15,4 @@ let footer  =
                                 Alt "" ] ] ]
                   div [ Class "has-text-centered" ]
                     [ span [ Class "more-info-company" ]
-                        [ str "Powered by Aavalanchain" ] ] ] ]
+                        [ str "Powered by Avalanchain" ] ] ] ]

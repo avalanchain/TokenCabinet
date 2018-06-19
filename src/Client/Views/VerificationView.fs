@@ -7,9 +7,8 @@ open ClientModelMsg
 open Fable
 
 let view (model : Model) (dispatch : Msg -> unit) =
-    div [ ]
-        [ str "verificationView" 
-          div [ Class "steps"
+    div [ Class "dashboard-wrapper" ]
+        [ div [ Class "steps"
                 Id "stepsDemo" ]
             [ div [ Class "step-item is-active is-success" ]
                 [ div [ Class "step-marker" ]

@@ -21,11 +21,11 @@ let LeftMenu  (model : Model) (dispatch : Msg -> unit)=
                         [ img [ Src "../lib/images/logos/square-violet.svg"
                                 Alt "" ] ] ]
                   
-                  navItem "sl sl-icon-speedometer" Verification
-                  navItem "sl sl-icon-docs" PurchaseToken
+                  navItem "sl sl-icon-basket" PurchaseToken
+                  navItem "sl sl-icon-note" Verification
                   navItem "sl sl-icon-briefcase" MyInvestments
                   navItem "sl sl-icon-graph" ReferralProgram
-                  navItem "sl sl-icon-settings" Contacts
-                  navItem "sl sl-icon-settings" Dashboard
+                  navItem "sl sl-icon-info" Contacts
+                  navItem "sl sl-icon-speedometer" Dashboard
                        
                  ] ] ]

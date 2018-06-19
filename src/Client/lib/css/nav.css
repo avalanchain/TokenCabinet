@@ -260,7 +260,8 @@ a.nav-item.is-tab.is-active {
     min-height: 3.5rem;
     position: relative;
     text-align: center;
-    z-index: 2
+    z-index: 2;
+    margin-top: 10px;
 }
 
 .nav>.container {
@@ -280,4 +281,9 @@ a.nav-item.is-tab.is-active {
 
 .nav-item .field .control.has-icons-left .icon {
     top: 0.2rem;
+}
+
+.dashboard-wrapper {
+    margin-left: 20px;
+    padding: 80px 20px 0 20px;
 }
