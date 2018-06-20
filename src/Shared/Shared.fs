@@ -1,10 +1,12 @@
 namespace Shared
 
 open System
+open Auth
+
 type Counter = int
  
 type ServerError =
-    | AuthError
+    | AuthError of AuthError
     | InternalError of exn
     | NotImplementedError
 
@@ -122,7 +124,7 @@ type ITokenSaleProtocol = {
     getCryptoCurrencies : unit -> Async<ServerResult<CryptoCurrencies.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
-    getFullCustomer     : unit -> Async<ServerResult<ViewModels.FullCustomer>> 
+    getFullCustomer     : SecureRequest<unit> -> Async<ServerResult<ViewModels.FullCustomer>> 
 
     getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }

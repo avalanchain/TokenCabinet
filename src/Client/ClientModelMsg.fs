@@ -7,6 +7,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
 open Shared
+open Auth
 
 open Fulma
 
@@ -30,7 +31,13 @@ type MenuMediator =
     | Contacts
     | Dashboard
 
+type AuthModel = {
+    Token: AuthToken
+}
+
 type Model = {
+    Auth: AuthModel option
+
     Counter: Counter option
 
     CryptoCurrencies: CryptoCurrencies.CryptoCurrency list

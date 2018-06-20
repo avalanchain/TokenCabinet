@@ -77,7 +77,8 @@ let cmdServerCall apiFunc args (completeMsg: 'T -> Msg) serverMethodName =
                     exn |> CommunicationError |> ServerErrorMsg)
 
 let init () : Model * Cmd<Msg> =
-    let model = {   Counter = None
+    let model = {   Auth = None
+                    Counter = None
                     CryptoCurrencies = []
                     CurrenciesCurentPrices = { Prices = [] }
                     TokenSale = None

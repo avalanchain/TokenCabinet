@@ -10,6 +10,7 @@
     <Compile Include="Templates/Index.fs" />
     <Compile Include="Templates/NotFound.fs" />
     <Compile Include="Templates/InternalError.fs" />
+    <Compile Include="../Shared/Auth.fs" />
     <Compile Include="../Shared/Entities/VerificationsModel.fs" />
     <Compile Include="../Shared/Entities/CryptoCurrenciesModel.fs" />
     <Compile Include="../Shared/Entities/SaleTokensModel.fs" />
