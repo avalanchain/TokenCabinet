@@ -183,7 +183,7 @@ module Chart =
         abstract plugins: obj option with get, set
 
     type [<Pojo>] ChartData = {
-        labels: U2<string, ResizeArray<string>>[]
+        labels: U2<string, string[]>[]
         datasets: ChartDataSets[]
     }
 
