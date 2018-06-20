@@ -14,6 +14,7 @@ open System
 open Client.Helpers
 open Fable.Core.JsInterop
 open ReactChartJs2
+open ChartJs.Chart
 let formatOptions = createEmpty<IDistanceInWordsOptions>
 formatOptions.includeSeconds <- false
 formatOptions.addSuffix <- true
@@ -76,8 +77,11 @@ let chartJsData: ChartJs.Chart.ChartData = {
     datasets = [| datasets |] 
 }
 
+let legend = jsOptions<ChartLegendOptions>(fun lo -> lo.position <- Some PositionType.Bottom)
+// fun lo -> lo.position <- Some "bottom"
 let chartProps = jsOptions<ChartComponentProps>(fun o -> 
-    o.data <- chartJsData |> ChartData.ofT );
+                                                        o.data <- chartJsData |> ChartData.ofT
+                                                        o.legend <- legend |> Some );
 
 let chart = div [ Id "doughnut-card"
                   Class "flex-card light-bordered card-overflow light-raised" ]
