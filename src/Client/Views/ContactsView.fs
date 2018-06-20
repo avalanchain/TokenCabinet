@@ -93,12 +93,12 @@ let GaugeChart : GaugeChartProps -> ReactElement = importDefault "../GaugeChart.
 
 let datasets = jsOptions<ChartJs.Chart.ChartDataSets>(fun o -> 
     o.data <- [| 300.; 50.; 100. |] |> U2.Case1 |> Some
-    o.backgroundColor <- [| "#FF6384"; "#36A2EB"; "#FFCE56" |] |> Array.map U4.Case1 |> U2.Case2 |> Some
-    o.hoverBackgroundColor <- [| "#FF6484"; "#36A3EB"; "#FFCF56" |] |> U2.Case2 |> Some
+    o.backgroundColor <- [| "#23d160"; "#00D1B2"; "#b5b5b5" |] |> Array.map U4.Case1 |> U2.Case2 |> Some
+    o.hoverBackgroundColor <- [| "#23d160"; "#b5b5b5" |] |> U2.Case2 |> Some
 )
 
 let chartJsData: ChartJs.Chart.ChartData = {
-    labels = [| "Red"; "Green"; "Yellow" |] |> Array.map U2.Case1  
+    labels = [| "Completed"; "Active"; "Waiting" |] |> Array.map U2.Case1  
     datasets = [| datasets |] 
 }
 
@@ -106,12 +106,24 @@ let chartProps = jsOptions<ChartComponentProps>(fun o ->
     o.data <- chartJsData |> ChartData.ofT );
 
 let view  (model : Model) (dispatch : Msg -> unit) =
-    div [ ]
-        [   str "Contacts"
-            ofImport "Doughnut" "react-chartjs-2" chartProps []
+    div [ Class "dashboard-wrapper" ]
+        [   
+            div [ ]
+                [   ofImport "Doughnut" "react-chartjs-2" chartProps []
 
-            ChartsPG.lineChartSample()
-            // ChartsPG.radialChartSample()
-            ofFunction GaugeChart { width = 500 } [ p[] [ str "asasdasdasdasd"]]
-            GaugeChart { width = 500 }
+                    ChartsPG.lineChartSample()
+                    // ChartsPG.radialChartSample()
+                    ofFunction GaugeChart { width = 500 } [ p[] [ str "asasdasdasdasd"]]
+                    GaugeChart { width = 500 } ]
+            div [ Id "doughnut-card"
+                  Class "flex-card light-bordered card-overflow light-raised" ]
+                [ h3 [ Class "card-heading is-absolute" ]
+                     [ str "Task progress" ]
+                  
+                  ofImport "Doughnut" "react-chartjs-2" chartProps []
+                  
+                  div [ Class "has-text-centered mt-50" ]
+                    [ a [ Class "button btn-dash secondary-btn btn-dash is-raised rounded ripple"
+                          HTMLAttr.Custom ("data-ripple-color", "") ]
+                        [ str "See all data" ] ] ]
         ]
