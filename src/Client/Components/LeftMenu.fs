@@ -1,5 +1,6 @@
 module Client.LeftMenu
 
+open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
@@ -7,6 +8,10 @@ open ClientModelMsg
 open Fable.Recharts
 
 let LeftMenu  (model : Model) (dispatch : UIMsg -> unit)=
+open JsInterop
+
+importAll "../lib/css/dashboard.css"
+let LeftMenu  (model : Model) (dispatch : Msg -> unit)=
     let navItem icon menuMediator =  li [ Class ("side-icon " + if model.MenuMediator = menuMediator then "is-active" else "")
                                           OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)  
                                            ]

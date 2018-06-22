@@ -28,8 +28,9 @@ open System.ComponentModel
 open Fable.PowerPack
 // importAll "../../node_modules/bulma/bulma.sass"
 importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
-importAll "../Client/lib/css/dashboard.css"
+// importAll "../Client/lib/css/dashboard.css"
 // importAll "../Client/lib/js/dashboard.js"
+// importAll "../Client/lib/css/nephos/core.css"
 let ethHost = match Utils.load<string> "EthereumHost" with
                 | Some eh -> eh
                 | None -> 
