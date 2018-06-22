@@ -12,6 +12,7 @@ group Server
 
     nuget FSharp.Data = 3.0.0-beta3
     nuget SQLProvider
+    nuget jose-jwt
 
     clitool dotnet-saturn
 

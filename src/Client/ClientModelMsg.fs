@@ -1,5 +1,6 @@
 module ClientModelMsg
 
+open System
 open Elmish
 open Elmish.React
 
@@ -52,19 +53,28 @@ type RemotingError =
     | ServerError of ServerError
 
 type Msg =
-    | Increment
-    | Decrement
-    | Init of Counter
-
-    | ServerErrorMsg    of RemotingError
-    | ErrorMsg          of Model * Msg
-
-    | InitDb
-    | InitDbCompleted               of unit
-
+    | AuthMsg       of AuthMsg
+    | ServerMsg     of ServerMsg
+    | UIMsg         of UIMsg
+    | UnexpectedMsg of UnexpectedMsg
+    | ErrorMsg      of string * Msg * Model
+    | OldMsg        of OldMsg
+and AuthMsg =
+    | LoggedIn      of Auth.AuthToken
+    | LoggedOut
+and ServerMsg =
     | GetCryptoCurrenciesCompleted  of CryptoCurrencies.CryptoCurrency list
     | GetTokenSaleCompleted         of ViewModels.TokenSale
     | PriceTick                     of ViewModels.CurrencyPriceTick
-    
-    | Tick          of uint64
-    | MenuSelected  of MenuMediator
+and UIMsg =
+    | Tick                  of uint64
+    | MenuSelected          of MenuMediator
+and UnexpectedMsg =
+    | BrowserStorageFailure of Exception
+    | ServerErrorMsg        of RemotingError
+and OldMsg = 
+    | Increment
+    | Decrement
+    | Init                  of Counter
+    | InitDb
+    | InitDbCompleted       of unit

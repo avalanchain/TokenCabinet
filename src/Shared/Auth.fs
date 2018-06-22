@@ -3,7 +3,7 @@ namespace Shared
 module Auth =
 
     type AuthToken = AuthToken of string
-    type LoginInfo = { Username: string; Password: string }
+    type LoginInfo = { Username: string; Password: string } // TODO: Send password hash only!!!
 
     // possible errors when logging in
     type LoginError = 

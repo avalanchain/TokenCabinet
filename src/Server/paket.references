@@ -6,5 +6,6 @@ group Server
     Microsoft.Data.Sqlite
     FSharp.Data
     SQLProvider
+    jose-jwt
     
     dotnet-saturn

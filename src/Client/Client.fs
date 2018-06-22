@@ -25,6 +25,7 @@ open Fable.Core.JsInterop
 open Client
 open ClientModelMsg
 open System.ComponentModel
+open Fable.PowerPack
 // importAll "../../node_modules/bulma/bulma.sass"
 importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
 importAll "../Client/lib/css/dashboard.css"
@@ -49,6 +50,16 @@ Browser.console.log web3
 // let web3 = W3.web3
 // console.log("web3: " + (string W3.web3))
 
+module LocalStorage = 
+    let loadUser () : Auth.AuthToken option =
+        BrowserLocalStorage.load "user"
+
+    let saveUserCmd user =
+        Cmd.ofFunc (BrowserLocalStorage.save "user") user (fun _ -> LoggedIn user |> AuthMsg) (BrowserStorageFailure >> UnexpectedMsg)
+
+    let deleteUserCmd =
+        Cmd.ofFunc BrowserLocalStorage.delete "user" (fun _ -> LoggedOut |> AuthMsg) (BrowserStorageFailure >> UnexpectedMsg)
+
 module Server =
 
     open Shared
@@ -71,10 +82,10 @@ let cmdServerCall apiFunc args (completeMsg: 'T -> Msg) serverMethodName =
         args
         (fun res -> match res with
                     | Ok cc -> cc |> completeMsg
-                    | Error serverError -> serverError |> ServerError |> ServerErrorMsg
+                    | Error serverError -> serverError |> ServerError |> ServerErrorMsg |> UnexpectedMsg
                     )
         (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
-                    exn |> CommunicationError |> ServerErrorMsg)
+                    exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg)
 
 let init () : Model * Cmd<Msg> =
     let model = {   Auth = None
@@ -84,44 +95,53 @@ let init () : Model * Cmd<Msg> =
                     TokenSale = None
                     MenuMediator = PurchaseToken 
                 }
-    let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () Init "getInitCounter()"
-    let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () GetCryptoCurrenciesCompleted "getCryptoCurrencies()"
-    let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () GetTokenSaleCompleted "getTokenSale()"
+    let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
+    let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (GetCryptoCurrenciesCompleted >> ServerMsg) "getCryptoCurrencies()"
+    let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (GetTokenSaleCompleted >> ServerMsg) "getTokenSale()"
+    let cmdTick                 = Cmd.ofMsg (Tick 0UL |> UIMsg)
 
-    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; Cmd.ofMsg (Tick 0UL) ])
+    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdTick ])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
     let (model', cmd') : Model * Cmd<Msg> =  
-        match model, msg with
-        | { Counter = None }  , Init x      -> { model with Counter = Some x }      , Cmd.none
-        | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
-        | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
+        match msg with
+        | OldMsg msg_ -> 
+            match model, msg_ with
+            | { Counter = None }  , Init x      -> { model with Counter = Some x }      , Cmd.none
+            | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
+            | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
+            | model, InitDb -> model, cmdServerCall (Server.adminApi.initDb) () (InitDbCompleted >> OldMsg) "InitDb()"
+            | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
+            | _ -> model, ("Unhandled", msg, model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
 
-        | model, InitDb -> model, cmdServerCall (Server.adminApi.initDb) () InitDbCompleted "InitDb()"
-        | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
+        | AuthMsg(LoggedIn authToken) -> { model with Auth = Some { Token = authToken } } , Cmd.none
+        | AuthMsg(LoggedOut)          -> { model with Auth = None } , Cmd.none
 
-        | model, GetCryptoCurrenciesCompleted cc ->  { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
-        | model, GetTokenSaleCompleted tc -> { model with TokenSale = Some (tc) } , Cmd.none
+        | ServerMsg msg_ ->
+            match msg_ with
+            | GetCryptoCurrenciesCompleted cc   -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
+            | GetTokenSaleCompleted tc          -> { model with TokenSale = Some (tc) } , Cmd.none
+            | PriceTick tick                    -> { model with CurrenciesCurentPrices = tick }, Cmd.none
 
-        | model, MenuSelected mm -> 
+        | UIMsg(MenuSelected mm) -> 
             let cmd =   Toastr.message (sprintf "Menu selected: '%A'" mm)
                         |> Toastr.withProgressBar
                         |> Toastr.position BottomRight
                         |> Toastr.timeout 1000
                         |> Toastr.success
             { model with MenuMediator = mm } , cmd  
+        | UIMsg(Tick i) -> model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (PriceTick >> ServerMsg) "getPriceTick()"
 
-        | model, Tick i -> model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i PriceTick "getPriceTick()"
-        | model, PriceTick tick -> { model with CurrenciesCurentPrices = tick }, Cmd.none
-
-        | model, ServerErrorMsg serverError -> 
-            console.error(sprintf "Server error '%A'" serverError)
+        | UnexpectedMsg msg_ ->
+            match msg_ with
+            | BrowserStorageFailure _ -> 
+                model, ("Browser storage access failed with", msg, model) |> ErrorMsg |> Cmd.ofMsg
+            | ServerErrorMsg _ -> 
+                model, ("Server error ", msg, model) |> ErrorMsg |> Cmd.ofMsg
+        | ErrorMsg(text, msg, m) -> 
+            console.error(sprintf "%s Msg '%A' on Model '%A'" text msg m)
             model, Cmd.none
-        | model, ErrorMsg(m, msg) -> 
-            console.error(sprintf "Unhandled Msg '%A' on Model '%A'" msg m)
-            model, Cmd.none
-        | model, msg -> model, (model, msg) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
     model', cmd'
 
 
@@ -149,7 +169,7 @@ let view (model : Model) (dispatch : Msg -> unit) =
     div [ ]
         [ 
         //   NavBrand.navBrand model dispatch
-          LeftMenu.LeftMenu model dispatch
+          LeftMenu.LeftMenu model (UIMsg >> dispatch)
         //   ChildMenu.childMenu model dispatch
           TopNavbar.navBar model dispatch
         //   Container.container [ ]
@@ -168,7 +188,7 @@ let timer initial =
     let sub dispatch = 
         let mutable i = 0UL
         window.setInterval((fun _ ->    i <- i + 1UL
-                                        i |> Tick |> dispatch)
+                                        i |> Tick |> UIMsg |> dispatch)
                                     , 2000) |> ignore
     Cmd.ofSub sub
 
@@ -178,7 +198,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram init update view
-// |> Program.withSubscription timer
+|> Program.withSubscription timer
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withHMR

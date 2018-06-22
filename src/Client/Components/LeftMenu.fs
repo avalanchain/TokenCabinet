@@ -6,7 +6,7 @@ open Fulma
 open ClientModelMsg
 open Fable.Recharts
 
-let LeftMenu  (model : Model) (dispatch : Msg -> unit)=
+let LeftMenu  (model : Model) (dispatch : UIMsg -> unit)=
     let navItem icon menuMediator =  li [ Class ("side-icon " + if model.MenuMediator = menuMediator then "is-active" else "")
                                           OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)  
                                            ]

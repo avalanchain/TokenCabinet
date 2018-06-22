@@ -13,6 +13,8 @@ open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Shared.ViewModels
 open TokenSaleStageStatuses
+open System.Collections.ObjectModel
+open Shared.Auth
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
@@ -20,6 +22,25 @@ let port = 8085us
 let getInitCounter () : Task<ServerResult<Counter>> = task { return Ok 42 }
 let initDb () = task {  printfn "\n\ninitDb() called\n\n" 
                         return Ok () }
+
+// let private syncRoot = new obj()
+// let get
+
+let private logins = new System.Collections.Concurrent.ConcurrentDictionary<AuthToken, AuthJwt.UserRights>() //TODO: store in the db
+
+let private login config (loginInfo: LoginInfo) = task { 
+    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.Username }
+    let token = userRigths |> AuthJwt.encode |> AuthToken
+    logins.[token] <- userRigths
+    return token |> Ok
+}
+
+let private checkUserExists authToken =
+    logins.ContainsKey authToken
+
+let private isTokenValid authToken =
+    let (AuthToken at) = authToken
+    at |> AuthJwt.checkValid |> Option.isSome
 
 let getCryptoCurrencies config () = task { 
     printfn "getCryptoCurrencies() called"
@@ -87,31 +108,35 @@ let getTokenSale config () = task {
     return tokenSale |> Ok
 }                                
 
-let getFullCustomer config () = task { 
+let getFullCustomer config request = task { 
     printfn "getFullCustomer() called"
-    
-    let customer: Customers.Customer = 
-        {   Id = System.Guid.NewGuid()
-            FirstName = "John"
-            LastName = "Smith"
-            EthAddress = "0x001002003004005006007008009"
-            Password = "!!!ChangeMe!!!"
-            PasswordSalt = "!!PwdSalt!!"
-            Avatar = "MyPicture"
-        }
 
-    let customerPreference: CustomerPreferences.CustomerPreference = 
-        {   Id = customer.Id
-            Language = CustomerPreferences.Validation.supportedLangs.[0] }
+    return 
+        if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error
+        elif request.Token |> checkUserExists |> not then UserDoesNotHaveAccess |> AuthError |> Error
+        else 
+            let customer: Customers.Customer = 
+                {   Id = System.Guid.NewGuid()
+                    FirstName = "John"
+                    LastName = "Smith"
+                    EthAddress = "0x001002003004005006007008009"
+                    Password = "!!!ChangeMe!!!"
+                    PasswordSalt = "!!PwdSalt!!"
+                    Avatar = "MyPicture"
+                }
 
-    let fullCustomer =
-        {   Customer = customer
-            IsVerified = false
-            VerificationEvent = None
-            CustomerPreference = customerPreference
-            CustomerTier = Tier1
-        }
-    return fullCustomer |> Ok
+            let customerPreference: CustomerPreferences.CustomerPreference = 
+                {   Id = customer.Id
+                    Language = CustomerPreferences.Validation.supportedLangs.[0] }
+
+            let fullCustomer =
+                {   Customer = customer
+                    IsVerified = false
+                    VerificationEvent = None
+                    CustomerPreference = customerPreference
+                    CustomerTier = Tier1
+                }
+            fullCustomer |> Ok
 }   
 
 module PriceUpdater = 
@@ -214,7 +239,8 @@ let webApp config =
         {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
             initDb          = initDb            >> Async.AwaitTask }
     let tokenSaleProtocol =
-        {   getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
+        {   login               = login                 config    >> Async.AwaitTask
+            getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
             getTokenSale        = getTokenSale          config    >> Async.AwaitTask
             getFullCustomer     = getFullCustomer       config    >> Async.AwaitTask
             getPriceTick        = getPriceTick          config    >> Async.AwaitTask

@@ -120,7 +120,8 @@ type IAdminProtocol = {
     initDb              : unit -> Async<ServerResult<unit>> 
 }
 
-type ITokenSaleProtocol = {   
+type ITokenSaleProtocol = {
+    login               : LoginInfo -> Async<Result<AuthToken, LoginError>>
     getCryptoCurrencies : unit -> Async<ServerResult<CryptoCurrencies.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 

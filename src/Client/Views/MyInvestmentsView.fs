@@ -18,7 +18,7 @@ let counter (model : Model) (dispatch : Msg -> unit) =
         [ Control.p [ ]
             [ Button.a
                 [ Button.Color IsInfo
-                  Button.OnClick (fun _ -> dispatch InitDb) ]
+                  Button.OnClick (fun _ -> InitDb |> OldMsg |> dispatch) ]
                 [ str "Init Db" ] ]
           Control.p [ Control.IsExpanded ]
             [ Input.text
@@ -27,12 +27,12 @@ let counter (model : Model) (dispatch : Msg -> unit) =
           Control.p [ ]
             [ Button.a
                 [ Button.Color IsInfo
-                  Button.OnClick (fun _ -> dispatch Increment) ]
+                  Button.OnClick (fun _ -> Increment |> OldMsg |> dispatch) ]
                 [ str "+" ] ]
           Control.p [ ]
             [ Button.a
                 [ Button.Color IsInfo
-                  Button.OnClick (fun _ -> dispatch Decrement) ]
+                  Button.OnClick (fun _ -> Decrement |> OldMsg |> dispatch) ]
                 [ str "-" ] ] ]
 
 
