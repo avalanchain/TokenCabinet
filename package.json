@@ -4,6 +4,7 @@
         "@types/chart.js": "^2.7.22",
         "babel-polyfill": "6.26.0",
         "babel-runtime": "6.26.0",
+        "bootstrap": "3",
         "bulma": "^0.7.1",
         "bulma-extensions": "^2.2.0",
         "bulma-steps": "^2.2.1",

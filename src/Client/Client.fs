@@ -27,10 +27,12 @@ open ClientModelMsg
 open System.ComponentModel
 open Fable.PowerPack
 // importAll "../../node_modules/bulma/bulma.sass"
-importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
+// importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
 // importAll "../Client/lib/css/dashboard.css"
 // importAll "../Client/lib/js/dashboard.js"
-// importAll "../Client/lib/css/nephos/core.css"
+importAll "../../node_modules/bootstrap/dist/css/bootstrap.min.css"
+importAll "../Client/lib/css/inspinia/style.css"
+importAll "../Client/lib/css/inspinia/main.css"
 let ethHost = match Utils.load<string> "EthereumHost" with
                 | Some eh -> eh
                 | None -> 
@@ -94,7 +96,7 @@ let init () : Model * Cmd<Msg> =
                     CryptoCurrencies = []
                     CurrenciesCurentPrices = { Prices = [] }
                     TokenSale = None
-                    MenuMediator = PurchaseToken 
+                    MenuMediator = Dashboard 
                 }
     let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
     let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (GetCryptoCurrenciesCompleted >> ServerMsg) "getCryptoCurrencies()"
@@ -104,7 +106,6 @@ let init () : Model * Cmd<Msg> =
     model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdTick ])
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
-    console.log(sprintf "Msg: '%A', Model: '%A'" msg model)
     let (model', cmd') : Model * Cmd<Msg> =  
         match msg with
         | OldMsg msg_ -> 
@@ -169,20 +170,19 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
 
 
 let view (model : Model) (dispatch : Msg -> unit) =
-    div [ ]
+    div [ Id "wrapper" ]
         [ 
         //   NavBrand.navBrand model dispatch
           LeftMenu.LeftMenu model (UIMsg >> dispatch)
         //   ChildMenu.childMenu model dispatch
-          TopNavbar.navBar model dispatch
+         
         //   Container.container [ ]
-          div[ Id "dashboard-wrapper"
-               Class "columns"]
-              [ div [ Class "columns"]
-                    [ div [ Class "column"] 
-                          []
-                      div [ Class "content column is-11"] 
-                          [ContentView.contentView model dispatch]
+          div [ Id "page-wrapper" 
+                Class "gray-bg"]
+              [  TopNavbar.navBar model dispatch
+                 div [ Class "wrapper wrapper-content animated fadeInRight"]
+                    [ 
+                      ContentView.contentView model dispatch
                        ]]
           Footer.footer             
                          ]
@@ -203,7 +203,7 @@ open Elmish.HMR
 Program.mkProgram init update view
 |> Program.withSubscription timer
 #if DEBUG
-|> Program.withConsoleTrace
+// |> Program.withConsoleTrace
 |> Program.withHMR
 #endif
 |> Program.withReact "elmish-app"

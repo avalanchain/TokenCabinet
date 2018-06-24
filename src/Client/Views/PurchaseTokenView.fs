@@ -51,19 +51,21 @@ let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
                             | Cancelled -> ""
                             | Paused -> ""
 
-    model.TokenSale.Value.TokenSaleStages 
-    |> List.mapi (fun idx a -> div [ Class ("step-item  " + (getStatus a.Status)) ]
-                                [ div [ Class "step-marker" ]
-                                    [ span [ Class "icon" ]
-                                        [ i [ Class ("fa " + getIcon a.Status) ]
-                                            [ ] ] ]
-                                  div [ Class "step-details" ]
-                                    [ p [ Class "step-title" ]
-                                        [ str (string a.Name)  ]
-                                      p [ ]
-                                        [ str ( string a.CapEth + " ETH") ] 
-                                      p [ Class "is-size-7" ]
-                                        [ str ( convertDateTime a.StartDate.Date + " - " + convertDateTime a.EndDate) ]] ] )
+    match model.TokenSale with
+        | Some ts -> ts.TokenSaleStages 
+                        |> List.map (fun a -> div [ Class ("step-item  " + (getStatus a.Status)) ]
+                                                    [ div [ Class "step-marker" ]
+                                                        [ span [ Class "icon" ]
+                                                            [ i [ Class ("fa " + getIcon a.Status) ]
+                                                                [ ] ] ]
+                                                      div [ Class "step-details" ]
+                                                        [ p [ Class "step-title" ]
+                                                            [ str (string a.Name)  ]
+                                                          p [ ]
+                                                            [ str ( string a.CapEth + " ETH") ] 
+                                                          p [ Class "is-size-7" ]
+                                                            [ str ( convertDateTime a.StartDate.Date + " - " + convertDateTime a.EndDate) ]] ] )
+        | None -> []                                                    
     |> div [ Class "steps is-medium"] 
  //////Chart zone   
 let datasets = jsOptions<ChartJs.Chart.ChartDataSets>(fun o -> 

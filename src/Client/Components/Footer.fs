@@ -6,13 +6,13 @@ open Fulma
 open ClientModelMsg
 
 let footer  =
-    footer [ Class "footer" ]
-           [ div [ Class "container" ]
-                [ div [ Class "has-text-centered" ]
-                    [ div [ Class "has-text-centered" ]
-                        [ img [ Class "small-footer-logo"
-                                Src "assets/images/logos/bulkit-logo-g.png"
-                                Alt "" ] ] ]
-                  div [ Class "has-text-centered" ]
-                    [ span [ Class "more-info-company" ]
-                        [ str "Powered by Avalanchain" ] ] ] ]
+    div [ Class "footer" ]
+        [ div [ Class "pull-right" ]
+            [ strong [ ]
+                [ str "Powered " ]
+              str "by "
+              a [ Href "http://avalanchain.com" ]
+                [ str "Avalanchain " ]
+              str "© 2018" ]
+          div [ ]
+            [ ] ]
