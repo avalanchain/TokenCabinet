@@ -4,7 +4,8 @@ open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
-open ClientModelMsg
+open ClientMsgs
+open ClientModels
 open JsInterop
 
 // importAll "../lib/css/icons.min.css"

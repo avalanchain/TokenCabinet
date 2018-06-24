@@ -3,14 +3,14 @@ module Client.ContactsView
 open System.Linq
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
-open Fulma.FontAwesome
-open ClientModelMsg
 open Fable
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import.React
 open ReactChartJs2
+
+open ClientMsgs
+open ClientModels
 
 module ChartsPG =
     open Fable.Recharts   

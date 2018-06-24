@@ -3,7 +3,7 @@ module Client.Helpers
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
-open ClientModelMsg
+open ClientMsgs
 open Fable
 open Shared.ViewModels
 open Fable.DateFunctions

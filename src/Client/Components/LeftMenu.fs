@@ -3,9 +3,10 @@ module Client.LeftMenu
 open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
-open ClientModelMsg
 open Fable.Recharts
+
+open ClientMsgs
+open ClientModels
 
 open JsInterop
 

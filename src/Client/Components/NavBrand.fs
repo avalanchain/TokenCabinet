@@ -3,7 +3,8 @@ module Client.NavBrand
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
-open ClientModelMsg
+open ClientMsgs
+open ClientModels
 
 let navBrand  (model : Model) (dispatch : UIMsg -> unit)=
     let navItem name menuMediator = Navbar.Item.a [ Navbar.Item.IsActive (model.MenuMediator = menuMediator)

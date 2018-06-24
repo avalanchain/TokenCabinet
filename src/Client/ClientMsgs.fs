@@ -1,4 +1,4 @@
-module ClientModelMsg
+module ClientMsgs
 
 open System
 open Elmish
@@ -10,9 +10,6 @@ open Fable.Helpers.React.Props
 open Shared
 open Auth
 
-open Fulma
-
-open Fulma.FontAwesome
 open Fable
 open Fable.Core
 open Fable.Import.RemoteDev
@@ -24,6 +21,7 @@ open JsInterop
 open Fable.Core.JsInterop
 open CryptoCurrencyPrices
 
+
 type MenuMediator =
     | Verification
     | PurchaseToken
@@ -31,23 +29,6 @@ type MenuMediator =
     | ReferralProgram
     | Contacts
     | Dashboard
-
-type AuthModel = {
-    Token: AuthToken
-    UserName: string
-}
-
-type Model = {
-    Auth: AuthModel option
-
-    Counter: Counter option
-
-    CryptoCurrencies: CryptoCurrencies.CryptoCurrency list
-    CurrenciesCurentPrices: ViewModels.CurrencyPriceTick
-
-    TokenSale: ViewModels.TokenSale option
-    MenuMediator: MenuMediator  
-}
 
 type RemotingError =
     | CommunicationError of exn
@@ -58,7 +39,7 @@ type Msg =
     | ServerMsg     of ServerMsg
     | UIMsg         of UIMsg
     | UnexpectedMsg of UnexpectedMsg
-    | ErrorMsg      of string * Msg * Model
+    | ErrorMsg      of string * Msg * string
     | OldMsg        of OldMsg
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken

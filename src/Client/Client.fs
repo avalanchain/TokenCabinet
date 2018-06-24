@@ -23,7 +23,8 @@ open web3Impl
 open Fable.Core.JsInterop
 
 open Client
-open ClientModelMsg
+open ClientMsgs
+open ClientModels
 open System.ComponentModel
 open Fable.PowerPack
 // importAll "../../node_modules/bulma/bulma.sass"
@@ -115,7 +116,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
             | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
             | model, InitDb -> model, cmdServerCall (Server.adminApi.initDb) () (InitDbCompleted >> OldMsg) "InitDb()"
             | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
-            | _ -> model, ("Unhandled", msg, model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
+            | _ -> model, ("Unhandled", msg, string model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
 
         | AuthMsg(LoggedIn authToken) -> 
             { model with Auth = Some { Token = authToken; UserName = "" } } , Cmd.none // TODO: Add UserName
@@ -140,9 +141,9 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         | UnexpectedMsg msg_ ->
             match msg_ with
             | BrowserStorageFailure _ -> 
-                model, ("Browser storage access failed with", msg, model) |> ErrorMsg |> Cmd.ofMsg
+                model, ("Browser storage access failed with", msg, string model) |> ErrorMsg |> Cmd.ofMsg
             | ServerErrorMsg _ -> 
-                model, ("Server error ", msg, model) |> ErrorMsg |> Cmd.ofMsg
+                model, ("Server error ", msg, string model) |> ErrorMsg |> Cmd.ofMsg
         | ErrorMsg(text, msg, m) -> 
             console.error(sprintf "%s Msg '%A' on Model '%A'" text msg m)
             model, Cmd.none

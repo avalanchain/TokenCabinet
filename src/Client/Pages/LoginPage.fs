@@ -13,7 +13,8 @@ open Elmish
 open Elmish.React
 
 open Shared
-open ClientModelMsg
+open ClientMsgs
+open ClientModels
 open Shared.Auth
 
 type Msg = 

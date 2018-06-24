@@ -2,11 +2,14 @@ module Client.MyInvestmentsView
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
+
 open Fulma
 open Fulma.FontAwesome
-open ClientModelMsg
+
 open Fable
 open Verifications
+open ClientMsgs
+open ClientModels
 
 let show = function
             | Some x -> string x

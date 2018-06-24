@@ -2,9 +2,11 @@ module Client.VerificationView
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
-open ClientModelMsg
 open Fable
+
+open ClientMsgs
+open ClientModels
+
 
 let view (model : Model) (dispatch : Msg -> unit) =
     div [ Class "dashboard-wrapper" ]

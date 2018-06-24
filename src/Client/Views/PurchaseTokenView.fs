@@ -3,8 +3,6 @@ module Client.PurchaseTokenView
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.DateFunctions
-open Fulma
-open ClientModelMsg
 open Fable
 
 open Fable.Core
@@ -15,6 +13,10 @@ open Client.Helpers
 open Fable.Core.JsInterop
 open ReactChartJs2
 open ChartJs.Chart
+
+open ClientMsgs
+open ClientModels
+
 let formatOptions = createEmpty<IDistanceInWordsOptions>
 formatOptions.includeSeconds <- false
 formatOptions.addSuffix <- true
