@@ -21,18 +21,15 @@
     <Compile Include="../Shared/Entities/InvestmentTranStatusIdsModel.fs" />
     <Compile Include="../Shared/Entities/InvestmentsModel.fs" />
     <Compile Include="../Shared/Shared.fs" />
-
     <Compile Include="lib/BigNumber.fs" />
     <Compile Include="lib/jsonrpc.fs" />
     <Compile Include="lib/Web3.fs" />
     <Compile Include="lib/W3.fs" />
     <Compile Include="lib/Fable.Recharts.fs" />
-    <Compile Include="lib/ChartJs.fs" /> 
-    <Compile Include="lib/react-chartjs-2.fs" /> 
+    <Compile Include="lib/ChartJs.fs" />
+    <Compile Include="lib/react-chartjs-2.fs" />
     <Compile Include="Utils.fs" />
-
     <Compile Include="ClientModelMsg.fs" />
-
     <Compile Include="Components/HeroTile.fs" />
     <Compile Include="Components/Helpers.fs" />
     <Compile Include="Components/Footer.fs" />
@@ -42,7 +39,6 @@
     <Compile Include="Components/NavBrand.fs" />
     <Compile Include="Components/LeftMenu.fs" />
     <Compile Include="Components/Menu.fs" />
-
     <Compile Include="Views/DashboardView.fs" />
     <Compile Include="Views/PurchaseTokenView.fs" />
     <Compile Include="Views/VerificationView.fs" />
@@ -50,7 +46,7 @@
     <Compile Include="Views/ReferralProgramView.fs" />
     <Compile Include="Views/ContactsView.fs" />
     <Compile Include="Views/ContentView.fs" />
-
+    <Compile Include="Pages/LoginPage.fs" />
     <Compile Include="Client.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

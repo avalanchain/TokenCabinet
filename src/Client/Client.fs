@@ -115,8 +115,10 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
             | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
             | _ -> model, ("Unhandled", msg, model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
 
-        | AuthMsg(LoggedIn authToken) -> { model with Auth = Some { Token = authToken } } , Cmd.none
-        | AuthMsg(LoggedOut)          -> { model with Auth = None } , Cmd.none
+        | AuthMsg(LoggedIn authToken) -> 
+            { model with Auth = Some { Token = authToken; UserName = "" } } , Cmd.none // TODO: Add UserName
+        | AuthMsg(LoggedOut)          -> 
+            { model with Auth = None } , Cmd.none
 
         | ServerMsg msg_ ->
             match msg_ with

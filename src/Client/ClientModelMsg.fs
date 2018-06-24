@@ -34,6 +34,7 @@ type MenuMediator =
 
 type AuthModel = {
     Token: AuthToken
+    UserName: string
 }
 
 type Model = {
