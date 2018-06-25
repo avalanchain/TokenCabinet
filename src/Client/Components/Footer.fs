@@ -2,8 +2,6 @@ module Client.Footer
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
-open ClientMsgs
 
 let footer  =
     div [ Class "footer" ]

@@ -215,9 +215,9 @@ let innerPageView model (dispatch: AppMsg -> unit) =
     | MenuPage.Login -> 
         match model.PageModel with
         | LoginModel m -> (LoginPage.view m (LoginMsg >> dispatch)) 
-        | _ -> div [ ] [ str "Incorrect login model/page" ]
+        | _ -> 
             Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
-            [ ]
+            div [ ] [ str "Incorrect login model/page" ]
 
     | MenuPage.Cabinet p ->
         match model.PageModel with
