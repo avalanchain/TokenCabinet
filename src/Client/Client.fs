@@ -1,6 +1,8 @@
 module Client.Main
 
 open Elmish
+open Elmish.Browser.Navigation
+open Elmish.Browser.UrlParser
 open Elmish.React
 open Elmish.Toastr
 
@@ -94,7 +96,7 @@ let cmdServerCall apiFunc args (completeMsg: 'T -> AppMsg) serverMethodName =
         (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
                     exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg)
 
-let init () : AppModel * Cmd<AppMsg> =
+let init urlParsingResult : AppModel * Cmd<AppMsg> =
     let model = {   Auth                    = None
                     Loading                 = false
                     Page                    = MenuPage.Default
@@ -124,7 +126,10 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             | _ -> model, ("Unhandled", msg, string model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
 
         | AuthMsg(LoggedIn authToken) -> 
-            { model with Auth = Some { Token = authToken; UserName = "" } } , Cmd.none // TODO: Add UserName
+            let authModel = { LoginPage.AuthModel.Token = authToken; LoginPage.AuthModel.UserName = "" }
+            let page = CabinetPage.Page.Default
+            let model', cmd' = CabinetPage.init authModel page 
+            { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model' } , cmd' // TODO: Add UserName
         | AuthMsg(LoggedOut)          -> 
             { model with Auth = None } , Cmd.none
 
@@ -161,31 +166,28 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             console.error(sprintf "%s Msg '%A' on Model '%A'" text msg m)
             model, Cmd.none
 
-        | LoginMsg(_) -> failwith "Not Implemented"
-        | CabinetMsg(_) -> failwith "Not Implemented"            
+        | LoginMsg msg_ ->
+            match model.PageModel with
+            | LoginModel loginModel -> 
+                let model', cmd', externalMsg' = LoginPage.update msg_ loginModel
+                let cmd2 =
+                    match externalMsg' with
+                    | LoginPage.ExternalMsg.NoOp -> Cmd.none
+                    | LoginPage.ExternalMsg.LoginUser loginInfo -> 
+                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (LoggedIn >> AuthMsg) "login()"
+                        // AuthMsg
+
+                        // LocalStorage.saveUserCmd newUser.
+                { model with PageModel = LoginModel model' }, Cmd.batch [ Cmd.map LoginMsg cmd'; cmd2 ]
+            | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", LoginMsg msg_, (string model)) |> Cmd.ofMsg           
+        | CabinetMsg msg_ ->             
+            match model.PageModel with
+            | CabinetModel cabinetModel -> 
+                let model', cmd' = CabinetPage.update msg_ cabinetModel
+                { model with PageModel = CabinetModel model' }, Cmd.map CabinetMsg cmd'
+            | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", CabinetMsg msg_, (string model)) |> Cmd.ofMsg           
 
     model', cmd'
-
-
-
-        //   Control.p [ Control.IsExpanded ]
-        //     [ Input.text
-        //         [ Input.Disabled true
-        //           Input.Value (show model.Counter) ] ]
-
-        //   Control.p [ ]
-        //     [ Button.a
-        //         [ Button.Color IsInfo
-        //           Button.OnClick (fun _ -> dispatch Increment) ]
-        //         [ str "+" ] ]
-
-
-        //   Control.p [ ]
-        //     [ Button.a
-        //         [ Button.Color IsInfo
-        //           Button.OnClick (fun _ -> dispatch Decrement) ]
-        //         [ str "-" ] ] 
-
 
 // let view (model : Model) (dispatch : Msg -> unit) =
 //     div [ Id "wrapper" ]
@@ -216,14 +218,16 @@ let innerPageView model (dispatch: AppMsg -> unit) =
 
     | MenuPage.Login -> 
         match model.PageModel with
-        | LoginModel m -> [ (LoginPage.view m (LoginMsg >> dispatch)) ]
-        | _ -> [ ]
+        | LoginModel m -> [ LoginPage.view m (LoginMsg >> dispatch) ]
+        | _ -> 
+            Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
+            [ ]
 
     | MenuPage.Cabinet p ->
         match model.PageModel with
-        | CabinetModel sm -> [ (CabinetPage.view p sm (CabinetMsg >> dispatch)) ]         
+        | CabinetModel sm -> [ CabinetPage.view p sm (CabinetMsg >> dispatch) ]         
         | _ -> 
-            Browser.console.error(sprintf "Unexpected SubModel:[%A]" model.PageModel)
+            Browser.console.error(sprintf "Unexpected PageModel for CabinetPage:[%A]" model.PageModel)
             [ ]
 
     // | MenuPage.Trading p ->
@@ -367,9 +371,10 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram init update view
+|> Program.toNavigable(parseHash PageRouter.pageParser) PageRouter.urlUpdate
 // |> Program.withSubscription timer
 #if DEBUG
-// |> Program.withConsoleTrace
+|> Program.withConsoleTrace
 |> Program.withHMR
 #endif
 |> Program.withReact "ac-app"

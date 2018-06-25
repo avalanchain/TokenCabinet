@@ -39,8 +39,8 @@ let private checkUserExists authToken =
     logins.ContainsKey authToken
 
 let private isTokenValid authToken =
-    let (AuthToken at) = authToken
-    at |> AuthJwt.checkValid |> Option.isSome
+    let (AuthToken authToken) = authToken
+    authToken |> AuthJwt.checkValid |> Option.isSome
 
 let getCryptoCurrencies config () = task { 
     printfn "getCryptoCurrencies() called"

@@ -19,9 +19,9 @@ open ClientModels
 open Shared.Utils
 open Menu
 
-let staticPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
+let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
     allUnionCases(typeof<CabinetPage.Page>)
-    |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "static" </> s ((getUnionCaseName ed typeof<CabinetPage.Page>).ToLowerInvariant())))
+    |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "cabinet" </> s ((getUnionCaseName ed typeof<CabinetPage.Page>).ToLowerInvariant())))
 
 
 // let [<PassGenerics>]tradingPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
@@ -43,10 +43,10 @@ let staticPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list =
 
 
 /// The URL is turned into a Result.
-let pageParser : Parser<MenuPage -> _,_> =
+let pageParser : Parser<MenuPage -> MenuPage, MenuPage> =
     oneOf ([map MenuPage.Home (s "home")
             map MenuPage.Login (s "login") ] 
-            @ staticPageParsers
+            @ cabinetPageParsers
             // @ tradingPageParsers 
             )
     
@@ -78,4 +78,4 @@ let urlUpdate (result: MenuPage option) (model: AppModel) =
     //         model, Cmd.ofMsg (Logout |> MenuMsg)
 
     | Some (MenuPage.Home as page) ->
-        { model with Page = page }, []
+        { model with Page = page }, Cmd.none

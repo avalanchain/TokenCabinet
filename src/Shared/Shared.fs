@@ -121,7 +121,7 @@ type IAdminProtocol = {
 }
 
 type ITokenSaleProtocol = {
-    login               : LoginInfo -> Async<Result<AuthToken, LoginError>>
+    login               : LoginInfo -> Async<ServerResult<AuthToken>>
     getCryptoCurrencies : unit -> Async<ServerResult<CryptoCurrencies.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 

@@ -16,12 +16,13 @@ open Elmish.React.Common
 open LoginPage
 
 type Page =
-    | Verification
     | PurchaseToken
     | MyInvestments
     | ReferralProgram
+    | Verification
     | Contacts
     | Dashboard
+    with static member Default = PurchaseToken  
 
 type Model = 
     | VerificationModel     of string

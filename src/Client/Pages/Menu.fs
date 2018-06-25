@@ -45,12 +45,19 @@ let toHash =
 
 let init() = Utils.load<AuthModel> "user", Cmd.none
 
+let goToUrl (e: React.MouseEvent) =
+    e.preventDefault()
+    let href = !!e.target?href
+    Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
+
 [<PassGenerics>]
 let viewLink page description icon bage isActive =
-    a [ ClassName ("nav-link" + (if isActive then " active" else "")); Href (toHash page) ] [
-        yield i [ ClassName icon ] [ ]
-        yield ofString (" " + description)  
-        if bage > 0u then yield span [ ClassName "badge badge-info" ] [ ofString (bage.ToString()) ] 
+    a [ ClassName ("nav-link" + (if isActive then " active" else "")); 
+        Href (toHash page) 
+        OnClick goToUrl ] [
+            yield i [ ClassName icon ] [ ]
+            yield ofString (" " + description)  
+            if bage > 0u then yield span [ ClassName "badge badge-info" ] [ ofString (bage.ToString()) ] 
     ]
 
 [<PassGenerics>]
@@ -72,6 +79,7 @@ let cabinetNavViewLink page description icon bage isActive =
     li [ ClassName ("nav-item") ] [ viewLink page description icon bage isActive ]
 
 let handleClick (e: React.MouseEvent) =
+    Browser.console.log (sprintf "Menu  Mouse evt: '%A'" e)
     e.preventDefault()
     e.target?parentElement?classList?toggle("open") |> ignore
 
@@ -98,44 +106,6 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
                 ]
             ]
         ]
-
-    // let trading = 
-    //     [   li [    ClassName "nav-item nav-dropdown open" ] [
-    //             a [ ClassName "nav-link nav-dropdown-toggle"
-    //                 Href "#"
-    //                 OnClick handleClick ] [ text " TRADING" ]
-    //             ul [ ClassName "nav-dropdown-items" ] [
-    //                 let icon = function
-    //                             | Trading.Page.Trader ci -> "icon-refresh"
-    //                             | Trading.Page.VesselOperator ci -> "icon-shuffle"
-    //                             | Trading.Page.VesselMaster ci -> "icon-anchor"
-    //                             | Trading.Page.Terminal ci -> "icon-direction"
-    //                             | Trading.Page.Inspector ci -> "icon-eyeglass"
-    //                             | Trading.Page.Archive -> "icon-docs"
-    //                             | Trading.Page.All -> "icon-grid"
-    //                 let mutable lastCaseName = None 
-    //                 for c in Trading.pageDefs do 
-    //                     let tradingPage = c |> fst
-    //                     let menuPage = tradingPage |> MenuPage.Trading
-    //                     let companyInfo = !!tradingPage?data
-    //                     let caseName = tradingPage |> getUnionCaseNameSplit
-    //                     if lastCaseName <> Some caseName then yield div [ ClassName "dropdown-divider" ] [] 
-    //                     lastCaseName <- Some caseName
-    //                     yield cabinetNavViewLink menuPage ( if companyInfo |> isNull then caseName else !!companyInfo?Name)
-    //                         (icon tradingPage) (model.Trading |> (c |> snd) |> Map.count |> uint32) 
-    //                         (match model.Page with 
-    //                             | MenuPage.Trading tp -> 
-    //                                 let tpci = !!tp?data
-    //                                 if (companyInfo |> isNull) || (tpci |> isNull) then tp = tradingPage 
-    //                                 else 
-    //                                     let tpuid: uint32 = !!tpci?UID
-    //                                     tpuid = !!companyInfo?UID
-    //                             | _ -> false)
-    //                 yield div [ ClassName "dropdown-divider" ] []
-    //             ]
-    //         ]
-    //     ]
-
 
     let divider = li [ ClassName "divider" ] [ ]
 
