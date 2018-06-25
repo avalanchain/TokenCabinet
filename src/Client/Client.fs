@@ -60,10 +60,10 @@ module LocalStorage =
         BrowserLocalStorage.load "user"
 
     let saveUserCmd user =
-        Cmd.ofFunc (BrowserLocalStorage.save "user") user (fun _ -> LoggedIn user |> AuthMsg) (BrowserStorageFailure >> UnexpectedMsg)
+        Cmd.ofFunc (BrowserLocalStorage.save "user") user (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
 
     let deleteUserCmd =
-        Cmd.ofFunc BrowserLocalStorage.delete "user" (fun _ -> LoggedOut |> AuthMsg) (BrowserStorageFailure >> UnexpectedMsg)
+        Cmd.ofFunc BrowserLocalStorage.delete "user" (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
 
 module Server =
 
@@ -125,7 +125,8 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             let authModel = { LoginPage.AuthModel.Token = authToken; LoginPage.AuthModel.UserName = "" }
             let page = CabinetPage.Page.Default
             let model', cmd' = CabinetPage.init authModel page 
-            { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model' } , cmd' // TODO: Add UserName
+            let cmd' = Cmd.batch [LocalStorage.saveUserCmd authModel; cmd']
+            { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model' } , cmd'  // TODO: Add UserName
         | AuthMsg(LoggedOut)          -> 
             { model with Auth = None } , Cmd.none
 
@@ -139,6 +140,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             match msg with 
             | Tick i -> 
                 model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (PriceTick >> ServerMsg) "getPriceTick()"
+            | BrowserStorageUpdated -> model, Cmd.none            
             | MenuSelected page -> 
                 let cmd =   Toastr.message (sprintf "Menu selected: '%A'" page)
                             |> Toastr.withProgressBar
@@ -171,9 +173,6 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                     | LoginPage.ExternalMsg.NoOp -> Cmd.none
                     | LoginPage.ExternalMsg.LoginUser loginInfo -> 
                         cmdServerCall (Server.tokenSaleApi.login) loginInfo (LoggedIn >> AuthMsg) "login()"
-                        // AuthMsg
-
-                        // LocalStorage.saveUserCmd newUser.
                 { model with PageModel = LoginModel model' }, Cmd.batch [ Cmd.map LoginMsg cmd'; cmd2 ]
             | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", LoginMsg msg_, (string model)) |> Cmd.ofMsg           
         | CabinetMsg msg_ ->             

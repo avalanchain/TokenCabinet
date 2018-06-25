@@ -47,6 +47,7 @@ and ServerMsg =
 and UIMsg =
     | Tick                  of uint64
     | MenuSelected          of CabinetPage.Page
+    | BrowserStorageUpdated
     | Login
     | Logout  
 and UnexpectedMsg =
