@@ -16,7 +16,7 @@ let show = function
             | None -> "Loading..."
 
 
-let counter (model : Model) (dispatch : Msg -> unit) =
+let counter (model : Model) (dispatch : AppMsg -> unit) =
     Field.div [ Field.IsGrouped ]
         [ Control.p [ ]
             [ Button.a
@@ -39,7 +39,7 @@ let counter (model : Model) (dispatch : Msg -> unit) =
                 [ str "-" ] ] ]
 
 
-let columns (model : Model) (dispatch : Msg -> unit) =
+let columns (model : Model) (dispatch : AppMsg -> unit) =
     Columns.columns [ ]
         [ Column.column [ Column.Width (Fulma.Screen.All, Column.Is6) ]
             [ Card.card [ CustomClass "events-card" ]
@@ -114,7 +114,7 @@ let columns (model : Model) (dispatch : Msg -> unit) =
                       ] ] ]
 
 
-let view  (model : Model) (dispatch : Msg -> unit) =
+let view  (model : Model) (dispatch : AppMsg -> unit) =
     div [ Class "dashboard-wrapper" ]
         [   columns           model dispatch 
         ]

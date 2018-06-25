@@ -9,6 +9,7 @@ open Fable.Helpers.React.Props
 
 open Shared
 open Auth
+open Client
 
 open Fable
 open Fable.Core
@@ -21,15 +22,7 @@ open Fable.Core.JsInterop
 open CryptoCurrencyPrices
 
 open ClientMsgs
-
-[<RequireQualifiedAccess>]
-type MenuPage = 
-  | Home 
-  | Admin
-  | Login
-//   | Static of Statics.Page
-//   | Trading of Trading.Page
-  with static member Default = Home
+open LoginPage
 
 // type LoginState =
 // | LoggedOut
@@ -37,26 +30,34 @@ type MenuPage =
 
 // Model
 
-type SubModel =
-  | NoSubModel
-//   | LoginModel of LoginPage.Model
+[<RequireQualifiedAccess>]
+type MenuPage = 
+  | Home 
+  | Login
+  | Cabinet of CabinetPage.Page
+//   | Static of Statics.Page
+  with static member Default = Home
+
+
+type PageModel =
+  | NoPageModel
+  | LoginModel   of LoginPage.Model
+  | CabinetModel of CabinetPage.Model
 //   | StaticModel of Statics.Model
 
+type AppModel = {
+    Auth        : AuthModel option
+    Loading     : bool  
+    Page        : MenuPage
+    PageModel   : PageModel
+    // State       : LoginState
 
-type AuthModel = {
-    Token: AuthToken
-    UserName: string
-}
+    Counter     : Counter option
 
-type Model = {
-    Auth: AuthModel option
-
-    Counter: Counter option
-
-    CryptoCurrencies: CryptoCurrencies.CryptoCurrency list
+    CryptoCurrencies      : CryptoCurrencies.CryptoCurrency list
     CurrenciesCurentPrices: ViewModels.CurrencyPriceTick
 
-    TokenSale: ViewModels.TokenSale option
-    MenuMediator: MenuMediator  
+    TokenSale             : ViewModels.TokenSale option
+
 }
 

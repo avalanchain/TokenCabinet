@@ -1,4 +1,4 @@
-module LoginPage
+module Client.LoginPage
 
 open System
 open System.Text.RegularExpressions
@@ -13,12 +13,10 @@ open Elmish
 open Elmish.React
 
 open Shared
-open ClientMsgs
-open ClientModels
 open Shared.Auth
 
 type Msg = 
-    // | Login
+    | Login
     | ChangeUserName    of string
     | ChangePassword    of string
     | LoginSuccess      of authToken: AuthToken
@@ -29,6 +27,11 @@ type Msg =
 type ExternalMsg =
     | NoOp
     | LoginUser of LoginInfo
+
+type AuthModel = {
+    Token: AuthToken
+    UserName: string
+}
 
 type LoginState =
     | LoggedOut
@@ -75,7 +78,8 @@ let validateInput (model: Model) =
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
-    // | Login
+    | Login -> 
+        { model with InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangeUserName username -> 
         { model with InputUserName = username; InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->

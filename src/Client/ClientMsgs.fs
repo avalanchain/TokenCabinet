@@ -9,6 +9,7 @@ open Fable.Helpers.React.Props
 
 open Shared
 open Auth
+open Client
 
 open Fable
 open Fable.Core
@@ -21,26 +22,21 @@ open JsInterop
 open Fable.Core.JsInterop
 open CryptoCurrencyPrices
 
-
-type MenuMediator =
-    | Verification
-    | PurchaseToken
-    | MyInvestments
-    | ReferralProgram
-    | Contacts
-    | Dashboard
-
 type RemotingError =
     | CommunicationError of exn
     | ServerError of ServerError
 
-type Msg =
+type AppMsg =
     | AuthMsg       of AuthMsg
     | ServerMsg     of ServerMsg
     | UIMsg         of UIMsg
     | UnexpectedMsg of UnexpectedMsg
-    | ErrorMsg      of string * Msg * string
+    | ErrorMsg      of string * AppMsg * string
     | OldMsg        of OldMsg
+
+    | LoginMsg      of LoginPage.Msg
+    | CabinetMsg    of CabinetPage.Msg
+
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken
     | LoggedOut
@@ -50,7 +46,9 @@ and ServerMsg =
     | PriceTick                     of ViewModels.CurrencyPriceTick
 and UIMsg =
     | Tick                  of uint64
-    | MenuSelected          of MenuMediator
+    | MenuSelected          of CabinetPage.Page
+    | Login
+    | Logout  
 and UnexpectedMsg =
     | BrowserStorageFailure of Exception
     | ServerErrorMsg        of RemotingError

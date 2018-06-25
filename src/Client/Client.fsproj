@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="../Shared/Utils.fs" />
     <Compile Include="../Shared/Auth.fs" />
     <Compile Include="../Shared/Entities/VerificationsModel.fs" />
     <Compile Include="../Shared/Entities/CryptoCurrenciesModel.fs" />
@@ -29,10 +30,8 @@
     <Compile Include="lib/ChartJs.fs" />
     <Compile Include="lib/react-chartjs-2.fs" />
     <Compile Include="Utils.fs" />
-    <Compile Include="ClientMsgs.fs" />
 
-    <Compile Include="ClientModels.fs" />
-
+<!--
     <Compile Include="Components/HeroTile.fs" />
     <Compile Include="Components/Helpers.fs" />
     <Compile Include="Components/Footer.fs" />
@@ -50,8 +49,16 @@
     <Compile Include="Views/ReferralProgramView.fs" />
     <Compile Include="Views/ContactsView.fs" />
     <Compile Include="Views/ContentView.fs" />
+-->
 
     <Compile Include="Pages/LoginPage.fs" />
+    <Compile Include="Pages/CabinetPage.fs" />
+    <Compile Include="Pages/Home.fs" />
+
+    <Compile Include="ClientMsgs.fs" />
+    <Compile Include="ClientModels.fs" />
+    <Compile Include="Pages/Menu.fs" />
+
     <Compile Include="PageRouter.fs" />
     <Compile Include="Client.fs" />
   </ItemGroup>

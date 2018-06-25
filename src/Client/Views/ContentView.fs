@@ -6,7 +6,7 @@ open ClientMsgs
 open ClientModels
 
         
-let contentView  (model : Model) (dispatch : Msg -> unit) =
+let contentView  (model : Model) (dispatch : AppMsg -> unit) =
     match model.MenuMediator with 
     | Verification -> VerificationView.view model dispatch
     | PurchaseToken -> PurchaseTokenView.view model dispatch

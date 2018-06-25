@@ -22,7 +22,7 @@ formatOptions.includeSeconds <- false
 formatOptions.addSuffix <- true
 formatOptions.locale <- DateTime.Locales.Russian
 
-let info (model : Model) (dispatch : Msg -> unit) =
+let info (model : Model) (dispatch : AppMsg -> unit) =
     let fieldPairs = 
         match model.TokenSale with
             | Some v -> [   "Sale Start Date", ExternalDateFns.formatWithStr v.StartDate "Do MMM YYYY" 
@@ -32,12 +32,12 @@ let info (model : Model) (dispatch : Msg -> unit) =
             | None -> [ "", "" ]
     fieldPairs |> toTiles       
 
-let currencies (model : Model) (dispatch : Msg -> unit) =
+let currencies (model : Model) (dispatch : AppMsg -> unit) =
     let fieldPairs = 
         [ for price in model.CurrenciesCurentPrices.Prices -> price.Symbol, price.PriceUsd.ToString()+ " $" ]
     fieldPairs |> Helpers.toTiles   
 
-let tokenSaleStages  (model : Model) (dispatch : Msg -> unit) =
+let tokenSaleStages  (model : Model) (dispatch : AppMsg -> unit) =
 
     let convertDateTime (dt : DateTime) = ExternalDateFns.formatWithStr dt "Do MMM YYYY" 
     let getStatus = function    
@@ -99,7 +99,7 @@ let chart = div [ Id "doughnut-card"
                           HTMLAttr.Custom ("data-ripple-color", "") ]
                         [ str "See all data" ] ] ]
  //////Chart zone  end 
-let view  (model : Model) (dispatch : Msg -> unit) = 
+let view  (model : Model) (dispatch : AppMsg -> unit) = 
     div [ Class "dashboard-wrapper" ]
         [   HeroTile.hero
             tokenSaleStages   model dispatch

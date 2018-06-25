@@ -122,7 +122,7 @@ let update msg model =
         | AppMsg.OpenLogIn ->
             let m, cmd = Login.init None
             { model with
-                Page = MenuPage.Login
+                Page init= MenuPage.Login
                 SubModel = LoginModel m }, Cmd.batch [cmd; Navigation.modifyUrl (toHash MenuPage.Login) ]
 
         | StorageFailure e ->
@@ -213,7 +213,7 @@ let innerPageView model dispatch =
 
     | MenuPage.Login -> 
         match model.SubModel with
-        | LoginModel m -> [ (Login.view m dispatch) ]
+        | LoginModel m -> [ (LoginPage.view (LoginPage.init None) dispatch) ]
         | _ -> [ ]
 
     | MenuPage.Static p ->
@@ -257,7 +257,7 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 let pageView (model: Model) (dispatch: AppMsg -> unit) innerPageView =
     div [ ClassName "app" ]
         [
-            fn loader { active = model.Loading; spinner = true; text = "Talking to Ethereum ..." } [
+            // fn loader { active = model.Loading; spinner = true; text = "Talking to Ethereum ..." } [
                 header [ ClassName "app-header navbar" ] [
                     button [ClassName "navbar-toggler mobile-sidebar-toggler d-lg-none" 
                             OnClick mobileSidebarToggle 
@@ -342,7 +342,7 @@ let pageView (model: Model) (dispatch: AppMsg -> unit) innerPageView =
                 footer [ ClassName "app-footer" ] [ 
                     a [ Href "http://www.avalanchain.com" ] [ text "2018 Avalanchain" ]
                 ]
-            ]
+            // ]
         ]
 
 /// Constructs the view for the application given the model.

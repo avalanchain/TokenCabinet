@@ -6,6 +6,8 @@ open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import
 
+open Fable.Helpers.React
+
 // let reviver (name, value: obj) = 
 //     match name with 
 //     | "Contracts" -> 
@@ -27,3 +29,5 @@ let delete key =
 let stringifyPretty o = jsNative
 
 let toJsonPretty tabSize o = JS.JSON.stringify (o, Func<string, obj, obj>(fun _ -> deflate), U2.Case2(tabSize))
+
+let text = ofString

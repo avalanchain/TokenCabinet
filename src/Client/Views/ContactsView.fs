@@ -105,7 +105,7 @@ let chartJsData: ChartJs.Chart.ChartData = {
 let chartProps = jsOptions<ChartComponentProps>(fun o -> 
     o.data <- chartJsData |> ChartData.ofT );
 
-let view  (model : Model) (dispatch : Msg -> unit) =
+let view  (model : Model) (dispatch : AppMsg -> unit) =
     div [ Class "dashboard-wrapper" ]
         [   
             div [ ]

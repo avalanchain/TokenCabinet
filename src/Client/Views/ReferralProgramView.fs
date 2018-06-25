@@ -11,7 +11,7 @@ open ClientMsgs
 open ClientModels
 
 
-let view  (model : Model) (dispatch : Msg -> unit) =
+let view  (model : Model) (dispatch : AppMsg -> unit) =
     div [ Class "dashboard-wrapper" ]
         [   str "referralProgramView" 
             br []

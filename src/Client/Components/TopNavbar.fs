@@ -11,7 +11,7 @@ open JsInterop
 // importAll "../lib/css/icons.min.css"
 // importAll "../lib/css/nav.css"
 
-let navBar  (model : Model) (dispatch : Msg -> unit)=
+let navBar  (model : Model) (dispatch : AppMsg -> unit)=
     // let navItem name menuMediator = Navbar.Item.a [ Navbar.Item.IsActive (model.MenuMediator = menuMediator)
     //                                                 Navbar.Item.Props [ OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)] ]
     //                                     [ str name ]
