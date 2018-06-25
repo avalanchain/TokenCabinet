@@ -47,7 +47,8 @@ let toHash =
 let init() = Utils.load<AuthModel> "user", Cmd.none
 
 let goToUrl (e: React.MouseEvent) =
-    e.preventDefault()
+    // e.stopPropagation()
+    // e.preventDefault()
     let href = !!e.target?href
     Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
 
@@ -101,15 +102,8 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
     let cabinet = 
         let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPage.Page
         
-        [   li [    ClassName "nav-item nav-dropdown open" ] [
-                a [ ClassName "nav-link nav-dropdown-toggle"
-                    Href "#"
-                    OnClick handleClick ] [ ofString " STATIC DATA" ]
-                ul [ ClassName "nav-dropdown-items" ] [
-                    for page in getUnionCases(typeof<CabinetPage.Page>) do 
-                        yield navViewLink (page |> toPage |> MenuPage.Cabinet) ((page.Name |> splitOnCapital) + "s") "icon-puzzle" (page.Name = model.Page.ToString())
-                ]
-            ]
+        [   for page in getUnionCases(typeof<CabinetPage.Page>) -> 
+                navViewLink (page |> toPage |> MenuPage.Cabinet) ((page.Name |> splitOnCapital) + "s") "fa fa-th-large" (page.Name = model.Page.ToString())
         ]
 
     // let divider = li [ ClassName "divider" ] [ ]

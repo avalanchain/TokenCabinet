@@ -128,53 +128,47 @@ let view model (dispatch: Msg -> unit) =
         ]
 
     | LoggedOut ->
-        div [ ClassName "app flex-row align-items-center" ] [
-            div [ ClassName "container" ] [
-                div [ ClassName "row justify-content-center" ] [
-                    div [ ClassName "col-md-8" ] [
-                        div [ ClassName "card-group mb-0" ] [
-                            div [ ClassName "card p-4" ] [
-                                div [ ClassName "card-block" ] [
-                                    h1 [] [ str "Login" ]
-                                    p [ ClassName "text-muted" ] [ str "Log in with 'test' / 'test'." ]
-                                    div [ ClassName "input-group mb-3" ] [
-                                        span [ ClassName "input-group-addon" ] [ i [ ClassName "icon-user" ][]]
-                                        input [ Id "username"
-                                                Type "text" 
-                                                ClassName "form-control"
-                                                Placeholder "Username" 
-                                                DefaultValue model.InputUserName
-                                                OnChange (fun ev -> dispatch (ChangeUserName !!ev.target?value))
-                                                AutoFocus true
-                                                ]
-                                    ]
-                                    div [ ClassName "input-group mb-4" ] [
-                                        span [ ClassName "input-group-addon" ] [ i [ ClassName "icon-lock" ][]]
-                                        input [ Type "password" 
-                                                ClassName "form-control" 
-                                                Placeholder "Password"  
-                                                DefaultValue model.InputUserName
-                                                OnChange (fun ev -> dispatch (ChangePassword !!ev.target?value))
-                                                onEnter LogInClicked dispatch
-                                                ]
-                                    ]
-                                    div [ ClassName "row" ] [
-                                        div [ ClassName "col-6" ] [
-                                            button [ Type "button" 
-                                                     ClassName "btn btn-primary px-4" 
-                                                     OnClick (fun _ -> dispatch LogInClicked) 
-                                                     ] [ str "Login" ]
-                                        ]
-                                        div [ ClassName "col-6 text-right" ] [
-                                            button [ Type "button" 
-                                                     ClassName "btn btn-link px-0" ] [ str "Forgot password?" ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+        div [ 
+            // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
             ]
-        ]
+            [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
+                [ div [ ]
+                    [ div [ ]
+                        [ img [ Alt "image"
+                                Class "h55"
+                                Src "../lib/img/avalanchain.png" ] ]
+                    //   br [ ]
+                      h3 [ ]
+                        [ str "Welcome to avalanchain" ]
+                      form [ Class "m-t"
+                             Role "form"
+                             Action "#" ]
+                        [ div [ Class "form-group" ]
+                            [ input [ Id "username"
+                                      Type "email" 
+                                      ClassName "form-control"
+                                      Placeholder "Username" 
+                                      DefaultValue model.InputUserName
+                                      OnChange (fun ev -> dispatch (ChangeUserName !!ev.target?value))
+                                      AutoFocus true ] ]
+                          div [ Class "form-group" ]
+                            [ input [ Type "password" 
+                                      ClassName "form-control" 
+                                      Placeholder "Password"  
+                                      DefaultValue model.InputUserName
+                                      OnChange (fun ev -> dispatch (ChangePassword !!ev.target?value))
+                                      onEnter LogInClicked dispatch ] ]
+                          a [ 
+                              Type "submit"
+                              Class "btn btn-info block full-width m-b"
+                              OnClick (fun _ -> dispatch LogInClicked) ]
+                            [ str "Login" ] ]
+                      p [ Class "m-t project-title" ]
+                        [ small [ ]
+                            [ str "powered by "
+                              a [ 
+                                //   HTMLAttr.Custom ("style", "font-size: 12px;")
+                                  Href "http://avalanchain.com" ]
+                                [ str "Avalanchain" ]
+                              str " © 2018" ] ] ] ] ]
 
