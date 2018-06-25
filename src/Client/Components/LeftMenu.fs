@@ -47,14 +47,13 @@ let LeftMenu  (model : Model) (dispatch : UIMsg -> unit)=
                               Href "#" ]
                             [ span [ Class "clear" ]
                                    [ img [ Class "logo"
-                                        //   HTMLAttr.Custom ("style", "height: 55px")
                                            Src "../lib/img/avalanchain.png" ] ] ]
                           ul [ Class "dropdown-menu animated fadeInRight m-t-xs" ]
                             [ li [ ]
                                 [ a [ Href "#" ]
                                     [ str "Logout" ] ] ] ]
                       div [ Class "logo-element" ]
-                        [ str "IN+" ] ]
+                        [ str "TC" ] ]
                   li [ Class "active" ]
                     [ a [ Href "index.html" ]
                         [ i [ Class "fa fa-th-large" ]

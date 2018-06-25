@@ -3,15 +3,13 @@ module Client.TopNavbar
 open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
-open ClientMsgs
-open ClientModels
+
 open JsInterop
 
 // importAll "../lib/css/icons.min.css"
 // importAll "../lib/css/nav.css"
 
-let navBar  (model : Model) (dispatch : AppMsg -> unit)=
+let navBar  =
     // let navItem name menuMediator = Navbar.Item.a [ Navbar.Item.IsActive (model.MenuMediator = menuMediator)
     //                                                 Navbar.Item.Props [ OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)] ]
     //                                     [ str name ]

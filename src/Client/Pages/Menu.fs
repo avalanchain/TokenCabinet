@@ -3,6 +3,9 @@ module Client.Menu
 open System
 open FSharp.Reflection
 
+open Elmish.Browser.Navigation
+open Elmish.Browser.UrlParser
+
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
@@ -12,8 +15,7 @@ open Fable.Helpers.React.Props
 open Fable.Core.JsInterop
 
 open Elmish
-open Elmish.Browser.Navigation
-open Elmish.Browser.UrlParser
+
 
 open Shared.Utils
 
@@ -24,7 +26,6 @@ open ClientModels
 
 module O = FSharp.Core.Option
 
-importAll "../lib/css/dashboard.css"
 
 
 let toHash =
@@ -51,18 +52,19 @@ let goToUrl (e: React.MouseEvent) =
     Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
 
 [<PassGenerics>]
-let viewLink page description icon bage isActive =
-    a [ ClassName ("nav-link" + (if isActive then " active" else "")); 
-        Href (toHash page) 
-        OnClick goToUrl ] [
+let viewLink page description icon bage =
+    a [ Href (toHash page) 
+        OnClick goToUrl] [
             yield i [ ClassName icon ] [ ]
-            yield ofString (" " + description)  
-            if bage > 0u then yield span [ ClassName "badge badge-info" ] [ ofString (bage.ToString()) ] 
+            yield  span [ Class "nav-label" ]
+                                [ str description ]  
+            if bage > 0u then yield span [ ClassName "pull-right label label-primary" ] [ ofString (bage.ToString()) ] 
     ]
 
 [<PassGenerics>]
-let navViewLink page description icon =
-    li [ ClassName "nav-item" ] [ viewLink page description icon 0u false ]
+let navViewLink page description icon isActive =
+    li [ ClassName (if isActive then " active" else "") ] 
+       [ viewLink page description icon 0u ]
 
 let buttonLink page description icon onClick =
     a [ ClassName "nav-link"
@@ -76,54 +78,94 @@ let navButtonLink page description icon onClick =
 
 [<PassGenerics>]
 let cabinetNavViewLink page description icon bage isActive =
-    li [ ClassName ("nav-item") ] [ viewLink page description icon bage isActive ]
+    li [ ClassName ("nav-item" + (if isActive then " active" else "")) ] [ viewLink page description icon bage  ]
 
 let handleClick (e: React.MouseEvent) =
     Browser.console.log (sprintf "Menu  Mouse evt: '%A'" e)
     e.preventDefault()
     e.target?parentElement?classList?toggle("open") |> ignore
 
+
+// let testlink = 
+
 let view (model: AppModel) (dispatch: UIMsg -> unit) =
     let home = 
-        [   navViewLink MenuPage.Home "HOME" "icon-speedometer" ]
+        [   navViewLink MenuPage.Home "Main view" "fa fa-th-large" ( model.Page = MenuPage.Home )]
 
     let login = 
-        [   navViewLink MenuPage.Login "LOGIN" "icon-star" ]
+        [   navViewLink MenuPage.Login "LOGIN" "fa fa-sign-in" ( model.Page = MenuPage.Login )]
 
     let logout = 
         [   navButtonLink MenuPage.Login "LOGOUT" "icon-star" (fun _ -> dispatch Logout) ]
 
     let cabinet = 
-        let page (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPage.Page
+        let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPage.Page
         
         [   li [    ClassName "nav-item nav-dropdown open" ] [
                 a [ ClassName "nav-link nav-dropdown-toggle"
                     Href "#"
                     OnClick handleClick ] [ ofString " STATIC DATA" ]
                 ul [ ClassName "nav-dropdown-items" ] [
-                    for c in getUnionCases(typeof<CabinetPage.Page>) do 
-                        yield navViewLink (c |> page |> MenuPage.Cabinet) ((c.Name |> splitOnCapital) + "s") "icon-puzzle"
+                    for page in getUnionCases(typeof<CabinetPage.Page>) do 
+                        yield navViewLink (page |> toPage |> MenuPage.Cabinet) ((page.Name |> splitOnCapital) + "s") "icon-puzzle" (page.Name = model.Page.ToString())
                 ]
             ]
         ]
 
-    let divider = li [ ClassName "divider" ] [ ]
+    // let divider = li [ ClassName "divider" ] [ ]
 
-    div [ ClassName "sidebar" ] [
-        nav [ ClassName "sidebar-nav" ] [
-            ul [ ClassName "nav" ] (
+    let staticPart = 
+        li [ Class "nav-header" ]
+            [   div [ Class "dropdown profile-element" ]
+                                        [ a [ DataToggle "dropdown"
+                                              Class "dropdown-toggle"
+                                              Href "#" ]
+                                            [ span [ Class "clear" ]
+                                                   [ img [ Class "logo"
+                                                           Src "../lib/img/avalanchain.png" ] ] ]
+                                           ]
+                div [ Class "logo-element" ]
+                    [ ofString "TC" ] 
+            ]
+
+    let dynamicPart: React.ReactElement list = 
                 match model.Auth with
-                | None ->
-                        (home 
-                            @ (divider :: login)
-                        )
-                | Some _ -> 
-                        (home 
-                            // @ (divider :: trading)
-                            @ (divider :: cabinet)
-                            @ (divider :: logout)
-                            //@ (divider :: statics)
-                        )
-            )
-        ]
-    ]
+                    | None ->
+                            (home 
+                                @ (login)
+                            )
+                    | Some _ -> 
+                            (home 
+                                // @ (divider :: trading)
+                                @ (cabinet)
+                                @ (logout)
+                                //@ (divider :: statics)
+                            )
+                    
+
+    nav [ Class "navbar-default navbar-static-side"
+          Role "navigation" ]
+            [ div [ Class "sidebar-collapse" ]
+                [ ul [ Class "nav metismenu"
+                       Id "side-menu" ]
+                    
+                        (staticPart :: dynamicPart)
+                            ] ] 
+    // div [ ClassName "sidebar" ] [
+    //     nav [ ClassName "sidebar-nav" ] [
+    //         ul [ ClassName "nav" ] (
+    //             match model.Auth with
+    //             | None ->
+    //                     (home 
+    //                         @ (login)
+    //                     )
+    //             | Some _ -> 
+    //                     (home 
+    //                         // @ (divider :: trading)
+    //                         @ (cabinet)
+    //                         @ (logout)
+    //                         //@ (divider :: statics)
+    //                     )
+    //         )
+    //     ]
+    // ]

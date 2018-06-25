@@ -7,8 +7,6 @@ open Fulma
 open ClientMsgs
 open JsInterop
 
-importAll "../lib/css/icons.min.css"
-// importAll "../lib/css/dashboard.css"
 
 // let view  =
 //   div []

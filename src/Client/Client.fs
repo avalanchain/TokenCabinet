@@ -32,10 +32,6 @@ open Fable.PowerPack
 open Shared.Utils
 open Client.Menu
 
-// importAll "../../node_modules/bulma/bulma.sass"
-// importAll "../../node_modules/bulma-steps/dist/css/bulma-steps.min.css"
-// importAll "../Client/lib/css/dashboard.css"
-// importAll "../Client/lib/js/dashboard.js"
 importAll "../../node_modules/bootstrap/dist/css/bootstrap.min.css"
 importAll "../Client/lib/css/inspinia/style.css"
 importAll "../Client/lib/css/inspinia/main.css"
@@ -211,24 +207,24 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
 [<PassGenerics>]
 let innerPageView model (dispatch: AppMsg -> unit) =
     match model.Page with
-    | MenuPage.Home -> [ Home.view() ]
+    | MenuPage.Home -> Home.view() 
 
     // | MenuPage.Admin -> 
     //     [ Admin.view (model.Trading) (AdminMsg >> dispatch) ]
 
     | MenuPage.Login -> 
         match model.PageModel with
-        | LoginModel m -> [ LoginPage.view m (LoginMsg >> dispatch) ]
-        | _ -> 
+        | LoginModel m -> (LoginPage.view m (LoginMsg >> dispatch)) 
+        | _ -> div [ ] [ str "Incorrect login model/page" ]
             Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
             [ ]
 
     | MenuPage.Cabinet p ->
         match model.PageModel with
-        | CabinetModel sm -> [ CabinetPage.view p sm (CabinetMsg >> dispatch) ]         
+        | CabinetModel sm -> (CabinetPage.view p sm (CabinetMsg >> dispatch))        
         | _ -> 
             Browser.console.error(sprintf "Unexpected PageModel for CabinetPage:[%A]" model.PageModel)
-            [ ]
+            div [ ] [ str "Incorrect cabinet model/page" ]
 
     // | MenuPage.Trading p ->
     //     match model.EthConnection with
@@ -262,93 +258,20 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 /// Constructs the view for the application given the model.
 [<PassGenerics>]
 let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
-    div [ ClassName "app" ]
+    div [ Id "wrapper" ]
         [
-            // fn loader { active = model.Loading; spinner = true; text = "Talking to Ethereum ..." } [
-                header [ ClassName "app-header navbar" ] [
-                    button [ClassName "navbar-toggler mobile-sidebar-toggler d-lg-none" 
-                            OnClick mobileSidebarToggle 
-                            Type "button"] [ unbox "\u9776" ]
-                    a [ ClassName "navbar-brand" 
-                        Href "#"] []
-                    ul [ ClassName "nav navbar-nav d-md-down-none" ] [
-                        li [ ClassName "nav-item" ] [
-                            button [    ClassName "nav-link navbar-toggler sidebar-toggler" 
-                                        Type "button" 
-                                        OnClick sidebarToggle ] [ unbox "\u9776" ]
-                        ]
-                        li [ ClassName "nav-item px-3" ] [
-                            a [ ClassName "nav-link" 
-                                Href "#" ] [ ofString "Activities" ]
-                        ]
-                        li [ ClassName "nav-item px-3" ] [
-                            a [ ClassName "nav-link" 
-                                Href "#" ] [ ofString "Pending requests" ]
-                        ]
-                    ]
-                    ul [ ClassName "nav navbar-nav ml-auto" ] [
-                        li [ ClassName "nav-item d-md-down-none" ] [
-                            a [ ClassName "nav-link" 
-                                Href "#" ] [ 
-                                    i [ ClassName "icon-bell" ] []
-                                    span [ ClassName "badge badge-pill badge-danger" ] [ ofInt 5 ]
-                                ]
-                        ]
-                        li [ ClassName "nav-item d-md-down-none" ] [
-                            a [ ClassName "nav-link" 
-                                Href "#" ] [ 
-                                    i [ ClassName "icon-list" ] []
-                                ]
-                        ]
-                        li [ ClassName "nav-item d-md-down-none" ] [
-                            a [ ClassName "nav-link" 
-                                Href "#" ] [ 
-                                    i [ ClassName "icon-location-pin" ] []
-                                ]
-                        ]
-                        li [ ClassName "nav-item d-md-down-none" ] [
-                            div [ ClassName "dropdown" ] [
-                                a [ ClassName "nav-link dropdown-toggle nav-link" ] [
-                                    img [   Src "img/avatars/6.jpg" 
-                                            ClassName "img-avatar" 
-                                            Alt "info@avalanchain.com" ]
-                                    ]
-                                ]
-                        ]
-                        // li [ ClassName "nav-item d-md-down-none" ] [
-                        //     button [    ClassName "nav-link navbar-toggler aside-menu-toggler" 
-                        //                 Type "button" 
-                        //                 OnClick asideToggle ] [ unbox "&#9776;" ]
-                        // ]
-                    ]
+
+                Menu.view model (AppMsg.UIMsg >> dispatch)
+                div [ Id "page-wrapper"
+                      Class "gray-bg" ] [
+                      TopNavbar.navBar
+                      div [ Class "wrapper wrapper-content animated fadeInRight"]
+                          [ 
+                            (innerPageView model dispatch)
+                               ]
                 ]
 
-                div [ ClassName "app-body" ] [
-                    //sidebar model dispatch
-                    Menu.view model (AppMsg.UIMsg >> dispatch)
-                    main [ ClassName "main" ] [
-                        ol [ ClassName "breadcrumb" ] (
-                            match model.Page with 
-                            | MenuPage.Home -> [ li [ ClassName "breadcrumb-item active" ] [ ofString "Home" ] ]
-                            // | MenuPage.Admin -> [ li [ ClassName "breadcrumb-item active" ] [ ofString "Admin" ] ]
-                            | MenuPage.Login -> [ li [ ClassName "breadcrumb-item active" ] [ ofString "Login" ] ]
-                            | MenuPage.Cabinet p -> [   li [ ClassName "breadcrumb-item" ] [ ofString "Token Cabinet" ]
-                                                        li [ ClassName "breadcrumb-item active" ] [ ofString (getUnionCaseNameSplit p (typeof<CabinetPage.Page>)) ] ]
-                            // | MenuPage.Trading p -> [   li [ ClassName "breadcrumb-item" ] [ ofString "Trading" ]
-                            //                             li [ ClassName "breadcrumb-item active" ] [ ofString (p |> getUnionCaseNameSplit) ] ]
-                        )
-                        div [ ClassName "container-fluid" ] [
-                            div [ ClassName "animated fadeIn" ] [
-                                div [  ] (innerPageView model dispatch)
-                            ]
-                        ]
-                    ]
-                    //aside model dispatch
-                ]
-
-                footer [ ClassName "app-footer" ] [ 
-                    a [ Href "http://www.avalanchain.com" ] [ ofString "2018 Avalanchain" ]
-                ]
+                Footer.footer
             // ]
         ]
 
