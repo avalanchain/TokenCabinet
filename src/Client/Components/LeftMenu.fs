@@ -10,7 +10,7 @@ open ClientModels
 
 open JsInterop
 
-importAll "../lib/css/dashboard.css"
+// importAll "../lib/css/dashboard.css"
 // let LeftMenu  (model : Model) (dispatch : UIMsg -> unit)=
 //     let navItem icon menuMediator =  li [ Class ("side-icon " + if model.MenuMediator = menuMediator then "is-active" else "")
 //                                           OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)  
