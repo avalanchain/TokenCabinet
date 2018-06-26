@@ -30,6 +30,7 @@
     <Compile Include="lib/ChartJs.fs" />
     <Compile Include="lib/react-chartjs-2.fs" />
     <Compile Include="Utils.fs" />
+    <Compile Include="Components/Helpers.fs" />
 
 <!--
     <Compile Include="Components/HeroTile.fs" />
@@ -52,6 +53,7 @@
 -->
 
 
+    <Compile Include="lib/ReactBootstrap.fs" />
     <Compile Include="Components/Footer.fs" />
     <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Pages/LoginPage.fs" />

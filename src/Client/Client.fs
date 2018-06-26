@@ -126,6 +126,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             let page = CabinetPage.Page.Default
             let model', cmd' = CabinetPage.init authModel page 
             let cmd' = Cmd.batch [LocalStorage.saveUserCmd authModel; cmd']
+            Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore // TODO: fix localStorage cmds not fired
             { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model' } , cmd'  // TODO: Add UserName
         | AuthMsg(LoggedOut)          -> 
             { model with Auth = None } , Cmd.none

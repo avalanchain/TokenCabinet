@@ -2,6 +2,7 @@
     "private": true,
     "dependencies": {
         "@types/chart.js": "^2.7.22",
+        "@types/react-bootstrap": "^0.32.10",
         "babel-polyfill": "6.26.0",
         "babel-runtime": "6.26.0",
         "bootstrap": "3",
@@ -12,7 +13,7 @@
         "date-fns": "^1.29.0",
         "file-loader": "^1.1.11",
         "react": "16.4.0",
-        "react-bootstrap": "0.32.1",
+        "react-bootstrap": "^0.32.1",
         "react-chartjs-2": "^2.7.2",
         "react-dom": "16.4.0",
         "react-loading-overlay": "^0.3.0",

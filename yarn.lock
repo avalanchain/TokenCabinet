@@ -6,6 +6,18 @@
   version "2.7.22"
   resolved "https://registry.yarnpkg.com/@types/chart.js/-/chart.js-2.7.22.tgz#1a6d695362d4368ad7f4e79f0249f9c6fa05dac1"
 
+"@types/react-bootstrap@^0.32.10":
+  version "0.32.10"
+  resolved "https://registry.yarnpkg.com/@types/react-bootstrap/-/react-bootstrap-0.32.10.tgz#46473829e92687f0301cc8b4d14a92e4b28e6aaa"
+  dependencies:
+    "@types/react" "*"
+
+"@types/react@*":
+  version "16.4.2"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.4.2.tgz#f1a9cf1ee85221530def2ac26aee20f910a9dac8"
+  dependencies:
+    csstype "^2.2.0"
+
 "@webassemblyjs/ast@1.5.12":
   version "1.5.12"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.5.12.tgz#a9acbcb3f25333c4edfa1fdf3186b1ccf64e6664"
@@ -1770,6 +1782,10 @@ csso@~2.3.1:
   dependencies:
     clap "^1.0.9"
     source-map "^0.5.3"
+
+csstype@^2.2.0:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.5.5.tgz#4125484a3d42189a863943f23b9e4b80fedfa106"
 
 currently-unhandled@^0.4.1:
   version "0.4.1"
@@ -4579,7 +4595,7 @@ rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-bootstrap@0.32.1:
+react-bootstrap@^0.32.1:
   version "0.32.1"
   resolved "https://registry.yarnpkg.com/react-bootstrap/-/react-bootstrap-0.32.1.tgz#60624c1b48a39d773ef6cce6421a4f33ecc166bb"
   dependencies:

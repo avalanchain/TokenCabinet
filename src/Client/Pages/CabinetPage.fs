@@ -94,13 +94,32 @@ let update (msg: Msg) model : Model * Cmd<Msg> =
         Browser.console.error(sprintf "Unexpected Model '%A' and Msg '%A' combination" m msg)
         model, Cmd.none
 
+open ReactBootstrap
+open Fable.Import.React
+open Client.Helpers
+
+
 let view (page: Page) (model: Model) (dispatch: Msg -> unit) = 
     match page, model with
         | Verification, VerificationModel m       -> [ str "Verification view" ]
         | PurchaseToken, PurchaseTokenModel m     -> [ str "Purchase Token view" ]
         | MyInvestments, MyInvestmentsModel m     -> [ str "My Investments view" ]
         | ReferralProgram, ReferralProgramModel m -> [ str "Referral Program view" ]
-        | Contacts, ContactsModel m               -> [ str "Contacts view" ]
+        | Contacts, ContactsModel m               -> 
+            [   str "Contacts view"
+                comE buttonToolbar [
+                    comE button [
+                        str "Default"
+                    ]
+                    comF button (fun o -> o.bsStyle <- Some "primary" ) [
+                        str "Default"
+                    ]
+                    comF button (fun o ->   o.bsStyle <- Some "warning"
+                                            o.onClick <- Some (MouseEventHandler(fun e -> e.stopPropagation())) ) [
+                        str "Default"
+                    ]    
+                ] 
+            ]
         | Dashboard, DashboardModel m             -> [ str "Dashboard view" ]
         // | Book ed, BookListModel m -> viewPageStatic<Book> ed m dispatch
         // | Individual ed, IndividualListModel m -> viewPageStatic<Individual> ed m dispatch
