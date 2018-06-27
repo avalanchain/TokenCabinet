@@ -495,3 +495,19 @@ button.btn-primary.dim:active {
 .login{
     padding: 10% 0px;
 }
+
+.btn-large-dim {
+    font-size: 30px;
+}
+
+button.btn-info.dim .name {
+    font-size: 15px;
+}
+
+button.btn-info.dim .price {
+    font-size: 12px;
+}
+
+.currencylogo{
+    width: 40px;
+}

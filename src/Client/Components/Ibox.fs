@@ -10,7 +10,7 @@ let view title body =
                         [ h5 [ ]
                             [ str title ] ]
                       div [ Class "ibox-content" ]
-                        [ body] ]
+                        body ] 
 let viewRow title body =
     div [ Class "row" ]
             [ div [ Class "col-lg-12" ]

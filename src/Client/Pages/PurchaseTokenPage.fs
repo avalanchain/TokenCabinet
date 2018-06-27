@@ -17,7 +17,7 @@ open ViewModels
 open Client.CabinetModel
 
 
-let body m = 
+let bodyTL m = 
       ul [ Class "timeline"
            Id "timeline" ]
            [
@@ -37,14 +37,27 @@ let body m =
            ]
 let timeline (model: Model) =
     match model.TokenSale with
-    | Some m ->
-        Ibox.viewRow "Timeline" (body m)
-    | None -> Ibox.viewRow "Timeline" (div [ ] [str "No model loaded" ]) 
+    | Some m -> Ibox.viewRow "Timeline" ([ bodyTL m ])
+    | None   -> Ibox.viewRow "Timeline" ([ str "No model loaded" ]) 
 
-
-
+let cur name image price =
+            button [ Class "btn btn-info  dim btn-large-dim btn-outline"
+                     Type "button" ]
+                    [  div [ Class "name" ]
+                            [str name]
+                       img [ Class "currencylogo"
+                             Src "https://www.cryptocompare.com/media/20646/eth_logo.png" ]
+                       div [ Class "price" ]
+                           [str (price + " $")] ]
+let currenciesdata = ["ETH", "img", "750";"ETH", "img", "750";"ETH", "img", "750"]
+let bodyC  = 
+            [   for (name, img, price) in currenciesdata ->
+                    cur name img price
+            ]
+let currencies (model: Model) = Ibox.viewRow "Currencies" bodyC
 
 let view (model: Model) =
     div [  ]
-        [ timeline model ]
+        [ timeline model
+          currencies model]
 
