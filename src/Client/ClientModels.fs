@@ -23,6 +23,7 @@ open CryptoCurrencyPrices
 
 open ClientMsgs
 open LoginPage
+open CabinetModel
 
 // type LoginState =
 // | LoggedOut
@@ -42,7 +43,7 @@ type MenuPage =
 type PageModel =
   | NoPageModel
   | LoginModel   of LoginPage.Model
-  | CabinetModel of CabinetPage.Model
+  | CabinetModel of CabinetModel.Model
 //   | StaticModel of Statics.Model
 
 type AppModel = {
@@ -54,10 +55,7 @@ type AppModel = {
 
     Counter     : Counter option
 
-    CryptoCurrencies      : CryptoCurrencies.CryptoCurrency list
-    CurrenciesCurentPrices: ViewModels.CurrencyPriceTick
-
-    TokenSale             : ViewModels.TokenSale option
+    CabinetModel: CabinetModel.Model
 
 }
 

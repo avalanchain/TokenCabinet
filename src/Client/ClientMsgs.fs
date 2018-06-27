@@ -28,7 +28,6 @@ type RemotingError =
 
 type AppMsg =
     | AuthMsg       of AuthMsg
-    | ServerMsg     of ServerMsg
     | UIMsg         of UIMsg
     | UnexpectedMsg of UnexpectedMsg
     | ErrorMsg      of string * AppMsg * string
@@ -40,10 +39,7 @@ type AppMsg =
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken
     | LoggedOut
-and ServerMsg =
-    | GetCryptoCurrenciesCompleted  of CryptoCurrencies.CryptoCurrency list
-    | GetTokenSaleCompleted         of ViewModels.TokenSale
-    | PriceTick                     of ViewModels.CurrencyPriceTick
+
 and UIMsg =
     | Tick                  of uint64
     | MenuSelected          of CabinetPage.Page

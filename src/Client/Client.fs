@@ -27,11 +27,13 @@ open Fable.Core.JsInterop
 open Client
 open ClientMsgs
 open ClientModels
+open CabinetModel
 open System.ComponentModel
 open Fable.PowerPack
 open Shared.Utils
 open Client.Menu
 open Fable
+open Client
 
 importAll "../../node_modules/bootstrap/dist/css/bootstrap.min.css"
 importAll "../Client/lib/css/inspinia/style.css"
@@ -99,16 +101,12 @@ let init urlParsingResult : AppModel * Cmd<AppMsg> =
                     Page                    = MenuPage.Default
                     PageModel               = NoPageModel
                     Counter                 = None
-                    CryptoCurrencies        = []
-                    CurrenciesCurentPrices  = { Prices = [] }
-                    TokenSale               = None
-                }
-    let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
-    let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (GetCryptoCurrenciesCompleted >> ServerMsg) "getCryptoCurrencies()"
-    let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (GetTokenSaleCompleted >> ServerMsg) "getTokenSale()"
-    let cmdTick                 = Cmd.ofMsg (Tick 0UL |> UIMsg)
+                    CabinetModel            = CabinetPage.init()
 
-    model, (Cmd.batch [cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdTick ])
+                }
+
+
+    model, Cmd.none
 
 let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
     let (model', cmd') : AppModel * Cmd<AppMsg> =  
@@ -125,23 +123,21 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
         | AuthMsg(LoggedIn authToken) -> 
             let authModel = { LoginPage.AuthModel.Token = authToken; LoginPage.AuthModel.UserName = "" }
             let page = CabinetPage.Page.Default
-            let model', cmd' = CabinetPage.init authModel model.TokenSale  page 
-            let cmd' = Cmd.batch [LocalStorage.saveUserCmd authModel; cmd']
-            Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore // TODO: fix localStorage cmds not fired
-            { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model' } , cmd'  // TODO: Add UserName
+            let cmdLocalStorage         = LocalStorage.saveUserCmd authModel
+            let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
+            let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
+            let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
+            let cmdTick                 = Cmd.ofMsg (Tick 0UL |> UIMsg)
+            let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdTick ]
+            // Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
+            { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model.CabinetModel } , cmd'  // TODO: Add UserName
         | AuthMsg(LoggedOut)          -> 
-            { model with Auth = None } , Cmd.none
-
-        | ServerMsg msg_ ->
-            match msg_ with
-            | GetCryptoCurrenciesCompleted cc   -> { model with Counter = Some (cc.Length); CryptoCurrencies = cc } , Cmd.none
-            | GetTokenSaleCompleted tc          -> { model with TokenSale = Some (tc) } , Cmd.none
-            | PriceTick tick                    -> { model with CurrenciesCurentPrices = tick }, Cmd.none
+            { model with Auth = None; CabinetModel = CabinetPage.init() } , Cmd.none
 
         | UIMsg msg ->
             match msg with 
             | Tick i -> 
-                model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (PriceTick >> ServerMsg) "getPriceTick()"
+                model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (CabinetPage.PriceTick >> CabinetPage.ServerMsg >> CabinetMsg) "getPriceTick()"
             | BrowserStorageUpdated -> model, Cmd.none            
             | MenuSelected page -> 
                 let cmd =   Toastr.message (sprintf "Menu selected: '%A'" page)

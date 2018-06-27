@@ -14,6 +14,7 @@ open Elmish.React
 
 open Shared
 open ViewModels
+open Client.CabinetModel
 
 
 let body m = 
@@ -34,8 +35,8 @@ let body m =
                       [ h4 [ ]
                           [ str (stage.CapEth.ToString() + " %") ] ] ]
            ]
-let timeline (model: ViewModels.TokenSale option) =
-    match model with
+let timeline (model: Model) =
+    match model.TokenSale with
     | Some m ->
         Ibox.viewRow "Timeline" (body m)
     | None -> Ibox.viewRow "Timeline" (div [ ] [str "No model loaded" ]) 
@@ -43,7 +44,7 @@ let timeline (model: ViewModels.TokenSale option) =
 
 
 
-let view (model: ViewModels.TokenSale option) =
+let view (model: Model) =
     div [  ]
         [ timeline model ]
 

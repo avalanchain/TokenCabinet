@@ -15,6 +15,7 @@ open Elmish.React
 open Elmish.React.Common
 open LoginPage
 open Shared
+open Client.CabinetModel
 
 type Page =
     | PurchaseToken
@@ -25,13 +26,15 @@ type Page =
     | Dashboard
     with static member Default = PurchaseToken  
 
-type Model = 
-    | VerificationModel     of string
-    | PurchaseTokenModel    of ViewModels.TokenSale option
-    | MyInvestmentsModel    of string
-    | ReferralProgramModel  of string
-    | ContactsModel         of string
-    | DashboardModel        of string
+// type Model = 
+//     | VerificationModel     of string
+//     | PurchaseTokenModel    of ViewModels.TokenSale option
+//     | MyInvestmentsModel    of string
+//     | ReferralProgramModel  of string
+//     | ContactsModel         of string
+//     | DashboardModel        of string
+
+
 
 type Msg =
     | VerificationMsg
@@ -40,15 +43,17 @@ type Msg =
     | ReferralProgramMsg
     | ContactsMsg
     | DashboardMsg
+    | ServerMsg     of ServerMsg
+and ServerMsg =
+    | GetCryptoCurrenciesCompleted  of CryptoCurrencies.CryptoCurrency list
+    | GetTokenSaleCompleted         of ViewModels.TokenSale
+    | PriceTick                     of ViewModels.CurrencyPriceTick
 
-let init (user: AuthModel) (model: ViewModels.TokenSale option) (page: Page) = 
-    match page with 
-    | Verification      -> VerificationModel "VerificationModel",       Cmd.none
-    | PurchaseToken     -> PurchaseTokenModel model ,     Cmd.none
-    | MyInvestments     -> MyInvestmentsModel "MyInvestmentsModel",     Cmd.none
-    | ReferralProgram   -> ReferralProgramModel "ReferralProgramModel", Cmd.none
-    | Contacts          -> ContactsModel "ContactsModel",               Cmd.none
-    | Dashboard         -> DashboardModel "DashboardModel",             Cmd.none
+let init () = 
+    {   CryptoCurrencies        = []
+        CurrenciesCurentPrices  = { Prices = [] }
+        TokenSale               = None }
+   
 
     // | Book ed -> 
     //     let m,cmd = EntityDefs.book.Init user
@@ -67,14 +72,19 @@ let init (user: AuthModel) (model: ViewModels.TokenSale option) (page: Page) =
     //     m |> BillOfLadingListModel, Cmd.map (BillOfLadingMsg) cmd  
 
 
-let update (msg: Msg) model : Model * Cmd<Msg> = model ,Cmd.none
-    // match model, msg with
-    // | VerificationModel m,    VerificationMsg    -> VerificationModel "Verification update",   Cmd.none
-    // | PurchaseTokenModel m,   PurchaseTokenMsg   -> PurchaseTokenModel "PurchaseToken update", Cmd.none
-    // | MyInvestmentsModel m,   MyInvestmentsMsg   -> MyInvestmentsModel "MyInvestments update", Cmd.none
-    // | ReferralProgramModel m, ReferralProgramMsg -> ReferralProgramModel "ReferralProgramModel update", Cmd.none
-    // | ContactsModel m,        ContactsMsg        -> ContactsModel "ContactsModel update", Cmd.none
-    // | DashboardModel m,       DashboardMsg       -> DashboardModel "DashboardModel update", Cmd.none
+let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
+    match msg with
+    | VerificationMsg    -> model, Cmd.none
+    | PurchaseTokenMsg   -> model, Cmd.none
+    | MyInvestmentsMsg   -> model, Cmd.none
+    | ReferralProgramMsg -> model, Cmd.none
+    | ContactsMsg        -> model, Cmd.none
+    | DashboardMsg       -> model, Cmd.none
+    | ServerMsg msg_     ->
+        match msg_ with
+        | GetCryptoCurrenciesCompleted cc   -> { model with CryptoCurrencies = cc } , Cmd.none
+        | GetTokenSaleCompleted tc          -> { model with TokenSale = Some (tc) } , Cmd.none
+        | PriceTick tick                    -> { model with CurrenciesCurentPrices = tick }, Cmd.none
 
     // | BookListModel m, BookMsg ms -> 
     //     let m, cmd = EntityDefs.book.Update ms m
@@ -91,12 +101,12 @@ open Client.Helpers
 
 
 let view (page: Page) (model: Model) (dispatch: Msg -> unit) = 
-    match page, model with
-        | Verification, VerificationModel m       -> [ str "Verification view" ]
-        | PurchaseToken, PurchaseTokenModel m     -> [ PurchaseTokenPage.view m ]
-        | MyInvestments, MyInvestmentsModel m     -> [ str "My Investments view" ]
-        | ReferralProgram, ReferralProgramModel m -> [ str "Referral Program view" ]
-        | Contacts, ContactsModel m               -> 
+    match page with
+        | Verification      -> [ str "Verification view" ]
+        | PurchaseToken     -> [ PurchaseTokenPage.view model]
+        | MyInvestments     -> [ str "My Investments view" ]
+        | ReferralProgram   -> [ str "Referral Program view" ]
+        | Contacts               -> 
             [   str "Contacts view"
                 comE buttonToolbar [
                     comE button [
@@ -111,15 +121,15 @@ let view (page: Page) (model: Model) (dispatch: Msg -> unit) =
                     ]    
                 ] 
             ]
-        | Dashboard, DashboardModel m             -> [ DashboardView.view ]
+        | Dashboard             -> [ DashboardView.view ]
         // | Book ed, BookListModel m -> viewPageStatic<Book> ed m dispatch
         // | Individual ed, IndividualListModel m -> viewPageStatic<Individual> ed m dispatch
         // | Organization ed, OrganizationListModel m -> viewPageStatic<Organization> ed m dispatch
         // | Vessel ed, VesselListModel m -> viewPageStatic<Vessel> ed m dispatch
         // | BillOfLading ed, BillOfLadingListModel m -> viewPageStatic<BillOfLading> ed m dispatch
-        | p, m -> 
-            Browser.console.error(sprintf "Impossible Page:[%A] - Model:[%A] combination" p m)
-            [ ]
+        // | p -> 
+        //     Browser.console.error(sprintf "Impossible Page:[%A] - Model:[%A] combination" p)
+        //     [ ]
     |> div [] 
         
 

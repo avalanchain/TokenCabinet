@@ -52,6 +52,7 @@
     <Compile Include="Views/ContentView.fs" />
 -->
 
+    <Compile Include="Pages/CabinetModel.fs" />
     <Compile Include="Components/Ibox.fs" />
     <Compile Include="Views/DashboardView.fs" />
     <Compile Include="lib/ReactBootstrap.fs" />

@@ -16,6 +16,7 @@ open Elmish.Browser.UrlParser
 
 open ClientMsgs
 open ClientModels
+open CabinetModel
 open Shared.Utils
 open Menu
 
@@ -63,8 +64,7 @@ let urlUpdate (result: MenuPage option) (model: AppModel) =
     | Some (MenuPage.Cabinet p as page) ->
         match model.Auth with
         | Some user ->
-            let m,cmd = CabinetPage.init user model.TokenSale p
-            { model with Page = page; PageModel = m |> CabinetModel }, Cmd.map (CabinetMsg) cmd
+            { model with Page = page; PageModel = model.CabinetModel |> CabinetModel }, Cmd.none
         | None ->
             model, Cmd.ofMsg (Logout |> UIMsg)
 
