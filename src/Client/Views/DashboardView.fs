@@ -8,7 +8,7 @@ open Fulma
 open JsInterop
 
 
-let periods = ["100", "25"; "50", "20"; "20", "15"; "10", "10"]
+let periods = ["100", "25", true; "50", "20", true; "20", "15", false; "10", "10", false]
 let view  =
         div [ Class "row" ]
             [ div [ Class "col-lg-12" ]
@@ -20,8 +20,8 @@ let view  =
                         [ ul [ Class "timeline"
                                Id "timeline" ]
                                [
-                                 for (count, discount) in periods ->
-                                   li [ Class "li complete" ]
+                                 for (count, discount, complete) in periods ->
+                                   li [ Class ("li" + (if complete then " complete" else "")) ]
                                       [ div [ Class "timestamp" ]
                                           [ span [ Class "author" ]
                                               [ str (count + " ETH") ] ]

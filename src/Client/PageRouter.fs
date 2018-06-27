@@ -63,7 +63,7 @@ let urlUpdate (result: MenuPage option) (model: AppModel) =
     | Some (MenuPage.Cabinet p as page) ->
         match model.Auth with
         | Some user ->
-            let m,cmd = CabinetPage.init user p
+            let m,cmd = CabinetPage.init user model.TokenSale p
             { model with Page = page; PageModel = m |> CabinetModel }, Cmd.map (CabinetMsg) cmd
         | None ->
             model, Cmd.ofMsg (Logout |> UIMsg)

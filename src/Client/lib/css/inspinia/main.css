@@ -285,19 +285,52 @@ button.btn-primary.dim:active {
     transition: all 200ms ease-in;
 }
 
-.li.complete .status {
+.li.complete .status,
+.li.active .status {
     border-top: 2px solid #1ab394;
 }
 
 .li.complete .status:before {
     background-color: #1ab394;
     border: none;
-    transition: all 200ms ease-in;
+    /* transition: all 200ms ease-in; */
 }
 
-.li.complete .status h4 {
+.li.complete .status h4,
+.li.active .status h4 {
     color: #1ab394;
 }
+
+
+.li.active .status:before {
+    background-color: #ffffff;
+    border: 2px solid #1ab394;
+    /* transition: all 200ms ease-in; */
+}
+
+.li.cancelled .status h4 {
+    color: #C7413E;
+}
+
+
+.li.cancelled .status:before {
+    background-color: #ffffff;
+    border: 2px solid #C7413E;
+}
+
+
+/* 
+.li.paused .status h4 {
+    color: #C7413E;
+}
+
+
+.li.paused .status:before {
+    background-color: #ffffff;
+    border: 2px solid #D6DCE0;
+} */
+
+
 .project-long{
     border-top: none;
     border-bottom: 1px solid #e7eaec;

@@ -60,7 +60,8 @@ module ViewModels =
         | Completed
         | Paused
         | Suspended
-    and TokenSaleStageStatus =
+        
+    and [<RequireQualifiedAccess>] TokenSaleStageStatus =
         | Expectation
         | Active
         | Completed
