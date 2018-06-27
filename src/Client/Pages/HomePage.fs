@@ -1,4 +1,4 @@
-module Client.Home
+module Client.HomePage
 
 open System
 open Fable.Core

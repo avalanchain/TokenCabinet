@@ -32,7 +32,6 @@ type AppMsg =
     | UnexpectedMsg of UnexpectedMsg
     | ErrorMsg      of string * AppMsg * string
     | OldMsg        of OldMsg
-
     | LoginMsg      of LoginPage.Msg
     | CabinetMsg    of CabinetPage.Msg
 

@@ -126,8 +126,12 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
             let cmdTick                 = Cmd.ofMsg (Tick 0UL |> UIMsg)
             let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdTick ]
-            // Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
-            { model with Auth = Some authModel ; Page = MenuPage.Cabinet page; PageModel = PageModel.CabinetModel model.CabinetModel } , cmd'  // TODO: Add UserName
+            Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
+            { model with    Auth = Some authModel 
+                            Page = MenuPage.Cabinet page
+                            PageModel = PageModel.CabinetModel model.CabinetModel
+                            CabinetModel = model.CabinetModel
+                 } , cmd'  // TODO: Add UserName
         | AuthMsg(LoggedOut)          -> 
             { model with Auth = None; CabinetModel = CabinetPage.init() } , Cmd.none
 
@@ -174,7 +178,8 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             match model.PageModel with
             | CabinetModel cabinetModel -> 
                 let model', cmd' = CabinetPage.update msg_ cabinetModel
-                { model with PageModel = CabinetModel model' }, Cmd.map CabinetMsg cmd'
+                { model with    PageModel = CabinetModel model' 
+                                CabinetModel = model' }, Cmd.map CabinetMsg cmd'
             | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", CabinetMsg msg_, (string model)) |> Cmd.ofMsg           
 
     model', cmd'
@@ -201,7 +206,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
 [<PassGenerics>]
 let innerPageView model (dispatch: AppMsg -> unit) =
     match model.Page with
-    | MenuPage.Home -> Home.view() 
+    | MenuPage.Home -> HomePage.view() 
 
     // | MenuPage.Admin -> 
     //     [ Admin.view (model.Trading) (AdminMsg >> dispatch) ]

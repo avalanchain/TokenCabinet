@@ -59,7 +59,7 @@
     <Compile Include="Pages/LoginPage.fs" />
     <Compile Include="Pages/PurchaseTokenPage.fs" />
     <Compile Include="Pages/CabinetPage.fs" />
-    <Compile Include="Pages/Home.fs" />
+    <Compile Include="Pages/HomePage.fs" />
 
     <Compile Include="ClientMsgs.fs" />
     <Compile Include="ClientModels.fs" />
