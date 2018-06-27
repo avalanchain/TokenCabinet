@@ -458,3 +458,7 @@ button.btn-primary.dim:active {
 .h55{
     height: 55px;
 }
+
+.login{
+    padding: 10% 0px;
+}

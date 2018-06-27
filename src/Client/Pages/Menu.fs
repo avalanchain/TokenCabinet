@@ -90,20 +90,27 @@ let handleClick (e: React.MouseEvent) =
 // let testlink = 
 
 let view (model: AppModel) (dispatch: UIMsg -> unit) =
+    let icon  (page: CabinetPage.Page) = 
+                match page with 
+                | CabinetPage.Page.Verification      -> "fa fa-address-card"    
+                | CabinetPage.Page.PurchaseToken     -> "fa fa-shopping-cart"  
+                | CabinetPage.Page.MyInvestments     -> "fa fa-briefcase"  
+                | CabinetPage.Page.ReferralProgram   -> "fa fa-refresh"
+                | CabinetPage.Page.Contacts          -> "fa fa-phone"            
+                | CabinetPage.Page.Dashboard         -> "fa fa-th-large"         
     let home = 
         [   navViewLink MenuPage.Home "Main view" "fa fa-th-large" ( model.Page = MenuPage.Home )]
 
     let login = 
         [   navViewLink MenuPage.Login "LOGIN" "fa fa-sign-in" ( model.Page = MenuPage.Login )]
 
-    let logout = 
-        [   navButtonLink MenuPage.Login "LOGOUT" "icon-star" (fun _ -> dispatch Logout) ]
-
     let cabinet = 
         let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPage.Page
         
-        [   for page in getUnionCases(typeof<CabinetPage.Page>) -> 
-                navViewLink (page |> toPage |> MenuPage.Cabinet) ((page.Name |> splitOnCapital) + "s") "fa fa-th-large" (page.Name = model.Page.ToString())
+        [   for page in getUnionCases(typeof<CabinetPage.Page>) ->
+                let pageName = page.Name |> splitOnCapital 
+                let page = page |> toPage
+                navViewLink (MenuPage.Cabinet page) pageName (icon page) (MenuPage.Cabinet page = model.Page)
         ]
 
     // let divider = li [ ClassName "divider" ] [ ]
@@ -125,16 +132,11 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
     let dynamicPart: React.ReactElement list = 
                 match model.Auth with
                     | None ->
-                            (home 
-                                @ (login)
+                            (home @ login
                             )
                     | Some _ -> 
-                            (home 
-                                // @ (divider :: trading)
-                                @ (cabinet)
-                                @ (logout)
-                                //@ (divider :: statics)
-                            )
+                            (cabinet)
+                            
                     
 
     nav [ Class "navbar-default navbar-static-side"

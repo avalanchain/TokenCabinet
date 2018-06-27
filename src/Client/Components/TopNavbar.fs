@@ -4,18 +4,21 @@ open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
+
+
+open Client
+open ClientMsgs
+open ClientModels
 open JsInterop
 
-// importAll "../lib/css/icons.min.css"
-// importAll "../lib/css/nav.css"
 
-let navBar  =
+let navBar (dispatch: UIMsg -> unit)  = 
     // let navItem name menuMediator = Navbar.Item.a [ Navbar.Item.IsActive (model.MenuMediator = menuMediator)
     //                                                 Navbar.Item.Props [ OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)] ]
     //                                     [ str name ]
 
        div [ Class "row border-bottom" ]
-            [ nav [ Class "navbar navbar-static-top white-bg"
+            [ nav [ Class "navbar navbar-static-top white-bg no-margins"
                     Role "navigation"
                     // HTMLAttr.Custom ("style", "margin-bottom: 0") 
                     ]
@@ -36,7 +39,8 @@ let navBar  =
                                       Id "top-search" ] ] ] ]
                   ul [ Class "nav navbar-top-links navbar-right" ]
                     [ li [ ]
-                        [ a [ Href "#" ]
+                        [ a [ Href "#" 
+                              OnClick(fun _ -> dispatch Logout)  ]
                             [ i [ Class "fa fa-sign-out" ]
                                 [ ]
                               str "Log out" ] ] ] ] ]

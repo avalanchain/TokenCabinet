@@ -128,7 +128,7 @@ let view model (dispatch: Msg -> unit) =
         ]
 
     | LoggedOut ->
-        div [ 
+        div [ Class "login"
             // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
             ]
             [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]

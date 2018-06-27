@@ -52,16 +52,17 @@
     <Compile Include="Views/ContentView.fs" />
 -->
 
-
+    <Compile Include="Views/DashboardView.fs" />
     <Compile Include="lib/ReactBootstrap.fs" />
-    <Compile Include="Components/Footer.fs" />
-    <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Pages/LoginPage.fs" />
     <Compile Include="Pages/CabinetPage.fs" />
     <Compile Include="Pages/Home.fs" />
 
     <Compile Include="ClientMsgs.fs" />
     <Compile Include="ClientModels.fs" />
+    
+    <Compile Include="Components/Footer.fs" />
+    <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Pages/Menu.fs" />
 
     <Compile Include="PageRouter.fs" />

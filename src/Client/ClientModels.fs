@@ -36,7 +36,7 @@ type MenuPage =
   | Login
   | Cabinet of CabinetPage.Page
 //   | Static of Statics.Page
-  with static member Default = Home
+  with static member Default = Login
 
 
 type PageModel =

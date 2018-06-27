@@ -31,6 +31,7 @@ open System.ComponentModel
 open Fable.PowerPack
 open Shared.Utils
 open Client.Menu
+open Fable
 
 importAll "../../node_modules/bootstrap/dist/css/bootstrap.min.css"
 importAll "../Client/lib/css/inspinia/style.css"
@@ -256,24 +257,39 @@ type [<Pojo>] LoaderProps = {
 let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-overlay")
 
 /// Constructs the view for the application given the model.
-[<PassGenerics>]
-let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
-    div [ Id "wrapper" ]
-        [
 
-                Menu.view model (AppMsg.UIMsg >> dispatch)
-                div [ Id "page-wrapper"
-                      Class "gray-bg" ] [
-                      TopNavbar.navBar
-                      div [ Class "wrapper wrapper-content animated fadeInRight"]
-                          [ 
-                            (innerPageView model dispatch)
-                               ]
+let mainView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView = 
+            div [ Id "wrapper" ]
+                [
+
+                        Menu.view model (AppMsg.UIMsg >> dispatch)
+                        div [ Id "page-wrapper"
+                              Class "gray-bg" ] [
+                              TopNavbar.navBar (AppMsg.UIMsg >> dispatch)
+                              div [ Class "wrapper wrapper-content animated fadeInRight"]
+                                  [ 
+                                    (innerPageView model dispatch)
+                                       ]
+
+                              Footer.footer
+                        ]
+                    // ]
                 ]
 
-                Footer.footer
-            // ]
-        ]
+
+[<PassGenerics>]
+let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
+    match model.Auth with
+        | Some _-> mainView model dispatch innerPageView
+        | None -> match model.PageModel with 
+                    | LoginModel loginModel -> LoginPage.view loginModel (AppMsg.LoginMsg >> dispatch)
+                    | _ -> 
+                        Browser.console.error("Unsupported model/Auth state combination")
+                        Login |> UIMsg |> dispatch 
+                        div [] []
+         
+    
+
 
 /// Constructs the view for the application given the model.
 [<PassGenerics>]
