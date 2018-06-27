@@ -21,8 +21,8 @@ open Shared.Utils
 open Menu
 
 let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
-    allUnionCases(typeof<CabinetPage.Page>)
-    |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "cabinet" </> s ((getUnionCaseName ed typeof<CabinetPage.Page>).ToLowerInvariant())))
+    allUnionCases<CabinetPage.Page>
+    |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "cabinet" </> s ((getUnionCaseName ed).ToLowerInvariant())))
 
 
 // let [<PassGenerics>]tradingPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 

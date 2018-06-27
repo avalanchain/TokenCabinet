@@ -15,6 +15,7 @@ open Shared.ViewModels
 open TokenSaleStageStatuses
 open System.Collections.ObjectModel
 open Shared.Auth
+open Shared.Utils
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
@@ -46,7 +47,9 @@ let getCryptoCurrencies config () = task {
     printfn "getCryptoCurrencies() called"
     let! res = CryptoCurrencies.Database.getAll(config.connectionString) 
     return match res with
-            | Ok o -> o |> Seq.toList |> Ok
+            | Ok o -> [ for cc in o -> {Symbol  = (getUnionCaseFromString<CryptoCurrencySymbol> cc.Id).Value // TODO: Do a proper failwith
+                                        Name    = cc.Name
+                                        LogoUrl = cc.LogoUrl } ] |> Ok
             | Error exn ->  printfn "Data access exception: '%A'" exn
                             exn |> InternalError |> Error
 }
@@ -147,37 +150,37 @@ module PriceUpdater =
         let! prices = PriceSource.AsyncLoad(CCUrl) 
         return {    Prices =
                         [
-                            {   Symbol = "BTC"
+                            {   Symbol = BTC
                                 CryptoCurrencyName = "Bitcoin"
                                 PriceUsd = prices.Btc.Usd |> decimal
                                 PriceEth = prices.Btc.Eth |> decimal
                                 PriceAt = System.DateTime.Now }
-                            {   Symbol = "ETH"
+                            {   Symbol = ETH
                                 CryptoCurrencyName = "Ethereum"
                                 PriceUsd = prices.Eth.Usd |> decimal
                                 PriceEth = prices.Eth.Eth |> decimal
                                 PriceAt = System.DateTime.Now }
-                            {   Symbol = "LTC"
+                            {   Symbol = LTC
                                 CryptoCurrencyName = "Litecoin"
                                 PriceUsd = prices.Ltc.Usd |> decimal
                                 PriceEth = prices.Ltc.Eth |> decimal
                                 PriceAt = System.DateTime.Now }
-                            {   Symbol = "BCH"
+                            {   Symbol = BCH
                                 CryptoCurrencyName = "Bitcoin Cash"
                                 PriceUsd = prices.Bch.Usd |> decimal
                                 PriceEth = prices.Bch.Eth |> decimal
                                 PriceAt = System.DateTime.Now }
-                            {   Symbol = "BTG"
+                            {   Symbol = BTG
                                 CryptoCurrencyName = "Bitcoin Gold"
                                 PriceUsd = prices.Btg.Usd |> decimal
                                 PriceEth = prices.Btg.Eth |> decimal
                                 PriceAt = System.DateTime.Now }
-                            {   Symbol = "ETC"
+                            {   Symbol = ETC
                                 CryptoCurrencyName = "Ethereum Classic"
                                 PriceUsd = prices.Etc.Usd |> decimal
                                 PriceEth = prices.Etc.Eth |> decimal
                                 PriceAt = System.DateTime.Now }
-                            {   Symbol = "DASH"
+                            {   Symbol = DASH
                                 CryptoCurrencyName = "Dash"
                                 PriceUsd = prices.Dash.Usd |> decimal
                                 PriceEth = prices.Dash.Eth |> decimal
@@ -215,23 +218,6 @@ module PriceUpdater =
 let getPriceTick config i = task {
         let! prices = PriceUpdater.getLatestPrices() |> Async.StartAsTask
         return prices |> Ok
-}
-
-let getPriceTick2 config i = task {
-    return {    Prices =
-                    [
-                        {   Symbol = "BTC"
-                            CryptoCurrencyName = "Bitcoin"
-                            PriceUsd = 7000UL + i |> decimal
-                            PriceEth = 15UL + i |> decimal
-                            PriceAt = System.DateTime.Now }
-                        {   Symbol = "ETH"
-                            CryptoCurrencyName = "Ethereum"
-                            PriceUsd = 500UL + i |> decimal
-                            PriceEth = 1UL + i |> decimal
-                            PriceAt = System.DateTime.Now }
-                    ] }
-        |> Ok
 }
 
 let webApp config =

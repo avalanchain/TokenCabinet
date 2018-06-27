@@ -98,8 +98,16 @@ module ViewModels =
         Email: string
     } 
 
+    type CryptoCurrencySymbol = ETH | ETC | BTC | LTC | BCH | BTG | DASH
+
+    type CryptoCurrency = {
+        Symbol    : CryptoCurrencySymbol
+        Name      : string
+        LogoUrl   : string
+    }
+
     type CryptoCurrencyPrice = {
-        Symbol: string
+        Symbol: CryptoCurrencySymbol
         CryptoCurrencyName: string
         PriceUsd: decimal
         PriceEth: decimal
@@ -123,7 +131,7 @@ type IAdminProtocol = {
 
 type ITokenSaleProtocol = {
     login               : LoginInfo -> Async<ServerResult<AuthToken>>
-    getCryptoCurrencies : unit -> Async<ServerResult<CryptoCurrencies.CryptoCurrency list>> 
+    getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
     getFullCustomer     : SecureRequest<unit> -> Async<ServerResult<ViewModels.FullCustomer>> 

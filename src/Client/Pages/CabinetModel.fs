@@ -5,7 +5,7 @@ open Shared
 type Model = {
     // Auth        : AuthModel option
     // Loading     : bool  
-    CryptoCurrencies      : CryptoCurrencies.CryptoCurrency list
+    CryptoCurrencies      : ViewModels.CryptoCurrency list
     CurrenciesCurentPrices: ViewModels.CurrencyPriceTick
 
     TokenSale             : ViewModels.TokenSale option

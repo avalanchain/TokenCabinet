@@ -45,8 +45,9 @@ type Msg =
     | DashboardMsg
     | ServerMsg     of ServerMsg
 and ServerMsg =
-    | GetCryptoCurrenciesCompleted  of CryptoCurrencies.CryptoCurrency list
+    | GetCryptoCurrenciesCompleted  of ViewModels.CryptoCurrency list
     | GetTokenSaleCompleted         of ViewModels.TokenSale
+    | GetFullCustomerCompleted      of ViewModels.FullCustomer
     | PriceTick                     of ViewModels.CurrencyPriceTick
 
 let init () = 

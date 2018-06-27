@@ -13,7 +13,9 @@ module Auth =
 
     // a request with a token
     type SecureRequest<'T> = { Token : AuthToken; Content : 'T }
-        with static member Unit token = { Token = token; Content = () }
+    module SecureRequest =
+        let unit token = { Token = token; Content = () }
+        let req token content = { Token = token; Content = content }
 
     // possible authentication/authorization errors     
     type AuthError = 

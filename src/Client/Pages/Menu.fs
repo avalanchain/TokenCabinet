@@ -32,7 +32,7 @@ let toHash =
   function
   | MenuPage.Home -> "#home"
   | MenuPage.Login -> "#login"
-  | MenuPage.Cabinet tc -> "#cabinet/" + (getUnionCaseName tc typeof<CabinetPage.Page>).ToLowerInvariant()
+  | MenuPage.Cabinet tc -> "#cabinet/" + (getUnionCaseName tc).ToLowerInvariant()
 //   | MenuPage.Trading p -> 
 //     let uid = match p with 
 //                 | Trading.Page.Trader ci
@@ -107,7 +107,7 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
     let cabinet = 
         let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPage.Page
         
-        [   for page in getUnionCases(typeof<CabinetPage.Page>) ->
+        [   for page in getUnionCases<CabinetPage.Page> ->
                 let pageName = page.Name |> splitOnCapital 
                 let page = page |> toPage
                 navViewLink (MenuPage.Cabinet page) pageName (icon page) (MenuPage.Cabinet page = model.Page)

@@ -120,12 +120,13 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
         | AuthMsg(LoggedIn authToken) -> 
             let authModel = { LoginPage.AuthModel.Token = authToken; LoginPage.AuthModel.UserName = "" }
             let page = CabinetPage.Page.Default
-            let cmdLocalStorage         = LocalStorage.saveUserCmd authModel
-            let cmdInitCounter          = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
-            let cmdGetCryptoCurrencies  = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
-            let cmdGetTokenSale         = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
-            let cmdTick                 = Cmd.ofMsg (Tick 0UL |> UIMsg)
-            let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdTick ]
+            let cmdLocalStorage             = LocalStorage.saveUserCmd authModel
+            let cmdInitCounter              = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
+            let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
+            let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
+            let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.SecureRequest.unit authToken) (CabinetPage.GetFullCustomerCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getFullCustomer()"
+            let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg)
+            let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdGetFullCustomerCompleted; cmdTick ]
             Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
             { model with    Auth = Some authModel 
                             Page = MenuPage.Cabinet page
