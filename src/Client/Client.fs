@@ -124,7 +124,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             let cmdInitCounter              = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
             let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
             let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
-            let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.SecureRequest.unit authToken) (CabinetPage.GetFullCustomerCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getFullCustomer()"
+            let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureRequestE authToken) (CabinetPage.GetFullCustomerCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getFullCustomer()"
             let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg)
             let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdGetFullCustomerCompleted; cmdTick ]
             Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 

@@ -9,4 +9,5 @@ type Model = {
     CurrenciesCurentPrices: ViewModels.CurrencyPriceTick
 
     TokenSale             : ViewModels.TokenSale option
+    FullCustomer          : ViewModels.FullCustomer option
     }

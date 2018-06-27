@@ -53,7 +53,8 @@ and ServerMsg =
 let init () = 
     {   CryptoCurrencies        = []
         CurrenciesCurentPrices  = { Prices = [] }
-        TokenSale               = None }
+        TokenSale               = None
+        FullCustomer            = None }
    
 
     // | Book ed -> 
@@ -85,6 +86,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
         match msg_ with
         | GetCryptoCurrenciesCompleted cc   -> { model with CryptoCurrencies = cc } , Cmd.none
         | GetTokenSaleCompleted tc          -> { model with TokenSale = Some (tc) } , Cmd.none
+        | GetFullCustomerCompleted fc       -> { model with FullCustomer = Some (fc) } , Cmd.none
         | PriceTick tick                    -> { model with CurrenciesCurentPrices = tick }, Cmd.none
 
     // | BookListModel m, BookMsg ms -> 
