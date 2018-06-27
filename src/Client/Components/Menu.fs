@@ -2,8 +2,6 @@ module Client.NavMenu
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
-
 let menu =
     Menu.menu [ ]
         [ Menu.label [ ]

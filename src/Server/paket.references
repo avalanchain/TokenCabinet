@@ -7,5 +7,12 @@ group Server
     FSharp.Data
     SQLProvider
     jose-jwt
+
+    Nethereum.Hex
+    Nethereum.Web3
+    Nethereum.StandardTokenEIP20
+    NBitcoin
+    NBitcoin.Litecoin
+    NBitcoin.Altcoins
     
     dotnet-saturn

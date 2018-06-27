@@ -11,9 +11,6 @@ open Fable.Helpers.React.Props
 
 open Shared
 
-open Fulma
-
-open Fulma.FontAwesome
 open Fable
 open Fable.Core
 open Fable.Import.RemoteDev

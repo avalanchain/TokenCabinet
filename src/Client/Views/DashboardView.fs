@@ -3,7 +3,6 @@ module Client.DashboardView
 open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Fulma
 // open ClientMsgs
 open JsInterop
 

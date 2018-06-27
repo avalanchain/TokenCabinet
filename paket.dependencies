@@ -14,6 +14,13 @@ group Server
     nuget SQLProvider
     nuget jose-jwt
 
+    nuget Nethereum.Hex
+    nuget Nethereum.Web3
+    nuget Nethereum.StandardTokenEIP20
+    nuget NBitcoin
+    nuget NBitcoin.Litecoin
+    nuget NBitcoin.Altcoins
+
     clitool dotnet-saturn
 
 group Client
@@ -27,7 +34,6 @@ group Client
     nuget Fable.Elmish.HMR
     nuget Fable.Remoting.Client ~> 2.4
     nuget Fable.React
-    nuget Fulma
     nuget Fable.DateFunctions
     nuget Elmish.Toastr
 

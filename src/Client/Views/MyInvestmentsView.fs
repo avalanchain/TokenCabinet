@@ -3,9 +3,6 @@ module Client.MyInvestmentsView
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
-open Fulma
-open Fulma.FontAwesome
-
 open Fable
 open Verifications
 open ClientMsgs

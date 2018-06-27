@@ -2,12 +2,10 @@ module Client.Helpers
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-// open Fulma
 // open ClientMsgs
 open Fable
 open Shared.ViewModels
 open Fable.DateFunctions
-// open Fulma.FontAwesome
 open System
 open Fable.Import.React
 open Fable.Core.JsInterop

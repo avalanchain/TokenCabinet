@@ -9,7 +9,6 @@ group Client
     Fable.React
     Fable.Remoting.Client
 
-    Fulma
     Elmish.Toastr
 
     dotnet-fable
