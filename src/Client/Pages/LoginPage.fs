@@ -132,8 +132,7 @@ let view model (dispatch: Msg -> unit) =
             // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
             ]
             [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
-                [ div [ ]
-                    [ div [ ]
+                  [   div [ ]
                         [ img [ Alt "image"
                                 Class "h55"
                                 Src "../lib/img/avalanchain.png" ] ]
@@ -144,10 +143,10 @@ let view model (dispatch: Msg -> unit) =
                              Role "form"
                              Action "#" ]
                         [ div [ Class "form-group" ]
-                            [ input [ Id "username"
+                            [ input [ Id "email"
                                       Type "email" 
                                       ClassName "form-control"
-                                      Placeholder "Username" 
+                                      Placeholder "Email" 
                                       DefaultValue model.InputUserName
                                       OnChange (fun ev -> dispatch (ChangeUserName !!ev.target?value))
                                       AutoFocus true ] ]
@@ -162,7 +161,16 @@ let view model (dispatch: Msg -> unit) =
                               Type "submit"
                               Class "btn btn-info block full-width m-b"
                               OnClick (fun _ -> dispatch LogInClicked) ]
-                            [ str "Login" ] ]
+                            [ str "Login" ] 
+                          a [ Href "forgot_password" ]
+                            [ small [ ]
+                                [ str "Forgot password?" ] ]
+                          p [ Class "text-muted text-center" ]
+                            [ small [ ]
+                                [ str "Do not have an account?" ] ]
+                          a [ Class "btn btn-sm btn-white btn-block"
+                              Href "register" ]
+                           [ str "Create an account" ]]
                       p [ Class "m-t project-title" ]
                         [ small [ ]
                             [ str "powered by "
@@ -170,5 +178,5 @@ let view model (dispatch: Msg -> unit) =
                                 //   HTMLAttr.Custom ("style", "font-size: 12px;")
                                   Href "http://avalanchain.com" ]
                                 [ str "Avalanchain" ]
-                              str " © 2018" ] ] ] ] ]
+                              str " © 2018" ] ] ] ]
 

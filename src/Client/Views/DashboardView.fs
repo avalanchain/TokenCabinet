@@ -32,7 +32,7 @@ let view  =
 
 
 
-
+// let view = RegisterPage.view
 
                             //  [ li [ Class "li complete" ]
                             //     [ div [ Class "timestamp" ]
