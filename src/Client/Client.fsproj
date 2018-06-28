@@ -52,10 +52,11 @@
     <Compile Include="Views/ContentView.fs" />
 -->
 
+    <Compile Include="Components/Ibox.fs" />
     <Compile Include="Pages/ForgotPasswordPage.fs" />
     <Compile Include="Pages/RegisterPage.fs" />
+    <Compile Include="Pages/VerificationPage.fs" />
     <Compile Include="Pages/CabinetModel.fs" />
-    <Compile Include="Components/Ibox.fs" />
     <Compile Include="Views/DashboardView.fs" />
     <Compile Include="lib/ReactBootstrap.fs" />
     <Compile Include="Pages/LoginPage.fs" />

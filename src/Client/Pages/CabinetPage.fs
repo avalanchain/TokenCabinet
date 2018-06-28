@@ -105,7 +105,7 @@ open Client.Helpers
 
 let view (page: Page) (model: Model) (dispatch: Msg -> unit) = 
     match page with
-        | Verification      -> [ str "Verification view" ]
+        | Verification      -> [ VerificationPage.view ]
         | PurchaseToken     -> [ PurchaseTokenPage.view model]
         | MyInvestments     -> [ str "My Investments view" ]
         | ReferralProgram   -> [ str "Referral Program view" ]
