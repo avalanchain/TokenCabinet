@@ -17,6 +17,7 @@ open Shared.Auth
 open ViewModels
 
 open Client.LoginCommon
+open Client.Page
 
 type Msg = 
     | Login
@@ -146,7 +147,8 @@ let view model (dispatch: Msg -> unit) =
                             [ small [ ]
                                 [ str "Already have an account?" ] ]
                           a [ Class "btn btn-sm btn-white btn-block"
-                              Href "login.html" ]
+                              Href (toHash MenuPage.Login) 
+                              OnClick goToUrl ]
                             [ str "Login" ]]
                       p [ Class "m-t project-title" ]
                         [ small [ ]
