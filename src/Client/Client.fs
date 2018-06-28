@@ -22,6 +22,7 @@ open web3Impl
 open Fable.Core.JsInterop
 
 open Client
+open Client.Page
 open ClientMsgs
 open ClientModels
 open CabinetModel
@@ -29,8 +30,8 @@ open System.ComponentModel
 open Fable.PowerPack
 open Shared.Utils
 open Client.Menu
-open Fable
-open Client
+
+open LoginCommon
 
 importAll "../../node_modules/bootstrap/dist/css/bootstrap.min.css"
 importAll "../Client/lib/css/inspinia/style.css"
@@ -117,9 +118,9 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
             | _ -> model, ("Unhandled", msg, string model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
 
-        | AuthMsg(LoggedIn authToken) -> 
-            let authModel = { LoginPage.AuthModel.Token = authToken; LoginPage.AuthModel.UserName = "" }
-            let page = CabinetPage.Page.Default
+        | AuthMsg(AuthMsg.LoggedIn authToken) -> 
+            let authModel = { AuthModel.Token = authToken; AuthModel.UserName = "" }
+            let page = CabinetPagePage.Default
             let cmdLocalStorage             = LocalStorage.saveUserCmd authModel
             let cmdInitCounter              = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
             let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
@@ -127,13 +128,13 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureRequestE authToken) (CabinetPage.GetFullCustomerCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getFullCustomer()"
             let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg)
             let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdGetFullCustomerCompleted; cmdTick ]
-            Navigation.newUrl (CabinetPage.Page.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
+            Navigation.newUrl (CabinetPagePage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
             { model with    Auth = Some authModel 
                             Page = MenuPage.Cabinet page
                             PageModel = PageModel.CabinetModel model.CabinetModel
                             CabinetModel = model.CabinetModel
                  } , cmd'  // TODO: Add UserName
-        | AuthMsg(LoggedOut)          -> 
+        | AuthMsg(AuthMsg.LoggedOut)          -> 
             { model with Auth = None; CabinetModel = CabinetPage.init() } , Cmd.none
 
         | UIMsg msg ->
@@ -152,7 +153,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                 let loginModel, cmd = LoginPage.init model.Auth
                 { model with Page = MenuPage.Login; PageModel = loginModel |> LoginModel } , Cmd.none
             | Logout -> 
-                { model with Page = MenuPage.Default; Auth = None; PageModel = NoPageModel } , LoggedOut |> AuthMsg |> Cmd.ofMsg
+                { model with Page = MenuPage.Default; Auth = None; PageModel = NoPageModel } , AuthMsg.LoggedOut |> AuthMsg |> Cmd.ofMsg
 
         | UnexpectedMsg msg_ ->
             match msg_ with
@@ -172,9 +173,33 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                     match externalMsg' with
                     | LoginPage.ExternalMsg.NoOp -> Cmd.none
                     | LoginPage.ExternalMsg.LoginUser loginInfo -> 
-                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (LoggedIn >> AuthMsg) "login()"
+                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "login()"
                 { model with PageModel = LoginModel model' }, Cmd.batch [ Cmd.map LoginMsg cmd'; cmd2 ]
             | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", LoginMsg msg_, (string model)) |> Cmd.ofMsg           
+        | RegisterMsg msg_ ->
+            match model.PageModel with
+            | RegisterModel registerModel -> 
+                let model', cmd', externalMsg' = RegisterPage.update msg_ registerModel
+                let cmd2 =
+                    match externalMsg' with
+                    | RegisterPage.ExternalMsg.NoOp -> Cmd.none
+                    | RegisterPage.ExternalMsg.LoginUser loginInfo -> 
+                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "register()"
+                { model with PageModel = RegisterModel model' }, Cmd.batch [ Cmd.map RegisterMsg cmd'; cmd2 ]
+            | _ -> model, ErrorMsg("Incorrect Message/Model combination for Register", RegisterMsg msg_, (string model)) |> Cmd.ofMsg           
+        | ForgotPasswordMsg msg_ ->
+            match model.PageModel with
+            | ForgotPasswordModel forgotModel -> 
+                let model', cmd', externalMsg' = ForgotPasswordPage.update msg_ forgotModel
+                let cmd2 =
+                    match externalMsg' with
+                    | ForgotPasswordPage.ExternalMsg.NoOp -> Cmd.none
+                    | ForgotPasswordPage.ExternalMsg.LoginUser loginInfo -> 
+                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "forgotPassword()"
+                { model with PageModel = ForgotPasswordModel model' }, Cmd.batch [ Cmd.map ForgotPasswordMsg cmd'; cmd2 ]
+            | _ -> model, ErrorMsg("Incorrect Message/Model combination for ForgotPassword", ForgotPasswordMsg msg_, (string model)) |> Cmd.ofMsg           
+
+
         | CabinetMsg msg_ ->             
             match model.PageModel with
             | CabinetModel cabinetModel -> 
@@ -215,6 +240,20 @@ let innerPageView model (dispatch: AppMsg -> unit) =
     | MenuPage.Login -> 
         match model.PageModel with
         | LoginModel m -> (LoginPage.view m (LoginMsg >> dispatch)) 
+        | _ -> 
+            Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
+            div [ ] [ str "Incorrect login model/page" ]
+
+    | MenuPage.Register -> 
+        match model.PageModel with
+        | RegisterModel m -> (Client.RegisterPage.view m (RegisterMsg >> dispatch)) 
+        | _ -> 
+            Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
+            div [ ] [ str "Incorrect login model/page" ]
+
+    | MenuPage.ForgotPassword -> 
+        match model.PageModel with
+        | ForgotPasswordModel m -> (Client.ForgotPasswordPage.view m (ForgotPasswordMsg >> dispatch)) 
         | _ -> 
             Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
             div [ ] [ str "Incorrect login model/page" ]
@@ -281,8 +320,11 @@ let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
     match model.Auth with
         | Some _-> mainView model dispatch innerPageView
         | None -> match model.PageModel with 
-                    | LoginModel loginModel -> LoginPage.view loginModel (AppMsg.LoginMsg >> dispatch)
-                    | _ -> 
+                    | LoginModel loginModel           -> LoginPage.view loginModel (AppMsg.LoginMsg >> dispatch)
+                    | RegisterModel registerModel     -> RegisterPage.view registerModel (AppMsg.RegisterMsg >> dispatch)
+                    | ForgotPasswordModel forgotModel -> ForgotPasswordPage.view forgotModel (AppMsg.ForgotPasswordMsg >> dispatch)
+                    | NoPageModel 
+                    | CabinetModel(_) ->                     
                         Browser.console.error("Unsupported model/Auth state combination")
                         Login |> UIMsg |> dispatch 
                         div [] []
@@ -309,7 +351,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram init update view
-|> Program.toNavigable(parseHash PageRouter.pageParser) PageRouter.urlUpdate
+|> Program.toNavigable (parseHash pageParser) PageRouter.urlUpdate
 // |> Program.withSubscription timer
 #if DEBUG
 |> Program.withConsoleTrace

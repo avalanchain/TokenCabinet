@@ -23,34 +23,14 @@ open ClientMsgs
 open Shared.Auth
 open LoginPage
 open ClientModels
+open LoginCommon
+open Client.Page
 
 module O = FSharp.Core.Option
 
 
-
-let toHash =
-  function
-  | MenuPage.Home -> "#home"
-  | MenuPage.Login -> "#login"
-  | MenuPage.Cabinet tc -> "#cabinet/" + (getUnionCaseName tc).ToLowerInvariant()
-//   | MenuPage.Trading p -> 
-//     let uid = match p with 
-//                 | Trading.Page.Trader ci
-//                 | Trading.Page.VesselOperator ci
-//                 | Trading.Page.VesselMaster ci
-//                 | Trading.Page.Terminal ci
-//                 | Trading.Page.Inspector ci -> "/" + ci.UID.ToString()
-//                 | Trading.Page.Archive 
-//                 | Trading.Page.All -> ""
-//     "#trading/" + getUnionCase(p).Name.ToLowerInvariant() + uid
-
 let init() = Utils.load<AuthModel> "user", Cmd.none
 
-let goToUrl (e: React.MouseEvent) =
-    // e.stopPropagation()
-    // e.preventDefault()
-    let href = !!e.target?href
-    Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
 
 [<PassGenerics>]
 let viewLink page description icon bage =
@@ -90,14 +70,14 @@ let handleClick (e: React.MouseEvent) =
 // let testlink = 
 
 let view (model: AppModel) (dispatch: UIMsg -> unit) =
-    let icon  (page: CabinetPage.Page) = 
+    let icon  (page: CabinetPagePage) = 
                 match page with 
-                | CabinetPage.Page.Verification      -> "fa fa-address-card"    
-                | CabinetPage.Page.PurchaseToken     -> "fa fa-shopping-cart"  
-                | CabinetPage.Page.MyInvestments     -> "fa fa-briefcase"  
-                | CabinetPage.Page.ReferralProgram   -> "fa fa-refresh"
-                | CabinetPage.Page.Contacts          -> "fa fa-phone"            
-                | CabinetPage.Page.Dashboard         -> "fa fa-th-large"         
+                | Verification      -> "fa fa-address-card"    
+                | PurchaseToken     -> "fa fa-shopping-cart"  
+                | MyInvestments     -> "fa fa-briefcase"  
+                | ReferralProgram   -> "fa fa-refresh"
+                | Contacts          -> "fa fa-phone"            
+                | Dashboard         -> "fa fa-th-large"         
     let home = 
         [   navViewLink MenuPage.Home "Main view" "fa fa-th-large" ( model.Page = MenuPage.Home )]
 
@@ -105,9 +85,9 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
         [   navViewLink MenuPage.Login "LOGIN" "fa fa-sign-in" ( model.Page = MenuPage.Login )]
 
     let cabinet = 
-        let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPage.Page
+        let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPagePage
         
-        [   for page in getUnionCases<CabinetPage.Page> ->
+        [   for page in getUnionCases<CabinetPagePage> ->
                 let pageName = page.Name |> splitOnCapital 
                 let page = page |> toPage
                 navViewLink (MenuPage.Cabinet page) pageName (icon page) (MenuPage.Cabinet page = model.Page)

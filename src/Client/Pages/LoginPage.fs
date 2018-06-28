@@ -15,6 +15,9 @@ open Elmish.React
 open Shared
 open Shared.Auth
 
+open Client.LoginCommon
+open Client.Page
+
 type Msg = 
     | Login
     | ChangeUserName    of string
@@ -28,14 +31,6 @@ type ExternalMsg =
     | NoOp
     | LoginUser of LoginInfo
 
-type AuthModel = {
-    Token: AuthToken
-    UserName: string
-}
-
-type LoginState =
-    | LoggedOut
-    | LoggedIn  of AuthModel
 
 type Model = {
     State : LoginState
@@ -162,14 +157,16 @@ let view model (dispatch: Msg -> unit) =
                               Class "btn btn-info block full-width m-b"
                               OnClick (fun _ -> dispatch LogInClicked) ]
                             [ str "Login" ] 
-                          a [ Href "forgot_password" ]
+                          a [   Href (toHash MenuPage.ForgotPassword) 
+                                OnClick goToUrl ]
                             [ small [ ]
                                 [ str "Forgot password?" ] ]
                           p [ Class "text-muted text-center" ]
                             [ small [ ]
                                 [ str "Do not have an account?" ] ]
-                          a [ Class "btn btn-sm btn-white btn-block"
-                              Href "register" ]
+                          a [   Class "btn btn-sm btn-white btn-block"
+                                Href (toHash MenuPage.Register) 
+                                OnClick goToUrl ]
                            [ str "Create an account" ]]
                       p [ Class "m-t project-title" ]
                         [ small [ ]

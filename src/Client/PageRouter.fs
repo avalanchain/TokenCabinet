@@ -14,52 +14,30 @@ open Elmish.React
 open Elmish.Browser.Navigation
 open Elmish.Browser.UrlParser
 
+open Client.Page
 open ClientMsgs
 open ClientModels
 open CabinetModel
 open Shared.Utils
-open Menu
+open Client.Page
 
-let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
-    allUnionCases<CabinetPage.Page>
-    |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "cabinet" </> s ((getUnionCaseName ed).ToLowerInvariant())))
-
-
-// let [<PassGenerics>]tradingPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
-//     let parserWithUid caseName case getName = 
-//         map (fun uid -> { Trading.CompanyInfo.UID = uid |> uint32; Trading.CompanyInfo.Name = uid |> uint32 |> getName } |> case |> MenuPage.Trading) (s "trading" </> s caseName </> i32)
-//     Trading.pageDefs 
-//     |> List.map (fun ed -> 
-//                     let pd = ed |> fst
-//                     match pd with 
-//                     | Trading.Page.Trader ci -> parserWithUid (getUnionCase(pd).Name.ToLowerInvariant()) Trading.Page.Trader (fun uid -> (Examples.traders |> List.find (fun t -> t.Uid = uid)).Name)
-//                     | Trading.Page.VesselOperator ci -> parserWithUid (getUnionCase(pd).Name.ToLowerInvariant()) Trading.Page.VesselOperator (fun uid -> (Examples.vesselOperators |> List.find (fun t -> t.Uid = uid)).Name)
-//                     | Trading.Page.VesselMaster ci -> parserWithUid (getUnionCase(pd).Name.ToLowerInvariant()) Trading.Page.VesselMaster (fun uid -> (Examples.captains |> List.find (fun t -> t.Uid = uid)).Name)
-//                     | Trading.Page.Terminal ci -> parserWithUid (getUnionCase(pd).Name.ToLowerInvariant()) Trading.Page.Terminal (fun uid -> (Examples.terminals |> List.find (fun t -> t.Uid = uid)).Name)
-//                     | Trading.Page.Inspector ci -> parserWithUid (getUnionCase(pd).Name.ToLowerInvariant()) Trading.Page.Inspector (fun uid -> (Examples.inspectors |> List.find (fun t -> t.Uid = uid)).Name)
-                        
-//                     | Trading.Page.Archive 
-//                     | Trading.Page.All -> map (pd |> MenuPage.Trading) (s "trading" </> s (getUnionCase(pd).Name.ToLowerInvariant()) ))
-                    
-
-
-/// The URL is turned into a Result.
-let pageParser : Parser<MenuPage -> MenuPage, MenuPage> =
-    oneOf ([map MenuPage.Home (s "home")
-            map MenuPage.Login (s "login") ] 
-            @ cabinetPageParsers
-            // @ tradingPageParsers 
-            )
-    
 let urlUpdate (result: MenuPage option) (model: AppModel) =
     match result with
     | None ->
         Browser.console.error("Error parsing url:")
-        ( model, Navigation.modifyUrl (Menu.toHash model.Page) )
+        ( model, Navigation.modifyUrl (toHash model.Page) )
 
     | Some (MenuPage.Login as page) ->
         let m,cmd = LoginPage.init model.Auth
         { model with Page = page; PageModel = LoginModel m }, Cmd.map LoginMsg cmd
+
+    | Some (MenuPage.Register as page) ->
+        let m,cmd = RegisterPage.init model.Auth
+        { model with Page = page; PageModel = RegisterModel m }, Cmd.map RegisterMsg cmd
+
+    | Some (MenuPage.ForgotPassword as page) ->
+        let m,cmd = ForgotPasswordPage.init model.Auth
+        { model with Page = page; PageModel = ForgotPasswordModel m }, Cmd.map ForgotPasswordMsg cmd
 
     | Some (MenuPage.Cabinet p as page) ->
         match model.Auth with

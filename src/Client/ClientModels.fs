@@ -21,9 +21,11 @@ open JsInterop
 open Fable.Core.JsInterop
 open CryptoCurrencyPrices
 
+open Client.Page
 open ClientMsgs
 open LoginPage
 open CabinetModel
+open Client.LoginCommon
 
 // type LoginState =
 // | LoggedOut
@@ -31,19 +33,12 @@ open CabinetModel
 
 // Model
 
-[<RequireQualifiedAccess>]
-type MenuPage = 
-  | Home 
-  | Login
-  | Cabinet of CabinetPage.Page
-//   | Static of Statics.Page
-  with static member Default = Login
-
-
 type PageModel =
   | NoPageModel
-  | LoginModel   of LoginPage.Model
-  | CabinetModel of CabinetModel.Model
+  | LoginModel          of LoginPage.Model
+  | RegisterModel       of RegisterPage.Model
+  | ForgotPasswordModel of ForgotPasswordPage.Model
+  | CabinetModel        of CabinetModel.Model
 //   | StaticModel of Statics.Model
 
 type AppModel = {

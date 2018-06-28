@@ -7,15 +7,16 @@ open Microsoft.Extensions.DependencyInjection
 open Giraffe
 open Saturn
 open Config
-open Shared
 
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
+
+open Shared
 open Shared.ViewModels
-open TokenSaleStageStatuses
-open System.Collections.ObjectModel
 open Shared.Auth
 open Shared.Utils
+
+open Customer.Wallet
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
@@ -111,6 +112,7 @@ let getTokenSale config () = task {
     return tokenSale |> Ok
 }                                
 
+
 let getFullCustomer config request = task { 
     printfn "getFullCustomer() called"
 
@@ -138,6 +140,7 @@ let getFullCustomer config request = task {
                     VerificationEvent = None
                     CustomerPreference = customerPreference
                     CustomerTier = Tier1
+                    Wallet = (createCustomerWallet customer.Id).PublicPart TestEnv
                 }
             fullCustomer |> Ok
 }   

@@ -22,7 +22,6 @@
     <Compile Include="../Shared/Entities/InvestmentTranStatusIdsModel.fs" />
     <Compile Include="../Shared/Entities/InvestmentsModel.fs" />
     <Compile Include="../Shared/Shared.fs" />
-    <Compile Include="../Shared/WalletPublic.fs" />
     <Compile Include="lib/BigNumber.fs" />
     <Compile Include="lib/jsonrpc.fs" />
     <Compile Include="lib/Web3.fs" />
@@ -54,6 +53,9 @@
 -->
 
     <Compile Include="Components/Ibox.fs" />
+    <Compile Include="Page.fs" />
+
+    <Compile Include="Pages/LoginCommon.fs" />
     <Compile Include="Pages/ForgotPasswordPage.fs" />
     <Compile Include="Pages/RegisterPage.fs" />
     <Compile Include="Pages/VerificationPage.fs" />

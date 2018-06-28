@@ -17,15 +17,6 @@ open LoginPage
 open Shared
 open Client.CabinetModel
 
-type Page =
-    | PurchaseToken
-    | MyInvestments
-    | ReferralProgram
-    | Verification
-    | Contacts
-    | Dashboard
-    with static member Default = PurchaseToken  
-
 // type Model = 
 //     | VerificationModel     of string
 //     | PurchaseTokenModel    of ViewModels.TokenSale option
@@ -101,9 +92,10 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
 open ReactBootstrap
 open Fable.Import.React
 open Client.Helpers
+open Page
 
 
-let view (page: Page) (model: Model) (dispatch: Msg -> unit) = 
+let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) = 
     match page with
         | Verification      -> [ VerificationPage.view ]
         | PurchaseToken     -> [ PurchaseTokenPage.view model]

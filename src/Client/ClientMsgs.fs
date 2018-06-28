@@ -21,19 +21,22 @@ open JsInterop
 
 open Fable.Core.JsInterop
 open CryptoCurrencyPrices
+open Client.Page
 
 type RemotingError =
     | CommunicationError of exn
     | ServerError of ServerError
 
 type AppMsg =
-    | AuthMsg       of AuthMsg
-    | UIMsg         of UIMsg
-    | UnexpectedMsg of UnexpectedMsg
-    | ErrorMsg      of string * AppMsg * string
-    | OldMsg        of OldMsg
-    | LoginMsg      of LoginPage.Msg
-    | CabinetMsg    of CabinetPage.Msg
+    | AuthMsg           of AuthMsg
+    | UIMsg             of UIMsg
+    | UnexpectedMsg     of UnexpectedMsg
+    | ErrorMsg          of string * AppMsg * string
+    | OldMsg            of OldMsg
+    | LoginMsg          of LoginPage.Msg
+    | RegisterMsg       of RegisterPage.Msg
+    | ForgotPasswordMsg of ForgotPasswordPage.Msg
+    | CabinetMsg        of CabinetPage.Msg
 
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken
@@ -41,7 +44,7 @@ and AuthMsg =
 
 and UIMsg =
     | Tick                  of uint64
-    | MenuSelected          of CabinetPage.Page
+    | MenuSelected          of CabinetPagePage
     | BrowserStorageUpdated
     | Login
     | Logout  

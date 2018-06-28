@@ -1,6 +1,6 @@
 module Customer.Wallet
 
-open Customer.WalletPublic
+open Shared.WalletPublic
 
 open Nethereum
 open Nethereum.Hex.HexConvertors.Extensions
@@ -9,15 +9,15 @@ type EthAccount = {
     EAddress: CCAddress
     EPubKey:  CCPubKey
     EPrivKey: CCPrivKey
-}   with member __.PublicPart = {   EAddress = __.EAddress
-                                    EPubKey  = __.EPubKey }
+}   with member __.PublicPart = {   Address = __.EAddress
+                                    PubKey  = __.EPubKey }
 
 type BtcAccount = {
     BAddress: CCAddress
     BPubKey:  CCPubKey
     BPrivKey: CCPrivKey
-}   with member __.PublicPart = {   BAddress = __.BAddress
-                                    BPubKey  = __.BPubKey }
+}   with member __.PublicPart = {   Address = __.BAddress
+                                    PubKey  = __.BPubKey }
 
 type NetworkEnvAccounts = {
     Eth:  EthAccount
@@ -25,14 +25,14 @@ type NetworkEnvAccounts = {
     Btc:  BtcAccount
     Ltc:  BtcAccount
     Btg:  BtcAccount
-    Bth:  BtcAccount
+    Bch:  BtcAccount
     Dash: BtcAccount
 }   with member __.PublicPart: NetworkEnvPublicPart = { Eth  = __.Eth.PublicPart
                                                         Etc  = __.Etc.PublicPart
                                                         Btc  = __.Btc.PublicPart
                                                         Ltc  = __.Ltc.PublicPart
                                                         Btg  = __.Btg.PublicPart
-                                                        Bth  = __.Bth.PublicPart
+                                                        Bch  = __.Bch.PublicPart
                                                         Dash = __.Dash.PublicPart }
 type NetworkEnv = MainEnv | TestEnv
 
@@ -67,14 +67,14 @@ let createCustomerWallet id =
                     Btc  = bAccount NBitcoin.Network.Main
                     Ltc  = bAccount NBitcoin.Altcoins.Litecoin.Instance.Mainnet
                     Btg  = bAccount NBitcoin.Altcoins.BGold.Instance.Mainnet
-                    Bth  = bAccount NBitcoin.Altcoins.BCash.Instance.Mainnet
+                    Bch  = bAccount NBitcoin.Altcoins.BCash.Instance.Mainnet
                     Dash = bAccount NBitcoin.Altcoins.Dash.Instance.Mainnet  }
     let testEnv = { Eth  = eAccount
                     Etc  = eAccount
                     Btc  = bAccount NBitcoin.Network.TestNet
                     Ltc  = bAccount NBitcoin.Altcoins.Litecoin.Instance.Testnet
                     Btg  = bAccount NBitcoin.Altcoins.BGold.Instance.Testnet
-                    Bth  = bAccount NBitcoin.Altcoins.BCash.Instance.Testnet
+                    Bch  = bAccount NBitcoin.Altcoins.BCash.Instance.Testnet
                     Dash = bAccount NBitcoin.Altcoins.Dash.Instance.Testnet  }
 
     {   CustomerId  = id

@@ -30,7 +30,6 @@
     <Compile Include="../Shared/Entities/InvestmentsModel.fs" />
     <Compile Include="../Shared/Utils.fs" />
     <Compile Include="../Shared/Shared.fs" />
-    <Compile Include="../Shared/WalletPublic.fs" />
     <Compile Include="Entities/Verifications/VerificationsViews.fs" />
     <Compile Include="Entities/Verifications/VerificationsRepository.fs" />
     <Compile Include="Entities/Verifications/VerificationsController.fs" />

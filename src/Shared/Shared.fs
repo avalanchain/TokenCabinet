@@ -12,6 +12,43 @@ type ServerError =
 
 type ServerResult<'T> = Result<'T, ServerError>
 
+type CryptoCurrencySymbol = ETH | ETC | BTC | LTC | BCH | BTG | DASH
+
+module WalletPublic =
+
+    type CCAddress = CCAddress of string
+    type CCPubKey  = CCPubKey  of string
+    type CCPrivKey = CCPrivKey of string
+
+    type AccountPublicPart = {
+        Address: CCAddress
+        PubKey:  CCPubKey
+    }
+
+    type NetworkEnvPublicPart = {
+        Eth:  AccountPublicPart
+        Etc:  AccountPublicPart
+        Btc:  AccountPublicPart
+        Ltc:  AccountPublicPart
+        Btg:  AccountPublicPart
+        Bch:  AccountPublicPart
+        Dash: AccountPublicPart
+    }
+
+    type WalletPublicPart = {
+        CustomerId: System.Guid
+        Accounts: NetworkEnvPublicPart
+    } with member __.ForSymbol = function   
+                                | ETH  -> __.Accounts.Eth 
+                                | ETC  -> __.Accounts.Etc
+                                | BTC  -> __.Accounts.Btc
+                                | LTC  -> __.Accounts.Ltc
+                                | BCH  -> __.Accounts.Bch
+                                | BTG  -> __.Accounts.Btg
+                                | DASH -> __.Accounts.Dash
+
+
+
 module ViewModels = 
     type TokenSale = {
         SaleToken: SaleToken
@@ -69,11 +106,12 @@ module ViewModels =
         | Paused
 
     type FullCustomer = {
-        Customer: Customers.Customer
-        IsVerified: bool
-        VerificationEvent: CustomerVerificationEvents.CustomerVerificationEvent option
-        CustomerTier: CustomerTier
-        CustomerPreference: CustomerPreferences.CustomerPreference
+        Customer            : Customers.Customer
+        IsVerified          : bool
+        VerificationEvent   : CustomerVerificationEvents.CustomerVerificationEvent option
+        CustomerTier        : CustomerTier
+        CustomerPreference  : CustomerPreferences.CustomerPreference
+        Wallet              : WalletPublic.WalletPublicPart
     }
     and CustomerTier = 
         | Tier1
@@ -98,8 +136,7 @@ module ViewModels =
         Email: string
     } 
 
-    type CryptoCurrencySymbol = ETH | ETC | BTC | LTC | BCH | BTG | DASH
-
+   
     type CryptoCurrency = {
         Symbol    : CryptoCurrencySymbol
         Name      : string
