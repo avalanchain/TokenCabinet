@@ -69,7 +69,7 @@ let handleClick (e: React.MouseEvent) =
 
 // let testlink = 
 
-let view (model: AppModel) (dispatch: UIMsg -> unit) =
+let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
     let icon  (page: CabinetPagePage) = 
                 match page with 
                 | Verification      -> "fa fa-address-card"    
@@ -80,11 +80,11 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
                 | Dashboard         -> "fa fa-th-large"         
     let home = 
         let page = MenuPage.Home
-        [   navViewLink page "Main view" "fa fa-th-large" ( model.Page = page )]
+        [   navViewLink page "Main view" "fa fa-th-large" ( menuPage = page )]
 
     let login = 
         let page = LoginFlowPage.Login |> MenuPage.LoginFlow
-        [   navViewLink page "LOGIN" "fa fa-sign-in" ( model.Page = page )]
+        [   navViewLink page "LOGIN" "fa fa-sign-in" ( menuPage = page )]
 
     let cabinet = 
         let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPagePage
@@ -92,7 +92,7 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
         [   for page in getUnionCases<CabinetPagePage> ->
                 let pageName = page.Name |> splitOnCapital 
                 let page = page |> toPage
-                navViewLink (MenuPage.Cabinet page) pageName (icon page) (MenuPage.Cabinet page = model.Page)
+                navViewLink (MenuPage.Cabinet page) pageName (icon page) (MenuPage.Cabinet page = menuPage)
         ]
 
     // let divider = li [ ClassName "divider" ] [ ]
@@ -110,12 +110,6 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
                 div [ Class "logo-element" ]
                     [ ofString "TC" ] 
             ]
-
-    let dynamicPart: React.ReactElement list = 
-        match model.PageModel with
-        | CabinetModel _   -> cabinet
-        | NoPageModel
-        | LoginFlowModel _ -> login
                     
 
     nav [ Class "navbar-default navbar-static-side"
@@ -124,7 +118,7 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
                 [ ul [ Class "nav metismenu"
                        Id "side-menu" ]
                     
-                        (staticPart :: dynamicPart)
+                        (staticPart :: cabinet)
                             ] ] 
     // div [ ClassName "sidebar" ] [
     //     nav [ ClassName "sidebar-nav" ] [

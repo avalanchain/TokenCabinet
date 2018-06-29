@@ -221,29 +221,30 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 /// Constructs the view for the application given the model.
 
 let mainView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView = 
-            div [ Id "wrapper" ]
-                [
+    let fullCustomer = match model.PageModel with
+                        | CabinetModel m                    -> m.FullCustomer
+                        | LoginFlowModel _ | NoPageModel    -> None
+    div [ Id "wrapper" ]
+        [
+            Menu.view model.Page (AppMsg.UIMsg >> dispatch)
+            div [ Id "page-wrapper"
+                  Class "gray-bg" ] [
+                  TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> dispatch)
+                  div [ Class "wrapper wrapper-content animated fadeInRight"]
+                      [ 
+                        (innerPageView model dispatch)
+                           ]
 
-                        Menu.view model (AppMsg.UIMsg >> dispatch)
-                        div [ Id "page-wrapper"
-                              Class "gray-bg" ] [
-                              TopNavbar.navBar  model.CabinetModel.FullCustomer (AppMsg.UIMsg >> dispatch)
-                              div [ Class "wrapper wrapper-content animated fadeInRight"]
-                                  [ 
-                                    (innerPageView model dispatch)
-                                       ]
-
-                              Footer.footer
-                        ]
-                    // ]
-                ]
+                  Footer.footer
+            ]
+        ]
 
 
 [<PassGenerics>]
 let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
     match model.PageModel with 
     | LoginFlowModel loginModel -> LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> dispatch)
-    | CabinetModel(_) -> mainView model dispatch innerPageView
+    | CabinetModel cm -> mainView model dispatch innerPageView
     | NoPageModel ->
         Browser.console.error("Unsupported model/Auth state combination")
         Login |> UIMsg |> dispatch 

@@ -106,14 +106,14 @@ module ViewModels =
         | Paused
 
     type Customer = {
-      Id: System.Guid
-      FirstName: string
-      LastName: string
-      EthAddress: string
-      Password: string
-      PasswordSalt: string
-      Avatar: string
-      Email: string
+        Id: System.Guid
+        FirstName: string
+        LastName: string
+        EthAddress: string
+        Password: string
+        PasswordSalt: string
+        Avatar: string
+        Email: string
     }
     type FullCustomer = {
         Customer            : Customer
@@ -181,7 +181,7 @@ type ITokenSaleProtocol = {
     getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
-    getFullCustomer     : SecureVoidRequest -> Async<ServerResult<ViewModels.FullCustomer>> 
+    getFullCustomer     : SecureRequest<unit> -> Async<ServerResult<ViewModels.FullCustomer>> 
 
     getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }
