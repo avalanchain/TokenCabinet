@@ -181,7 +181,7 @@ type ITokenSaleProtocol = {
     getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
-    getFullCustomer     : SecureRequest<unit> -> Async<ServerResult<ViewModels.FullCustomer>> 
+    getFullCustomer     : SecureVoidRequest -> Async<ServerResult<ViewModels.FullCustomer>> 
 
     getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }

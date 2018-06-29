@@ -14,7 +14,8 @@ module Auth =
 
     // a request with a token
     type SecureRequest<'T> = { Token : AuthToken; Content : 'T }
-    let secureVoidRequest token = { Token = token; Content = () }
+    type SecureVoidRequest = { Token : AuthToken }
+    let secureVoidRequest token = { Token = token }
     let secureRequest token content = { Token = token; Content = content }
 
     // possible authentication/authorization errors     
