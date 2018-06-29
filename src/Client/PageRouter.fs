@@ -21,39 +21,25 @@ open CabinetModel
 open Shared.Utils
 open Client.Page
 
-let urlUpdate (result: MenuPage option) (model: AppModel) =
+let urlUpdate (result: MenuPage option) (model: AppModel): AppModel * Cmd<AppMsg> =
     match result with
     | None ->
         Browser.console.error("Error parsing url:")
-        ( model, Navigation.modifyUrl (toHash model.Page) )
+        model, Navigation.modifyUrl (toHash model.Page)
 
-    | Some (MenuPage.Login as page) ->
-        let m,cmd = LoginPage.init model.Auth
-        { model with Page = page; PageModel = LoginModel m }, Cmd.map LoginMsg cmd
-
-    | Some (MenuPage.Register as page) ->
-        let m,cmd = RegisterPage.init model.Auth
-        { model with Page = page; PageModel = RegisterModel m }, Cmd.map RegisterMsg cmd
-
-    | Some (MenuPage.ForgotPassword as page) ->
-        let m,cmd = ForgotPasswordPage.init model.Auth
-        { model with Page = page; PageModel = ForgotPasswordModel m }, Cmd.map ForgotPasswordMsg cmd
+    | Some (MenuPage.LoginFlow p as page) ->
+        match model.PageModel with
+        | LoginFlowModel m ->
+            let model', cmd' = LoginFlowPage.switchTo p m
+            { model with Page = page; PageModel = LoginFlowModel model' }, Cmd.map LoginFlowMsg cmd'
+        | NoPageModel
+        | CabinetModel _ -> model, Navigation.modifyUrl (toHash model.Page)
 
     | Some (MenuPage.Cabinet p as page) ->
-        match model.Auth with
-        | Some user ->
-            { model with Page = page; PageModel = model.CabinetModel |> CabinetModel }, Cmd.none
-        | None ->
-            model, Cmd.ofMsg (Logout |> UIMsg)
-
-    // | Some (MenuPage.Trading p as page) ->
-    //     match model.User with
-    //     | Some user ->
-    //         //let m,cmd = Trading.init user p
-    //         //{ model with Page = page; SubModel = m |> TradingModel }, Cmd.map (TradingMsg) cmd
-    //         { model with Page = page; SubModel = NoSubModel }, Cmd.none
-    //     | None ->
-    //         model, Cmd.ofMsg (Logout |> MenuMsg)
+        match model.PageModel with
+        | CabinetModel _ -> { model with Page = page }, Cmd.none
+        | NoPageModel
+        | LoginFlowModel _ -> model, Cmd.ofMsg (Logout |> UIMsg)
 
     | Some (MenuPage.Home as page) ->
         { model with Page = page }, Cmd.none

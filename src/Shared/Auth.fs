@@ -4,6 +4,7 @@ module Auth =
 
     type AuthToken = AuthToken of string
     type LoginInfo = { UserName: string; Password: string } // TODO: Send password hash only!!!
+    type ForgotPasswordInfo = { UserName: string }
 
     // possible errors when logging in
     type LoginError = 

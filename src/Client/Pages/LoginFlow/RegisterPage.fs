@@ -30,29 +30,28 @@ type Msg =
 
 type ExternalMsg =
     | NoOp
-    | LoginUser of LoginInfo
+    | RegisterUser of LoginInfo
 
 type Model = {
-    State : LoginState
     InputUserName: string
+    InputPassword: string
+    InputPasswordConf: string
     UsernameValidationErrors: string list
     PasswordValidationErrors: string list
-    InputPassword: string
+    PasswordConfValidationErrors: string list
     HasTriedToLogin: bool
-    LoginError: string option
+    RegisteringError: string option
 }
 
-let init (authModel: AuthModel option) = 
-    let state, userName = match authModel with
-                            | None              -> LoggedOut, ""
-                            | Some authModel    -> LoggedIn authModel, authModel.UserName
-    {   State         = state
-        InputUserName = userName
-        InputPassword = ""
-        UsernameValidationErrors =  [ ]
-        PasswordValidationErrors =  [ ]
-        HasTriedToLogin = false
-        LoginError      = None }, Cmd.ofMsg UpdateValidationErrors
+let init userName = 
+    {   InputUserName     = userName
+        InputPassword     = ""
+        InputPasswordConf = ""
+        UsernameValidationErrors     =  [ ]
+        PasswordValidationErrors     =  [ ]
+        PasswordConfValidationErrors =  [ ]
+        HasTriedToLogin     = false
+        RegisteringError    = None }, Cmd.ofMsg UpdateValidationErrors
 
 let validateInput (model: Model) =  
     let usernameRules = 
@@ -74,23 +73,23 @@ let validateInput (model: Model) =
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
     | Login -> 
-        { model with InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
+        { model with InputPassword = ""; RegisteringError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangeUserName username -> 
-        { model with InputUserName = username; InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
+        { model with InputUserName = username; InputPassword = ""; RegisteringError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->
-        { model with InputPassword = password; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    | LoginSuccess token ->
-        { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
-                                InputPassword = "" 
-                                HasTriedToLogin = false }, Cmd.none, NoOp
+        { model with InputPassword = password; RegisteringError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
+    // | LoginSuccess token ->
+    //     { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
+    //                             InputPassword = "" 
+    //                             HasTriedToLogin = false }, Cmd.none, NoOp
     | LoginFailed error -> 
-        { model with LoginError = Some error; HasTriedToLogin = false }, Cmd.none, NoOp
+        { model with RegisteringError = Some error; HasTriedToLogin = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         let usernameValidationErrors, passwordValidationErrors = validateInput model
         { model with    UsernameValidationErrors = usernameValidationErrors
                         PasswordValidationErrors = passwordValidationErrors }, Cmd.none, NoOp
     | LogInClicked ->
-        { model with HasTriedToLogin = true }, Cmd.none, LoginUser { UserName = model.InputUserName; Password = model.InputPassword } // TODO: hash password
+        { model with HasTriedToLogin = true }, Cmd.none, RegisterUser { UserName = model.InputUserName; Password = model.InputPassword } // TODO: hash password
 
 
 
@@ -147,7 +146,7 @@ let view model (dispatch: Msg -> unit) =
                             [ small [ ]
                                 [ str "Already have an account?" ] ]
                           a [ Class "btn btn-sm btn-white btn-block"
-                              Href (toHash MenuPage.Login) 
+                              Href (LoginFlowPage.Login |> MenuPage.LoginFlow |> toHash) 
                               OnClick goToUrl ]
                             [ str "Login" ]]
                       p [ Class "m-t project-title" ]

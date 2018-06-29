@@ -16,6 +16,7 @@ open Elmish.React.Common
 open LoginPage
 open Shared
 open Client.CabinetModel
+open Client.LoginCommon
 
 // type Model = 
 //     | VerificationModel     of string
@@ -41,11 +42,13 @@ and ServerMsg =
     | GetFullCustomerCompleted      of ViewModels.FullCustomer
     | PriceTick                     of ViewModels.CurrencyPriceTick
 
-let init () = 
-    {   CryptoCurrencies        = []
+let init authToken = 
+    {   Auth                    = { Token = authToken }
+        CryptoCurrencies        = []
         CurrenciesCurentPrices  = { Prices = [] }
         TokenSale               = None
         FullCustomer            = None }
+
    
 
     // | Book ed -> 

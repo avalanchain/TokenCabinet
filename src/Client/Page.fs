@@ -18,13 +18,16 @@ open Shared.Utils
 
 [<RequireQualifiedAccess>]
 type MenuPage = 
-  | Home 
-  | Login
-  | Register
-  | ForgotPassword
-  | Cabinet of CabinetPagePage
+    | Home 
+    | LoginFlow of LoginFlowPage
+    | Cabinet of CabinetPagePage
 //   | Static of Statics.Page
-  with static member Default = Login
+    with static member Default = LoginFlowPage.Default |> LoginFlow
+and LoginFlowPage =
+    | Login         
+    | Register      
+    | ForgotPassword
+    with static member Default = Login
 and CabinetPagePage =
     | PurchaseToken
     | MyInvestments
@@ -37,9 +40,7 @@ and CabinetPagePage =
 let toHash =
   function
   | MenuPage.Home           -> "#home"
-  | MenuPage.Login          -> "#login"
-  | MenuPage.Register       -> "#register"
-  | MenuPage.ForgotPassword -> "#forgot"
+  | MenuPage.LoginFlow lf   -> "#" + (getUnionCaseName lf).ToLowerInvariant()
   | MenuPage.Cabinet tc     -> "#cabinet/" + (getUnionCaseName tc).ToLowerInvariant()
 //   | MenuPage.Trading p -> 
 //     let uid = match p with 
@@ -58,6 +59,10 @@ let goToUrl (e: React.MouseEvent) =
     // e.preventDefault()
     let href = !!e.target?href
     Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
+
+let loginFlowPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
+    allUnionCases<LoginFlowPage>
+    |> List.map (fun ed -> map (ed |> MenuPage.LoginFlow) (s ((getUnionCaseName ed).ToLowerInvariant())))
 
 
 let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
@@ -85,10 +90,8 @@ let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list =
 
 /// The URL is turned into a Result.
 let pageParser : Parser<MenuPage -> MenuPage, MenuPage> =
-    oneOf ([map MenuPage.Home (s "home")
-            map MenuPage.Login (s "login") 
-            map MenuPage.Register (s "register") 
-            map MenuPage.ForgotPassword (s "forgot") ] 
+    oneOf ([ map MenuPage.Home (s "home") ]
+            @ loginFlowPageParsers
             @ cabinetPageParsers
             // @ tradingPageParsers 
             )

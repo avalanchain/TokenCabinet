@@ -94,48 +94,35 @@ let cmdServerCall apiFunc args (completeMsg: 'T -> AppMsg) serverMethodName =
                     exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg)
 
 let init urlParsingResult : AppModel * Cmd<AppMsg> =
-    let model = {   Auth                    = None
-                    Loading                 = false
+    let model = {   Loading                 = false
                     Page                    = MenuPage.Default
                     PageModel               = NoPageModel
-                    Counter                 = None
-                    CabinetModel            = CabinetPage.init()
-
                 }
 
 
     model, Cmd.none
 
 let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
+    let enforceLogin model =
+        let loginFlowModel, cmd = LoginFlowPage.init ()
+        { model with    Page = MenuPage.LoginFlow LoginFlowPage.Default
+                        PageModel = loginFlowModel |> PageModel.LoginFlowModel } , Cmd.map LoginFlowMsg cmd
+
     let (model', cmd') : AppModel * Cmd<AppMsg> =  
         match msg with
-        | OldMsg msg_ -> 
-            match model, msg_ with
-            | { Counter = None }  , Init x      -> { model with Counter = Some x }      , Cmd.none
-            | { Counter = Some x }, Increment   -> { model with Counter = Some (x + 1) }, Cmd.none
-            | { Counter = Some x }, Decrement   -> { model with Counter = Some (x - 1) }, Cmd.none
-            | model, InitDb -> model, cmdServerCall (Server.adminApi.initDb) () (InitDbCompleted >> OldMsg) "InitDb()"
-            | model, InitDbCompleted(_) -> { model with Counter = Some (100) } , Cmd.none
-            | _ -> model, ("Unhandled", msg, string model) |> ErrorMsg |> Cmd.ofMsg // Catch all for all messages
-
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
-            let authModel = { AuthModel.Token = authToken; AuthModel.UserName = "" }
             let page = CabinetPagePage.Default
-            let cmdLocalStorage             = LocalStorage.saveUserCmd authModel
-            let cmdInitCounter              = cmdServerCall (Server.adminApi.getInitCounter) () (Init >> OldMsg) "getInitCounter()"
+            let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken }
             let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
             let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
             let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetPage.GetFullCustomerCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getFullCustomer()"
             let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg)
-            let cmd' = Cmd.batch [cmdLocalStorage; cmdInitCounter; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdGetFullCustomerCompleted; cmdTick ]
+            let cmd' = Cmd.batch [cmdLocalStorage; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdGetFullCustomerCompleted; cmdTick ]
             Navigation.newUrl (CabinetPagePage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
-            { model with    Auth = Some authModel 
-                            Page = MenuPage.Cabinet page
-                            PageModel = PageModel.CabinetModel model.CabinetModel
-                            CabinetModel = model.CabinetModel
+            { model with    Page = MenuPage.Cabinet page
+                            PageModel = CabinetPage.init authToken |> PageModel.CabinetModel
                  } , cmd'  // TODO: Add UserName
-        | AuthMsg(AuthMsg.LoggedOut)          -> 
-            { model with Auth = None; CabinetModel = CabinetPage.init() } , Cmd.none
+        | AuthMsg(AuthMsg.LoggedOut) -> enforceLogin model
 
         | UIMsg msg ->
             match msg with 
@@ -149,11 +136,8 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                             |> Toastr.timeout 1000
                             |> Toastr.success
                 { model with Page = MenuPage.Cabinet page } , cmd  
-            | Login -> 
-                let loginModel, cmd = LoginPage.init model.Auth
-                { model with Page = MenuPage.Login; PageModel = loginModel |> LoginModel } , Cmd.none
-            | Logout -> 
-                { model with Page = MenuPage.Default; Auth = None; PageModel = NoPageModel } , AuthMsg.LoggedOut |> AuthMsg |> Cmd.ofMsg
+            | Login -> enforceLogin model
+            | Logout -> enforceLogin model
 
         | UnexpectedMsg msg_ ->
             match msg_ with
@@ -165,68 +149,30 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
             console.error(sprintf "%s Msg '%A' on Model '%A'" text msg m)
             model, Cmd.none
 
-        | LoginMsg msg_ ->
+        | LoginFlowMsg msg_ ->
             match model.PageModel with
-            | LoginModel loginModel -> 
-                let model', cmd', externalMsg' = LoginPage.update msg_ loginModel
+            | LoginFlowModel loginModel -> 
+                let model', cmd', externalMsg' = LoginFlowPage.update msg_ loginModel
                 let cmd2 =
                     match externalMsg' with
-                    | LoginPage.ExternalMsg.NoOp -> Cmd.none
-                    | LoginPage.ExternalMsg.LoginUser loginInfo -> 
+                    | LoginFlowPage.ExternalMsg.NoOp -> Cmd.none
+                    | LoginFlowPage.ExternalMsg.LoginUser loginInfo -> 
                         cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "login()"
-                { model with PageModel = LoginModel model' }, Cmd.batch [ Cmd.map LoginMsg cmd'; cmd2 ]
-            | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", LoginMsg msg_, (string model)) |> Cmd.ofMsg           
-        | RegisterMsg msg_ ->
-            match model.PageModel with
-            | RegisterModel registerModel -> 
-                let model', cmd', externalMsg' = RegisterPage.update msg_ registerModel
-                let cmd2 =
-                    match externalMsg' with
-                    | RegisterPage.ExternalMsg.NoOp -> Cmd.none
-                    | RegisterPage.ExternalMsg.LoginUser loginInfo -> 
-                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "register()"
-                { model with PageModel = RegisterModel model' }, Cmd.batch [ Cmd.map RegisterMsg cmd'; cmd2 ]
-            | _ -> model, ErrorMsg("Incorrect Message/Model combination for Register", RegisterMsg msg_, (string model)) |> Cmd.ofMsg           
-        | ForgotPasswordMsg msg_ ->
-            match model.PageModel with
-            | ForgotPasswordModel forgotModel -> 
-                let model', cmd', externalMsg' = ForgotPasswordPage.update msg_ forgotModel
-                let cmd2 =
-                    match externalMsg' with
-                    | ForgotPasswordPage.ExternalMsg.NoOp -> Cmd.none
-                    | ForgotPasswordPage.ExternalMsg.LoginUser loginInfo -> 
-                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "forgotPassword()"
-                { model with PageModel = ForgotPasswordModel model' }, Cmd.batch [ Cmd.map ForgotPasswordMsg cmd'; cmd2 ]
-            | _ -> model, ErrorMsg("Incorrect Message/Model combination for ForgotPassword", ForgotPasswordMsg msg_, (string model)) |> Cmd.ofMsg           
+                    | LoginFlowPage.ExternalMsg.RegisterUser info -> Cmd.none // TODO: Implement 
+                    | LoginFlowPage.ExternalMsg.ForgotPasswordUser info -> Cmd.none // TODO: Implement
 
+                { model with PageModel = LoginFlowModel model' }, Cmd.batch [ Cmd.map LoginFlowMsg cmd'; cmd2 ]
+            | _ -> model, ErrorMsg("Incorrect Message/Model combination for LoginFlow", LoginFlowMsg msg_, (string model)) |> Cmd.ofMsg           
 
         | CabinetMsg msg_ ->             
             match model.PageModel with
             | CabinetModel cabinetModel -> 
                 let model', cmd' = CabinetPage.update msg_ cabinetModel
-                { model with    PageModel = CabinetModel model' 
-                                CabinetModel = model' }, Cmd.map CabinetMsg cmd'
+                { model with PageModel = CabinetModel model' }, Cmd.map CabinetMsg cmd'
             | _ -> model, ErrorMsg("Incorrect Message/Model combination for Login", CabinetMsg msg_, (string model)) |> Cmd.ofMsg           
 
     model', cmd'
 
-// let view (model : Model) (dispatch : Msg -> unit) =
-//     div [ Id "wrapper" ]
-//         [ 
-//         //   NavBrand.navBrand model dispatch
-//           LeftMenu.LeftMenu model (UIMsg >> dispatch)
-//         //   ChildMenu.childMenu model dispatch
-         
-//         //   Container.container [ ]
-//           div [ Id "page-wrapper" 
-//                 Class "gray-bg"]
-//               [  TopNavbar.navBar model dispatch
-//                  div [ Class "wrapper wrapper-content animated fadeInRight"]
-//                     [ 
-//                       ContentView.contentView model dispatch
-//                        ]]
-//           Footer.footer             
-//                          ]
 
 /// Constructs the view for a page given the model and dispatcher.
 [<PassGenerics>]
@@ -234,26 +180,9 @@ let innerPageView model (dispatch: AppMsg -> unit) =
     match model.Page with
     | MenuPage.Home -> HomePage.view() 
 
-    // | MenuPage.Admin -> 
-    //     [ Admin.view (model.Trading) (AdminMsg >> dispatch) ]
-
-    | MenuPage.Login -> 
+    | MenuPage.LoginFlow page -> 
         match model.PageModel with
-        | LoginModel m -> (LoginPage.view m (LoginMsg >> dispatch)) 
-        | _ -> 
-            Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
-            div [ ] [ str "Incorrect login model/page" ]
-
-    | MenuPage.Register -> 
-        match model.PageModel with
-        | RegisterModel m -> (Client.RegisterPage.view m (RegisterMsg >> dispatch)) 
-        | _ -> 
-            Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
-            div [ ] [ str "Incorrect login model/page" ]
-
-    | MenuPage.ForgotPassword -> 
-        match model.PageModel with
-        | ForgotPasswordModel m -> (Client.ForgotPasswordPage.view m (ForgotPasswordMsg >> dispatch)) 
+        | LoginFlowModel m -> (LoginFlowPage.view m (LoginFlowMsg >> dispatch)) 
         | _ -> 
             Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
             div [ ] [ str "Incorrect login model/page" ]
@@ -264,11 +193,6 @@ let innerPageView model (dispatch: AppMsg -> unit) =
         | _ -> 
             Browser.console.error(sprintf "Unexpected PageModel for CabinetPage:[%A]" model.PageModel)
             div [ ] [ str "Incorrect cabinet model/page" ]
-
-    // | MenuPage.Trading p ->
-    //     match model.EthConnection with
-    //     | Some ethConnection -> [ (Trading.view p (model.Trading) (ethConnection.EthDispatcher) (LoadingMsg >> dispatch) ) ] 
-    //     | None -> [ ]        
 
 
 let sidebarToggle (e: React.MouseEvent) =
@@ -317,17 +241,13 @@ let mainView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
 
 [<PassGenerics>]
 let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
-    match model.Auth with
-        | Some _-> mainView model dispatch innerPageView
-        | None -> match model.PageModel with 
-                    | LoginModel loginModel           -> LoginPage.view loginModel (AppMsg.LoginMsg >> dispatch)
-                    | RegisterModel registerModel     -> RegisterPage.view registerModel (AppMsg.RegisterMsg >> dispatch)
-                    | ForgotPasswordModel forgotModel -> ForgotPasswordPage.view forgotModel (AppMsg.ForgotPasswordMsg >> dispatch)
-                    | NoPageModel 
-                    | CabinetModel(_) ->                     
-                        Browser.console.error("Unsupported model/Auth state combination")
-                        Login |> UIMsg |> dispatch 
-                        div [] []
+    match model.PageModel with 
+    | LoginFlowModel loginModel -> LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> dispatch)
+    | CabinetModel(_) -> mainView model dispatch innerPageView
+    | NoPageModel ->
+        Browser.console.error("Unsupported model/Auth state combination")
+        Login |> UIMsg |> dispatch 
+        div [] []
          
     
 

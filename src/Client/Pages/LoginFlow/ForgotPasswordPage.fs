@@ -31,11 +31,10 @@ type Msg =
 
 type ExternalMsg =
     | NoOp
-    | LoginUser of LoginInfo
+    | ForgotPassword of ForgotPasswordInfo
 
 
 type Model = {
-    State : LoginState
     InputUserName: string
     UsernameValidationErrors: string list
     PasswordValidationErrors: string list
@@ -44,12 +43,8 @@ type Model = {
     LoginError: string option
 }
 
-let init (authModel: AuthModel option) = 
-    let state, userName = match authModel with
-                            | None              -> LoggedOut, ""
-                            | Some authModel    -> LoggedIn authModel, authModel.UserName
-    {   State         = state
-        InputUserName = userName
+let init userName = 
+    {   InputUserName = userName
         InputPassword = ""
         UsernameValidationErrors =  [ ]
         PasswordValidationErrors =  [ ]
@@ -81,10 +76,10 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with InputUserName = username; InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->
         { model with InputPassword = password; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    | LoginSuccess token ->
-        { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
-                                InputPassword = "" 
-                                HasTriedToLogin = false }, Cmd.none, NoOp
+    // | LoginSuccess token ->
+    //     { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
+    //                             InputPassword = "" 
+    //                             HasTriedToLogin = false }, Cmd.none, NoOp
     | LoginFailed error -> 
         { model with LoginError = Some error; HasTriedToLogin = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
@@ -92,7 +87,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with    UsernameValidationErrors = usernameValidationErrors
                         PasswordValidationErrors = passwordValidationErrors }, Cmd.none, NoOp
     | LogInClicked ->
-        { model with HasTriedToLogin = true }, Cmd.none, LoginUser { UserName = model.InputUserName; Password = model.InputPassword } // TODO: hash password
+        { model with HasTriedToLogin = true }, Cmd.none, ForgotPassword { UserName = model.InputUserName } // TODO: hash password
 
 
 
@@ -129,7 +124,7 @@ let view model (dispatch: Msg -> unit) =
                                                     [ small [ ]
                                                         [ str "Go back to Login" ] ]
                                                   a [ Class "btn btn-sm btn-white btn-block"
-                                                      Href (toHash MenuPage.Login) 
+                                                      Href (LoginFlowPage.Login |> MenuPage.LoginFlow |> toHash) 
                                                       OnClick goToUrl ]
                                                     [ str "Login" ] ] ] ] ] ]  
                           p [ Class "m-t project-title" ]

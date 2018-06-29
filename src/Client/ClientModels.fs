@@ -34,23 +34,21 @@ open Client.LoginCommon
 // Model
 
 type PageModel =
-  | NoPageModel
-  | LoginModel          of LoginPage.Model
-  | RegisterModel       of RegisterPage.Model
-  | ForgotPasswordModel of ForgotPasswordPage.Model
-  | CabinetModel        of CabinetModel.Model
+    | NoPageModel
+    | LoginFlowModel of LoginFlowPage.Model
+    | CabinetModel   of CabinetModel.Model
 //   | StaticModel of Statics.Model
 
 type AppModel = {
-    Auth        : AuthModel option
-    Loading     : bool  
     Page        : MenuPage
     PageModel   : PageModel
+
+    Loading     : bool  
     // State       : LoginState
 
-    Counter     : Counter option
+    // Counter     : Counter option
 
-    CabinetModel: CabinetModel.Model
-
+    // LoginFlowModel: LoginFlowPage.Model
+    // CabinetModel  : CabinetModel.Model
 }
 

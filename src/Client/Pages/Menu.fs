@@ -79,10 +79,12 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
                 | Contacts          -> "fa fa-phone"            
                 | Dashboard         -> "fa fa-th-large"         
     let home = 
-        [   navViewLink MenuPage.Home "Main view" "fa fa-th-large" ( model.Page = MenuPage.Home )]
+        let page = MenuPage.Home
+        [   navViewLink page "Main view" "fa fa-th-large" ( model.Page = page )]
 
     let login = 
-        [   navViewLink MenuPage.Login "LOGIN" "fa fa-sign-in" ( model.Page = MenuPage.Login )]
+        let page = LoginFlowPage.Login |> MenuPage.LoginFlow
+        [   navViewLink page "LOGIN" "fa fa-sign-in" ( model.Page = page )]
 
     let cabinet = 
         let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPagePage
@@ -110,13 +112,10 @@ let view (model: AppModel) (dispatch: UIMsg -> unit) =
             ]
 
     let dynamicPart: React.ReactElement list = 
-                match model.Auth with
-                    | None ->
-                            (home @ login
-                            )
-                    | Some _ -> 
-                            (cabinet)
-                            
+        match model.PageModel with
+        | CabinetModel _   -> cabinet
+        | NoPageModel
+        | LoginFlowModel _ -> login
                     
 
     nav [ Class "navbar-default navbar-static-side"

@@ -22,7 +22,7 @@ type Msg =
     | Login
     | ChangeUserName    of string
     | ChangePassword    of string
-    | LoginSuccess      of authToken: AuthToken
+    // | LoginSuccess      of authToken: AuthToken
     | LoginFailed       of error:string
     | UpdateValidationErrors 
     | LogInClicked
@@ -33,21 +33,16 @@ type ExternalMsg =
 
 
 type Model = {
-    State : LoginState
     InputUserName: string
+    InputPassword: string
     UsernameValidationErrors: string list
     PasswordValidationErrors: string list
-    InputPassword: string
     HasTriedToLogin: bool
     LoginError: string option
 }
 
-let init (authModel: AuthModel option) = 
-    let state, userName = match authModel with
-                            | None              -> LoggedOut, ""
-                            | Some authModel    -> LoggedIn authModel, authModel.UserName
-    {   State         = state
-        InputUserName = userName
+let init userName = 
+    {   InputUserName = userName
         InputPassword = ""
         UsernameValidationErrors =  [ ]
         PasswordValidationErrors =  [ ]
@@ -79,10 +74,10 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with InputUserName = username; InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->
         { model with InputPassword = password; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    | LoginSuccess token ->
-        { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
-                                InputPassword = "" 
-                                HasTriedToLogin = false }, Cmd.none, NoOp
+    // | LoginSuccess token ->
+    //     { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
+    //                             InputPassword = "" 
+    //                             HasTriedToLogin = false }, Cmd.none, NoOp
     | LoginFailed error -> 
         { model with LoginError = Some error; HasTriedToLogin = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
@@ -116,64 +111,58 @@ let view model (dispatch: Msg -> unit) =
         | _ -> ()
         |> OnKeyDown
         
-    match model.State with
-    | LoggedIn _ ->
-        div [Id "greeting"] [
-          h3 [ ClassName "text-center" ] [ str (sprintf "Hi %s!" model.InputUserName) ]
-        ]
 
-    | LoggedOut ->
-        div [ Class "login"
-            // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
-            ]
-            [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
-                  [   div [ ]
-                        [ img [ Alt "image"
-                                Class "h55"
-                                Src "../lib/img/avalanchain.png" ] ]
-                    //   br [ ]
-                      h3 [ ]
-                        [ str "Welcome to avalanchain" ]
-                      form [ Class "m-t"
-                             Role "form"
-                             Action "#" ]
-                        [ div [ Class "form-group" ]
-                            [ input [ Id "email"
-                                      Type "email" 
-                                      ClassName "form-control"
-                                      Placeholder "Email" 
-                                      DefaultValue model.InputUserName
-                                      OnChange (fun ev -> dispatch (ChangeUserName !!ev.target?value))
-                                      AutoFocus true ] ]
-                          div [ Class "form-group" ]
-                            [ input [ Type "password" 
-                                      ClassName "form-control" 
-                                      Placeholder "Password"  
-                                      DefaultValue model.InputUserName
-                                      OnChange (fun ev -> dispatch (ChangePassword !!ev.target?value))
-                                      onEnter LogInClicked dispatch ] ]
-                          a [ 
-                              Type "submit"
-                              Class "btn btn-info block full-width m-b"
-                              OnClick (fun _ -> dispatch LogInClicked) ]
-                            [ str "Login" ] 
-                          a [   Href (toHash MenuPage.ForgotPassword) 
-                                OnClick goToUrl ]
-                            [ small [ ]
-                                [ str "Forgot password?" ] ]
-                          p [ Class "text-muted text-center" ]
-                            [ small [ ]
-                                [ str "Do not have an account?" ] ]
-                          a [   Class "btn btn-sm btn-white btn-block"
-                                Href (toHash MenuPage.Register) 
-                                OnClick goToUrl ]
-                           [ str "Create an account" ]]
-                      p [ Class "m-t project-title" ]
+    div [ Class "login"
+        // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
+        ]
+        [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
+              [   div [ ]
+                    [ img [ Alt "image"
+                            Class "h55"
+                            Src "../lib/img/avalanchain.png" ] ]
+                //   br [ ]
+                  h3 [ ]
+                    [ str "Welcome to avalanchain" ]
+                  form [ Class "m-t"
+                         Role "form"
+                         Action "#" ]
+                    [ div [ Class "form-group" ]
+                        [ input [ Id "email"
+                                  Type "email" 
+                                  ClassName "form-control"
+                                  Placeholder "Email" 
+                                  DefaultValue model.InputUserName
+                                  OnChange (fun ev -> dispatch (ChangeUserName !!ev.target?value))
+                                  AutoFocus true ] ]
+                      div [ Class "form-group" ]
+                        [ input [ Type "password" 
+                                  ClassName "form-control" 
+                                  Placeholder "Password"  
+                                  DefaultValue model.InputUserName
+                                  OnChange (fun ev -> dispatch (ChangePassword !!ev.target?value))
+                                  onEnter LogInClicked dispatch ] ]
+                      a [ 
+                          Type "submit"
+                          Class "btn btn-info block full-width m-b"
+                          OnClick (fun _ -> dispatch LogInClicked) ]
+                        [ str "Login" ] 
+                      a [   Href (LoginFlowPage.ForgotPassword |> MenuPage.LoginFlow |> toHash) 
+                            OnClick goToUrl ]
                         [ small [ ]
-                            [ str "powered by "
-                              a [ 
-                                //   HTMLAttr.Custom ("style", "font-size: 12px;")
-                                  Href "http://avalanchain.com" ]
-                                [ str "Avalanchain" ]
-                              str " © 2018" ] ] ] ]
+                            [ str "Forgot password?" ] ]
+                      p [ Class "text-muted text-center" ]
+                        [ small [ ]
+                            [ str "Do not have an account?" ] ]
+                      a [   Class "btn btn-sm btn-white btn-block"
+                            Href (LoginFlowPage.Register |> MenuPage.LoginFlow |> toHash) 
+                            OnClick goToUrl ]
+                       [ str "Create an account" ]]
+                  p [ Class "m-t project-title" ]
+                    [ small [ ]
+                        [ str "powered by "
+                          a [ 
+                            //   HTMLAttr.Custom ("style", "font-size: 12px;")
+                              Href "http://avalanchain.com" ]
+                            [ str "Avalanchain" ]
+                          str " © 2018" ] ] ] ]
 

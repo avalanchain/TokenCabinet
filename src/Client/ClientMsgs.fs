@@ -32,16 +32,12 @@ type AppMsg =
     | UIMsg             of UIMsg
     | UnexpectedMsg     of UnexpectedMsg
     | ErrorMsg          of string * AppMsg * string
-    | OldMsg            of OldMsg
-    | LoginMsg          of LoginPage.Msg
-    | RegisterMsg       of RegisterPage.Msg
-    | ForgotPasswordMsg of ForgotPasswordPage.Msg
+    | LoginFlowMsg      of LoginFlowPage.Msg
     | CabinetMsg        of CabinetPage.Msg
 
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken
     | LoggedOut
-
 and UIMsg =
     | Tick                  of uint64
     | MenuSelected          of CabinetPagePage
@@ -51,9 +47,3 @@ and UIMsg =
 and UnexpectedMsg =
     | BrowserStorageFailure of Exception
     | ServerErrorMsg        of RemotingError
-and OldMsg = 
-    | Increment
-    | Decrement
-    | Init                  of Counter
-    | InitDb
-    | InitDbCompleted       of unit
