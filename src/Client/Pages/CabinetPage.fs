@@ -108,7 +108,9 @@ let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) =
                         str "Default"
                     ]
                     comF button (fun o -> o.bsStyle <- Some "primary" ) [
-                        str "Default"
+                        div [] [str "Default"]
+                        div [] [str "Default"]
+                        div [] [str "Default"]
                     ]
                     comF button (fun o ->   o.bsStyle <- Some "warning"
                                             o.onClick <- Some (MouseEventHandler(fun e -> e.stopPropagation())) ) [

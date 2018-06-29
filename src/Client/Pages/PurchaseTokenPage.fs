@@ -15,8 +15,10 @@ open Elmish.React
 open Shared
 open ViewModels
 open Client.CabinetModel
+open Helpers
+open ReactBootstrap
 
-
+// let buttonToolbar = ReactBootstrap.buttonToolbar
 let bodyTL m = 
       ul [ Class "timeline"
            Id "timeline" ]
@@ -47,14 +49,14 @@ let bodySomeNone (model: Model) body =
 
 let cur name image price =
                     div [ Class "col-md-1"]
-                        [ button [ Class "btn btn-default dim btn-large-dim btn-outline"
-                                   Type "button" ]
-                                [  div [ Class "name" ]
-                                        [str (name.ToString())]
-                                   img [ Class "currencylogo"
-                                         Src "https://www.cryptocompare.com/media/20646/eth_logo.png" ]
-                                   div [ Class "price" ]
-                                       [str (price.ToString() + " $")] ]]
+                        [ comF button (fun o -> o.bsClass <- Some "btn btn-default dim btn-large-dim btn-outline") 
+                                      [ div [ Class "name" ]
+                                            [str (name.ToString())]
+                                        img [ Class "currencylogo"
+                                              Src "https://www.cryptocompare.com/media/20646/eth_logo.png" ]
+                                        div [ Class "price" ]
+                                            [str (price.ToString() + " $")] ] ]
+ 
             
 
 let bodyC (model: Model) = 
@@ -62,6 +64,24 @@ let bodyC (model: Model) =
                        cur curr.Symbol curr.Symbol curr.PriceUsd
             ]
 
+
+let test = comE buttonToolbar [
+                  comF (toggleButtonGroup<ToggleButtonGroup.RadioProps>) 
+                        (fun o -> 
+                             o.defaultValue <- Some (1 :> obj) //{ new System.Object() with member x.ToString() = "1"}
+                             o.name <- "options")   
+                        [
+                            // comE toggleButton [
+                            // str "Default"
+                            // ]
+                            comF toggleButton (fun o -> o.value <- U2.Case1 1. ) [
+                                str "Default"
+                            ]
+                            comF toggleButton (fun o -> o.value <- U2.Case1 2. ) [
+                                str "Default"
+                            ]
+                        ]   
+                ] 
 
 let bodyP m = div [ Class "text-center" ]
                                 [ div [ Class "m-b-md" ]
@@ -132,5 +152,6 @@ let secondRow m = Ibox.emptyRow [ invest m
 let view (model: Model) =
     div [  ]
         [ bodyRowSomeNone model bodyTL
-          secondRow model]
+          secondRow model
+          test]
 

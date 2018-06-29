@@ -9,6 +9,7 @@ open Fable.Import.React
 open Fable.Import.ReactDomServer
 
 open Client.Helpers
+open Fable.Helpers
 
 type Omit<'T, 'K> =
     interface end
@@ -1223,7 +1224,7 @@ module Pager =
 
     type PagerStatic =
         [<Emit "new $0($1...)">] abstract Create: unit -> Pager
-let [<Import("*","react-bootstrap/lib/PaginationFirst")>] paginationFirst: PaginationFirst.PaginationFirst = jsNative
+let [<Import("First","react-bootstrap/lib/Pagination")>] paginationFirst: PaginationFirst.PaginationFirst = jsNative
 
 
 module PaginationFirst =
@@ -1237,7 +1238,7 @@ module PaginationFirst =
 
     type PaginationFirstStatic =
         [<Emit "new $0($1...)">] abstract Create: unit -> PaginationFirst
-let [<Import("*","react-bootstrap/lib/PaginationPrev")>] paginationPrev: PaginationPrev.PaginationPrev = jsNative
+let [<Import("Prev","react-bootstrap/lib/Pagination")>] paginationPrev: PaginationPrev.PaginationPrev = jsNative
 
 
 module PaginationPrev =
@@ -1251,7 +1252,7 @@ module PaginationPrev =
 
     type PaginationPrevStatic =
         [<Emit "new $0($1...)">] abstract Create: unit -> PaginationPrev
-let [<Import("*","react-bootstrap/lib/PaginationNext")>] paginationNext: PaginationNext.PaginationNext = jsNative
+let [<Import("Next","react-bootstrap/lib/Pagination")>] paginationNext: PaginationNext.PaginationNext = jsNative
 
 
 module PaginationNext =
@@ -1265,7 +1266,7 @@ module PaginationNext =
 
     type PaginationNextStatic =
         [<Emit "new $0($1...)">] abstract Create: unit -> PaginationNext
-let [<Import("*","react-bootstrap/lib/PaginationLast")>] paginationLast: PaginationLast.PaginationLast = jsNative
+let [<Import("Last","react-bootstrap/lib/Pagination")>] paginationLast: PaginationLast.PaginationLast = jsNative
 
 
 module PaginationLast =
@@ -1279,7 +1280,7 @@ module PaginationLast =
 
     type PaginationLastStatic =
         [<Emit "new $0($1...)">] abstract Create: unit -> PaginationLast
-let [<Import("*","react-bootstrap/lib/PaginationEllipsis")>] paginationEllipsis: PaginationEllipsis.PaginationEllipsis = jsNative
+let [<Import("Ellipsis","react-bootstrap/lib/Pagination")>] paginationEllipsis: PaginationEllipsis.PaginationEllipsis = jsNative
 
 
 module PaginationEllipsis =
@@ -1757,11 +1758,13 @@ module ToggleButton =
         abstract value: U2<float, string> with get, set
 
     type [<AbstractClass>]ToggleButton =
-        inherit React.Component<obj>
+        inherit React.Component<ToggleButtonProps>
 
     type ToggleButtonStatic =
         [<Emit "new $0($1...)">] abstract Create: unit -> ToggleButton
-let [<Import("*","react-bootstrap/lib/ToggleButtonGroup")>] toggleButtonGroup: ToggleButtonGroup.ToggleButtonGroup = jsNative
+
+let [<Import("*","react-bootstrap/lib/ToggleButtonGroup")>] private toggleButtonGroup_: obj = jsNative
+let toggleButtonGroup<'P when 'P :> ToggleButtonGroup.BaseProps> = toggleButtonGroup_ :?> ToggleButtonGroup.ToggleButtonGroup<'P> 
 
 
 module ToggleButtonGroup =
@@ -1790,11 +1793,11 @@ module ToggleButtonGroup =
     type ToggleButtonGroupProps =
         inherit BaseProps
 
-    type [<AbstractClass>]ToggleButtonGroup =
-        inherit React.Component<BaseProps>
+    type [<AbstractClass>]ToggleButtonGroup<'T when 'T :> BaseProps> =
+        inherit React.Component<'T>
 
     type ToggleButtonGroupStatic =
-        [<Emit "new $0($1...)">] abstract Create: unit -> ToggleButtonGroup
+        [<Emit "new $0($1...)">] abstract Create: unit -> ToggleButtonGroup<BaseProps>
 let [<Import("*","react-bootstrap/lib/Tooltip")>] tooltip: Tooltip.Tooltip = jsNative
 
 
