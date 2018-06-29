@@ -17,8 +17,11 @@ open Shared.Auth
 open Shared.Utils
 
 open Customer.Wallet
+open System
+open Microsoft.AspNetCore.Http
 
 let publicPath = Path.GetFullPath "../Client/public"
+
 let port = 8085us
 
 let getInitCounter () : Task<ServerResult<Counter>> = task { return Ok 42 }
@@ -113,14 +116,14 @@ let getTokenSale config () = task {
 }                                
 
 
-let getFullCustomer config request = task { 
+let  getFullCustomer config (request: SecureVoidRequest) = task { 
     printfn "getFullCustomer() called"
 
     return 
         if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error
         elif request.Token |> checkUserExists |> not then UserDoesNotHaveAccess |> AuthError |> Error
         else 
-            let customer: Customers.Customer = 
+            let customer: Customer = 
                 {   Id = System.Guid.NewGuid()
                     FirstName = "John"
                     LastName = "Smith"
@@ -128,6 +131,7 @@ let getFullCustomer config request = task {
                     Password = "!!!ChangeMe!!!"
                     PasswordSalt = "!!PwdSalt!!"
                     Avatar = "MyPicture"
+                    Email = "email@gmail.com"
                 }
 
             let customerPreference: CustomerPreferences.CustomerPreference = 
@@ -223,6 +227,22 @@ let getPriceTick config i = task {
         return prices |> Ok
 }
 
+type CustomError = { errorMsg: string }
+
+let errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) = 
+    // do some logging
+    printfn "Error at %s on method %s" routeInfo.path routeInfo.methodName
+    printfn "Exception %A" ex 
+    // decide whether or not you want to propagate the error to the client
+    match ex with
+    | :? IOException as x ->
+        // propagate custom error, this is intercepted by the client
+        let customError = { errorMsg = "Something terrible happend" }
+        Propagate customError
+    | _ ->
+        // ignore error
+        Ignore
+
 let webApp config =
     let adminProtocol =
         {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
@@ -235,12 +255,15 @@ let webApp config =
             getPriceTick        = getPriceTick          config    >> Async.AwaitTask
         }
         
+        
     choose [
         remoting adminProtocol {
             use_route_builder Route.builder
+            use_error_handler errorHandler
         }
         remoting tokenSaleProtocol {
             use_route_builder Route.builder
+            use_error_handler errorHandler
         }
         Router.router
     ]

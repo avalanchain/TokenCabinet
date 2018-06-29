@@ -38,14 +38,14 @@ module WalletPublic =
     type WalletPublicPart = {
         CustomerId: System.Guid
         Accounts: NetworkEnvPublicPart
-    } with member __.ForSymbol = function   
-                                | ETH  -> __.Accounts.Eth 
-                                | ETC  -> __.Accounts.Etc
-                                | BTC  -> __.Accounts.Btc
-                                | LTC  -> __.Accounts.Ltc
-                                | BCH  -> __.Accounts.Bch
-                                | BTG  -> __.Accounts.Btg
-                                | DASH -> __.Accounts.Dash
+    } with member __.ForSymbol symbol = match symbol with   
+                                        | ETH  -> __.Accounts.Eth 
+                                        | ETC  -> __.Accounts.Etc
+                                        | BTC  -> __.Accounts.Btc
+                                        | LTC  -> __.Accounts.Ltc
+                                        | BCH  -> __.Accounts.Bch
+                                        | BTG  -> __.Accounts.Btg
+                                        | DASH -> __.Accounts.Dash
 
 
 
@@ -105,8 +105,18 @@ module ViewModels =
         | Cancelled
         | Paused
 
+    type Customer = {
+      Id: System.Guid
+      FirstName: string
+      LastName: string
+      EthAddress: string
+      Password: string
+      PasswordSalt: string
+      Avatar: string
+      Email: string
+    }
     type FullCustomer = {
-        Customer            : Customers.Customer
+        Customer            : Customer
         IsVerified          : bool
         VerificationEvent   : CustomerVerificationEvents.CustomerVerificationEvent option
         CustomerTier        : CustomerTier
@@ -171,7 +181,7 @@ type ITokenSaleProtocol = {
     getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
-    getFullCustomer     : SecureRequest<unit> -> Async<ServerResult<ViewModels.FullCustomer>> 
+    getFullCustomer     : SecureVoidRequest -> Async<ServerResult<ViewModels.FullCustomer>> 
 
     getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }

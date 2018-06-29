@@ -12,8 +12,9 @@ module Auth =
         | AccountBanned
 
     // a request with a token
+    type SecureVoidRequest = { Token : AuthToken }
     type SecureRequest<'T> = { Token : AuthToken; Content : 'T }
-    let secureRequestE token = { Token = token; Content = () }
+    let secureVoidRequest token = { Token = token }
     let secureRequest token content = { Token = token; Content = content }
 
     // possible authentication/authorization errors     

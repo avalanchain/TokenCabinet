@@ -10,14 +10,18 @@ open Client
 open ClientMsgs
 open ClientModels
 open JsInterop
+open Shared.Auth
+open CabinetModel
+open Shared.ViewModels
 
 
-let navBar (dispatch: UIMsg -> unit)  = 
-    // let navItem name menuMediator = Navbar.Item.a [ Navbar.Item.IsActive (model.MenuMediator = menuMediator)
-    //                                                 Navbar.Item.Props [ OnClick (fun _ ->  menuMediator |> MenuSelected |> dispatch)] ]
-    //                                     [ str name ]
+let customer (fullCustomer: FullCustomer option) =
+    match fullCustomer with
+            | Some f -> f.Customer.Email
+            | None   -> "" 
 
-       div [ Class "row border-bottom" ]
+let navBar (fullCustomer: FullCustomer option) (dispatch: UIMsg -> unit)  = 
+        div [ Class "row border-bottom" ]
             [ nav [ Class "navbar navbar-static-top white-bg no-margins"
                     Role "navigation"
                     // HTMLAttr.Custom ("style", "margin-bottom: 0") 
@@ -39,8 +43,15 @@ let navBar (dispatch: UIMsg -> unit)  =
                                       Id "top-search" ] ] ] ]
                   ul [ Class "nav navbar-top-links navbar-right" ]
                     [ li [ ]
-                        [ a [ Href "#" 
-                              OnClick(fun _ -> dispatch Logout)  ]
+                         [ a [ Href "#" 
+                               OnClick(fun _ -> dispatch Logout)  ]
+                            [ i [ Class "fa fa-envelope" ]
+                                [ ]
+                              str (customer fullCustomer) ] ]
+
+                      li [ ]
+                         [ a [ Href "#" 
+                               OnClick(fun _ -> dispatch Logout)  ]
                             [ i [ Class "fa fa-sign-out" ]
                                 [ ]
                               str "Log out" ] ] ] ] ]
