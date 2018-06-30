@@ -33,7 +33,7 @@ type AppMsg =
     | UnexpectedMsg     of UnexpectedMsg
     | ErrorMsg          of string * AppMsg * string
     | LoginFlowMsg      of LoginFlowPage.Msg
-    | CabinetMsg        of CabinetPage.Msg
+    | CabinetMsg        of CabinetModel.Msg
 
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken

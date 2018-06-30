@@ -548,3 +548,8 @@ button.dim .price {
       *width: 14.285714285714285714285714285714%;
     }
   }
+
+  .nav.nav-tabs li {
+    background: none;
+    border: none;
+}

@@ -61,10 +61,11 @@
     <Compile Include="Pages/LoginFlow/LoginPage.fs" />
     <Compile Include="Pages/LoginFlow/LoginFlowPage.fs" />
     
-    <Compile Include="Pages/VerificationPage.fs" />
     <Compile Include="Pages/CabinetModel.fs" />
-    <Compile Include="Views/DashboardView.fs" />
     <Compile Include="lib/ReactBootstrap.fs" />
+    
+    <Compile Include="Views/DashboardView.fs" />
+    <Compile Include="Pages/VerificationPage.fs" />
     <Compile Include="Pages/PurchaseTokenPage.fs" />
     <Compile Include="Pages/CabinetPage.fs" />
     <Compile Include="Pages/HomePage.fs" />

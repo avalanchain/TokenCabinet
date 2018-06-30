@@ -47,11 +47,12 @@ let bodySomeNone (model: Model) body =
     | Some m ->  body m 
     | None   ->  str "No model loaded" 
 
-let cur name image price =
+let cur symbol image price isActive dispatch =
                     div [ Class "col-md-1"]
-                        [ comF button (fun o -> o.bsClass <- Some "btn btn-default dim btn-large-dim btn-outline") 
+                        [ comF button (fun o -> o.bsClass <- "btn btn-default dim btn-large-dim btn-outline " + (if isActive then "active" else "") |> Some 
+                                                o.onClick <- React.MouseEventHandler(fun _ -> symbol |> ActiveSymbolChanged |> PurchaseTokenMsg |> dispatch) |> Some)
                                       [ div [ Class "name" ]
-                                            [str (name.ToString())]
+                                            [str (symbol.ToString())]
                                         img [ Class "currencylogo"
                                               Src "https://www.cryptocompare.com/media/20646/eth_logo.png" ]
                                         div [ Class "price" ]
@@ -59,29 +60,29 @@ let cur name image price =
  
             
 
-let bodyC (model: Model) = 
+let bodyC (model: Model) dispatch = 
             [   for curr in model.CurrenciesCurentPrices.Prices ->
-                       cur curr.Symbol curr.Symbol curr.PriceUsd
+                       cur curr.Symbol curr.Symbol curr.PriceUsd (model.ActiveSymbol= curr.Symbol) dispatch
             ]
 
 
-let test = comE buttonToolbar [
-                  comF (toggleButtonGroup<ToggleButtonGroup.RadioProps>) 
-                        (fun o -> 
-                             o.defaultValue <- Some (1 :> obj) //{ new System.Object() with member x.ToString() = "1"}
-                             o.name <- "options")   
-                        [
-                            // comE toggleButton [
-                            // str "Default"
-                            // ]
-                            comF toggleButton (fun o -> o.value <- U2.Case1 1. ) [
-                                str "Default"
-                            ]
-                            comF toggleButton (fun o -> o.value <- U2.Case1 2. ) [
-                                str "Default"
-                            ]
-                        ]   
-                ] 
+// let toggleButtonBar = comE buttonToolbar [
+//                   comF (toggleButtonGroup<ToggleButtonGroup.RadioProps>) 
+//                         (fun o -> 
+//                              o.defaultValue <- Some (1 :> obj) //{ new System.Object() with member x.ToString() = "1"}
+//                              o.name <- "options")   
+//                         [
+//                             // comE toggleButton [
+//                             // str "Default"
+//                             // ]
+//                             comF toggleButton (fun o -> o.value <- U2.Case1 1. ) [
+//                                 str "Default"
+//                             ]
+//                             comF toggleButton (fun o -> o.value <- U2.Case1 2. ) [
+//                                 str "Default"
+//                             ]
+//                         ]   
+//                 ] 
 
 let bodyP m = div [ Class "text-center" ]
                                 [ div [ Class "m-b-md" ]
@@ -95,12 +96,12 @@ let bodyP m = div [ Class "text-center" ]
                                   span [ Class "text-navy"]
                                        [ str ("Discount 20%" )]   ]//+ m.SaleToken.TotalSupply.ToString()
 
-// let priceBd (model: Model) =
-//     match model.TokenSale with
-//     | Some m -> [ bodyP m ]
-//     | None   -> [ str "No model loaded" ] 
+let ActiveSymbol (model: Model) =
+             div[][ str (model.ActiveSymbol.ToString()) ]  
 
-let currencies (model: Model) =  div [ Class "row seven-cols"] (bodyC model) 
+let currencies (model: Model) dispatch =  div [ Class "row seven-cols"] 
+                                              (bodyC model dispatch) 
+                                    
 
 let bodyCouner m = dl [ Class "dl-horizontal" ]
                         [ dt [ ]
@@ -143,15 +144,15 @@ let volumes m = div [ Class ("col-md-9") ]
 let counterRow m = Ibox.emptyRow [ counter m
                                    volumes m ]   
 
-let invest m = Ibox.btCol "Invest" "9" ([ currencies m
-                                          counterRow m])
+let invest m dispatch = Ibox.btCol "Invest" "9" ([ currencies m dispatch
+                                                   counterRow m])
                                                   
 let price (model: Model) = Ibox.btCol "Coin Price" "3" ([bodySomeNone model bodyP])
-let secondRow m = Ibox.emptyRow [ invest m
-                                  price m]
-let view (model: Model) =
+let secondRow m dispatch = Ibox.emptyRow [ invest m dispatch
+                                           price m]
+let view (model: Model) dispatch =
     div [  ]
         [ bodyRowSomeNone model bodyTL
-          secondRow model
-          test]
+          secondRow model dispatch
+          ActiveSymbol model ]
 

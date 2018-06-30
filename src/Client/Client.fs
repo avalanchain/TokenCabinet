@@ -113,9 +113,9 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
             let page = CabinetPagePage.Default
             let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken }
-            let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetPage.GetCryptoCurrenciesCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
-            let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetPage.GetTokenSaleCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getTokenSale()"
-            let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetPage.GetFullCustomerCompleted >> CabinetPage.ServerMsg >> CabinetMsg) "getFullCustomer()"
+            let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
+            let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
+            let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
             let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg)
             let cmd' = Cmd.batch [cmdLocalStorage; cmdGetCryptoCurrencies; cmdGetTokenSale; cmdGetFullCustomerCompleted; cmdTick ]
             Navigation.newUrl (CabinetPagePage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
@@ -127,7 +127,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
         | UIMsg msg ->
             match msg with 
             | Tick i -> 
-                model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (CabinetPage.PriceTick >> CabinetPage.ServerMsg >> CabinetMsg) "getPriceTick()"
+                model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"
             | BrowserStorageUpdated -> model, Cmd.none            
             | MenuSelected page -> 
                 let cmd =   Toastr.message (sprintf "Menu selected: '%A'" page)

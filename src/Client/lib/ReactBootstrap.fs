@@ -1677,7 +1677,7 @@ module Tab =
         abstract eventKey: obj option with get, set
         abstract unmountOnExit: bool option with get, set
         abstract tabClassName: string option with get, set
-        abstract title: React.ReactNode option with get, set
+        abstract title: string option with get, set
 
     type [<AbstractClass>]Tab =
         inherit React.Component<Tab.TabProps>

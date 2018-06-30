@@ -17,6 +17,7 @@ open LoginPage
 open Shared
 open Client.CabinetModel
 open Client.LoginCommon
+open Fable.Import.JS
 
 // type Model = 
 //     | VerificationModel     of string
@@ -28,24 +29,12 @@ open Client.LoginCommon
 
 
 
-type Msg =
-    | VerificationMsg
-    | PurchaseTokenMsg
-    | MyInvestmentsMsg
-    | ReferralProgramMsg
-    | ContactsMsg
-    | DashboardMsg
-    | ServerMsg     of ServerMsg
-and ServerMsg =
-    | GetCryptoCurrenciesCompleted  of ViewModels.CryptoCurrency list
-    | GetTokenSaleCompleted         of ViewModels.TokenSale
-    | GetFullCustomerCompleted      of ViewModels.FullCustomer
-    | PriceTick                     of ViewModels.CurrencyPriceTick
 
 let init authToken = 
     {   Auth                    = { Token = authToken }
         CryptoCurrencies        = []
         CurrenciesCurentPrices  = { Prices = [] }
+        ActiveSymbol            = ETH
         TokenSale               = None
         FullCustomer            = None }
 
@@ -71,7 +60,8 @@ let init authToken =
 let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
     match msg with
     | VerificationMsg    -> model, Cmd.none
-    | PurchaseTokenMsg   -> model, Cmd.none
+    | PurchaseTokenMsg (ActiveSymbolChanged symbol) -> 
+        { model with ActiveSymbol = symbol }, Cmd.none
     | MyInvestmentsMsg   -> model, Cmd.none
     | ReferralProgramMsg -> model, Cmd.none
     | ContactsMsg        -> model, Cmd.none
@@ -101,7 +91,7 @@ open Page
 let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) = 
     match page with
         | Verification      -> [ VerificationPage.view ]
-        | PurchaseToken     -> [ PurchaseTokenPage.view model]
+        | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch]
         | MyInvestments     -> [ str "My Investments view" ]
         | ReferralProgram   -> [ str "Referral Program view" ]
         | Contacts               -> 
