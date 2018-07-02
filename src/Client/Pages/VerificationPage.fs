@@ -14,98 +14,79 @@ open Elmish.React
 
 open Shared
 open ViewModels
+open Client.FormHelpers
 
+open ReactBootstrap
+open Helpers
 
 // let bodyRowSomeNone (model: Model) body =
 //     match model.TokenSale with
 //     | Some m -> Ibox.btRow "Timeline" ([ body m ])
 //     | None   -> Ibox.btRow "Timeline" ([ str "No model loaded" ]) 
 
+
+let formT body = comF form (fun o -> 
+                          //  o.className <- Some "panel-body" 
+                           o.horizontal <- Some true )
+                           body 
+
 let personalData =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-6 b-r" ]
-            [ form [ Role "form"
-                     Name "caForm"
-                     Class "form-horizontal" ]
-                [ div [ Class "form-group" ]
-                    [ label [ Class "col-sm-2 control-label" ]
-                        [ str "First Name" ]
-                      div [ Class "col-sm-10" ]
-                        [ input [ Type "text"
-                                  Class "form-control" ]
-                          span [ Class "help-block m-b-none" ]
-                            [ str "Chose a name for your Tokens" ] ] ]
-                  div [ Class "hr-line-dashed" ]
-                    [ ]
-                  div [ Class "form-group" ]
-                    [ label [ Class "col-sm-2 control-label" ]
-                        [ str "Last Name" ]
-                      div [ Class "col-sm-10" ]
-                        [ input [ Type "text"
-                                  Class "form-control" ]
-                          span [ Class "help-block m-b-none" ]
-                            [ str "Enter a brief description." ] ] ]
-                  div [ Class "hr-line-dashed" ]
-                    [ ]
+            [ formT
+                [ 
+                  fGroupO (FormElement.Input InputType.Text) "First Name" "Enter a brief First Name"
+                  div [ Class "hr-line-dashed" ] [ ]
+
+                  fGroupO (FormElement.Input InputType.Text) "Last Name" "Enter a brief Last Name"
+                  div [ Class "hr-line-dashed" ] [ ]
+
+                  fGroupO (FormElement.Input InputType.Text) "Middle Name" "Enter a brief Middle Name"
+                  div [ Class "hr-line-dashed" ] [ ]
+
+                  fGroupO (FormElement.Select [ "Sex", ""; "Male", "Male"; "Female", "Female"]) "Sex" "Enter a brief description"
                    ] ]
           div [ Class "col-lg-6" ]
-            [ form [ Role "form"
-                     Name "caForm"
-                     Class "form-horizontal" ]
-                [ div [ Class "form-group" ]
-                    [ label [ Class "col-sm-2 control-label" ]
-                        [ str "First Name" ]
-                      div [ Class "col-sm-10" ]
-                        [ input [ Type "text"
-                                  Class "form-control" ]
-                          span [ Class "help-block m-b-none" ]
-                            [ str "Chose a name for your Tokens" ] ] ]
-                  div [ Class "hr-line-dashed" ]
-                    [ ]
-                  div [ Class "form-group" ]
-                    [ label [ Class "col-sm-2 control-label" ]
-                        [ str "Last Name" ]
-                      div [ Class "col-sm-10" ]
-                        [ input [ Type "text"
-                                  Class "form-control" ]
-                          span [ Class "help-block m-b-none" ]
-                            [ str "Enter a brief description." ] ] ]
-                  div [ Class "hr-line-dashed" ]
-                    [ ]
+            [ 
+              formT
+                [ 
+                  fGroupO (FormElement.Input InputType.Date) "Birthday" "Enter a brief Birthday"
+                  div [ Class "hr-line-dashed" ] [ ]
+                  
+                  fGroupO (FormElement.Input InputType.Text) "Number of the document" "Enter a Series and number of the document"
+                  div [ Class "hr-line-dashed" ] [ ]
+
+                  fGroupO (FormElement.Input InputType.Text) "Country of issue" "Enter a Country of issue of the document"
+                  div [ Class "hr-line-dashed" ] [ ]
+                  
+                  fGroupO (FormElement.Input InputType.Date ) "Registration Date" "Enter a Registration Date"
+               
                   div [ ]
-                    [ button [ Class "btn btn-sm btn-info pull-right m-t-n-xs"
-                               Type "submit" ]
+                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-right m-t-n-xs")
                         [ strong [ ]
                             [ str "Next" ] ] ] ] ]]
 let address =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-12 b-r" ]
-            [ form [ Role "form"
-                     Name "caForm"
-                     Class "form-horizontal" ]
-                [ div [ Class "form-group" ]
-                    [ label [ Class "col-sm-2 control-label" ]
-                        [ str "Country" ]
-                      div [ Class "col-sm-10" ]
-                        [ input [ Type "text"
-                                  Class "form-control" ]
-                          span [ Class "help-block m-b-none" ]
-                            [ str "Chose a name for your Tokens" ] ] ]
-                  div [ Class "hr-line-dashed" ]
-                    [ ]
-                  div [ Class "form-group" ]
-                    [ label [ Class "col-sm-2 control-label" ]
-                        [ str "City" ]
-                      div [ Class "col-sm-10" ]
-                        [ input [ Type "text"
-                                  Class "form-control" ]
-                          span [ Class "help-block m-b-none" ]
-                            [ str "Enter a brief description." ] ] ]
-                  div [ Class "hr-line-dashed" ]
-                    [ ]
+            [ formT
+                [ fGroupO (FormElement.Input InputType.Date) "Country" "Enter a Country"
+                  div [ Class "hr-line-dashed" ] [ ]
+                  
+                  fGroupO (FormElement.Input InputType.Text) "City" "Enter a City"
+                  div [ Class "hr-line-dashed" ] [ ]
+
+                  fGroupO (FormElement.Input InputType.Text) "Address" "Enter a Address"
+                  div [ Class "hr-line-dashed" ] [ ]
+
+                  fGroupO (FormElement.Input InputType.Text) "Zipcode" "Enter a Zipcode"
+
                   div [ ]
-                    [ button [ Class "btn btn-sm btn-info pull-right m-t-n-xs"
-                               Type "submit" ]
+                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-left m-t-n-xs")
+                        [ strong [ ]
+                            [ str "Prev" ] ] ]
+                  
+                  div [ ]
+                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-right m-t-n-xs")
                         [ strong [ ]
                             [ str "Next" ] ] ] ] ]
          ]
@@ -121,27 +102,33 @@ let documentation =
               p [ Class "text-center" ]
                 [ a [ Href "" ]
                     [ i [ Class "fa fa-upload big-icon" ]
-                        [ ] ] ] ]]
-open Helpers
-open ReactBootstrap
+                        [ ] ] ] ]
+                        
+          div [ ]
+                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-left m-t-n-xs")
+                        [ strong [ ]
+                            [ str "Prev" ] ] ]
+                                
+                        ]
+
 
 
 let tabs = comF tabs (fun o -> 
                            o.defaultActiveKey <- Some (1 :> obj)
-                           o.id <- Some "uncontrolled-tab-example") 
+                           o.id <- Some "verification"
+                           o.animation <- Some false ) 
                            [
                               comF tab (fun o -> o.eventKey <- Some (1 :> obj) 
-                                                 o.title <- Some "Personal data" ) [
-                               personalData
-                                  ]
+                                                 o.title <- Some "Personal data" ) 
+                                       [ personalData ]
+
                               comF tab (fun o -> o.eventKey <- Some (2 :> obj) 
-                                                 o.title <- Some "Registration address" ) [
-                              address
-                                  ]
+                                                 o.title <- Some "Registration address" ) 
+                                        [ address ]
+
                               comF tab (fun o -> o.eventKey <- Some (3 :> obj) 
-                                                 o.title <- Some "Documentation" ) [
-                              documentation
-                                  ]
+                                                 o.title <- Some "Documentation" ) 
+                                        [ documentation ]
                             ]
 
 let view = div [ Class "tabs-container"] [tabs]

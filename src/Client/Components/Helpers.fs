@@ -9,19 +9,7 @@ open Fable.DateFunctions
 open System
 open Fable.Import.React
 open Fable.Core.JsInterop
-
-// let toTiles fieldPairs =
-//     [ for (label, value) in fieldPairs -> 
-//             Tile.parent [ ]
-//               [ Tile.child [ ]
-//                   [ Box.box' [ ]
-//                       [ Heading.p [ ]
-//                             [ str label ]
-//                         Heading.p [ Heading.IsSubtitle ]
-//                             [ str value ] ] ] ] 
-//     ]
-//     |> Tile.ancestor [ Tile.Modifiers [ Modifier.TextAlignment (Fulma.Screen.All, TextAlignment.Centered) ] ]
-//     |> fun ta -> section [ Class "info-tiles" ] [ ta ]
+open ReactBootstrap
 
 module React =
     type Component<'P> = Fable.Import.React.Component<'P, obj>
@@ -32,3 +20,5 @@ let inline comF<'P> (com: React.Component<'P>) (propsFunc: 'P -> unit) (children
     createElement(com, jsOptions<'P> propsFunc, children)
 let inline comE<'P> (com: React.Component<'P>) (children: ReactElement seq): ReactElement =
     createElement(com, createEmpty<'P>, children)
+
+

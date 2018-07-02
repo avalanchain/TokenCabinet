@@ -30,7 +30,7 @@ and LoginFlowPage =
     with static member Default = Login
 and CabinetPagePage =
     | PurchaseToken
-    | MyInvestments
+    | Investments
     | ReferralProgram
     | Verification
     | Contacts

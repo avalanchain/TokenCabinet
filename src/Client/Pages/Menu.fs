@@ -74,7 +74,7 @@ let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
                 match page with 
                 | Verification      -> "fa fa-address-card"    
                 | PurchaseToken     -> "fa fa-shopping-cart"  
-                | MyInvestments     -> "fa fa-briefcase"  
+                | Investments     -> "fa fa-briefcase"  
                 | ReferralProgram   -> "fa fa-refresh"
                 | Contacts          -> "fa fa-phone"            
                 | Dashboard         -> "fa fa-th-large"         
@@ -104,8 +104,8 @@ let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
                                               Class "dropdown-toggle"
                                               Href "#" ]
                                             [ span [ Class "clear" ]
-                                                   [ img [ Class "logo"
-                                                           Src "../lib/img/avalanchain.png" ] ] ]
+                                                   [ img [ Class "logolong"
+                                                           Src "../lib/img/token_cab_2.png" ] ] ]
                                            ]
                 div [ Class "logo-element" ]
                     [ ofString "TC" ] 

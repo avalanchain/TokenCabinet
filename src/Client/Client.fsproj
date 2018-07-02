@@ -65,6 +65,7 @@
     
     <Compile Include="Pages/CabinetModel.fs" />
     <Compile Include="lib/ReactBootstrap.fs" />
+    <Compile Include="Components/FormHelpers.fs" />
     
     <Compile Include="Views/DashboardView.fs" />
     <Compile Include="Pages/VerificationPage.fs" />

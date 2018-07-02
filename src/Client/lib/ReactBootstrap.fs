@@ -480,7 +480,7 @@ module FormControl =
         inherit React.HTMLProps<FormControl>
         abstract bsClass: string option with get, set
         abstract bsSize: Sizes option with get, set
-        abstract componentClass: React.ReactType option with get, set
+        abstract componentClass: string option with get, set
         abstract id: string option with get, set
         abstract inputRef: (HTMLInputElement -> unit) option with get, set
         abstract ``type``: string option with get, set

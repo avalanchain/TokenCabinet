@@ -92,7 +92,7 @@ let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) =
     match page with
         | Verification      -> [ VerificationPage.view ]
         | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch]
-        | MyInvestments     -> [ str "My Investments view" ]
+        | Investments     -> [ str "My Investments view" ]
         | ReferralProgram   -> [ str "Referral Program view" ]
         | Contacts               -> 
             [   str "Contacts view"

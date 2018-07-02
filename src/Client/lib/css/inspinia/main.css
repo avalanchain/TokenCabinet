@@ -483,6 +483,10 @@ button.btn-primary.dim:active {
     height: 55px
 }
 
+.logolong{
+    height: 40px;
+    margin: 7px 0;
+}
 .md-skin .nav-header{
     padding: 3px 25px;
 
