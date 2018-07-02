@@ -69,7 +69,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
     //                             InputPassword = "" 
     //                             HasTriedToLogin = false }, Cmd.none, NoOp
     | LoginFailed error -> 
-        { model with LoginErrors = []; TryingToLogin = false }, Cmd.none, NoOp
+        { model with LoginErrors = error; TryingToLogin = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
                         PasswordValidationErrors = InputValidators.passwordValidation model.InputPassword }, Cmd.none, NoOp
@@ -77,49 +77,12 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with TryingToLogin = true }, Cmd.none, LoginUser { UserName = model.InputEmail; Password = model.InputPassword } // TODO: hash password
 
 
-    // | SetUserName name ->
-    //     { model with Login = { model.Login with UserName = name; Password = "" }}, []
-    // | SetPassword pw ->
-    //     { model with Login = { model.Login with Password = pw }}, []
-    // | ClickLogIn ->
-    //     model, authUserCmd model.Login "/api/users/login"
-    // | AuthError exn ->
-    //     { model with ErrorMsg = string (exn.Message) }, []
-
-let [<Literal>] ENTER_KEY = 13.
-
-[<Emit("null")>]
-let emptyElement : ReactElement = jsNative
-let hasErrors startedTyping (errors: List<_>) = startedTyping && not errors.IsEmpty 
-let hasErrorsClass startedTyping (errors: List<_>) =
-    if hasErrors startedTyping errors then "has-error" else ""
-let hasErrorsSpan startedTyping (errors: List<_>) =
-    if hasErrors startedTyping errors 
-    then span [ Class "help-block" ] 
-            [ ul [ ]  [ for error in errors -> li [ ] [ str error ] ] ]
-    else emptyElement        
-
-let errorMessagesIfAny startedTyping = function
-    | [ ] -> emptyElement
-    | _ when not startedTyping -> emptyElement 
-    | errors -> span [ Class "help-block" ] 
-                    [ ul [ ]  [ for error in errors -> li [ ] [ str error ] ] ]
-
 let view (model: Model) (dispatch: Msg -> unit) = 
-    // let showErrorClass = if String.IsNullOrEmpty model.ErrorMsg then "hidden" else ""
     let buttonActive =  if not model.LoginErrors.IsEmpty 
-                            && not model.EmailValidationErrors.IsEmpty
-                            && not model.PasswordValidationErrors.IsEmpty 
-                        then "btn-disabled" else "btn-info"
-
-    let onEnter msg dispatch =
-        function 
-        | (ev:React.KeyboardEvent) when ev.keyCode = ENTER_KEY ->
-            ev.preventDefault() 
-            dispatch msg
-        | _ -> ()
-        |> OnKeyDown
-        
+                            && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
+                            && hasErrors model.PasswordStartedTyping model.PasswordValidationErrors |> not
+                            && (model.EmailStartedTyping || model.PasswordStartedTyping)
+                        then "btn-disabled" else "btn-info"        
 
     div [ Class "login"
         // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
@@ -129,7 +92,6 @@ let view (model: Model) (dispatch: Msg -> unit) =
                     [ img [ Alt "image"
                             Class "h55"
                             Src "../lib/img/avalanchain.png" ] ]
-                //   br [ ]
                   h3 [ ]
                     [ str "Welcome to avalanchain" ]
                   form [ Class "m-t"
@@ -143,16 +105,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
                                     DefaultValue model.InputEmail
                                     OnChange (fun ev -> dispatch (ChangeEmail !!ev.target?value))
                                     AutoFocus true ]
-                            errorMessagesIfAny model.EmailStartedTyping model.EmailValidationErrors
-
-                        //   if not model.EmailValidationErrors.IsEmpty then 
-                        //     yield span [ Id "helpBlockUserName"; Class "help-block" ]
-                        //             (model.EmailValidationErrors |> List.map str)  
-                        //   match model.LoginError with
-                        //   | Some e ->  
-                        //     yield span [ Id "helpBlockServerValidationResult"; Class "help-block" ]
-                        //             [ str e ]
-                        //   | None -> ()                                 
+                            hasErrorsSpan model.EmailStartedTyping model.EmailValidationErrors
                         ]
                       div [ Class ("form-group " + hasErrorsClass model.PasswordStartedTyping model.PasswordValidationErrors) ]
                         [   input [ Type "password" 
@@ -160,16 +113,15 @@ let view (model: Model) (dispatch: Msg -> unit) =
                                     Placeholder "Password"  
                                     DefaultValue model.InputPassword
                                     OnChange (fun ev -> dispatch (ChangePassword !!ev.target?value))
-                                    onEnter LogInClicked dispatch ]
-                        //   if not model.EmailValidationErrors.IsEmpty then 
-                        //     yield span [ Id "helpBlockPassword"; Class "help-block" ]
-                        //             (model.PasswordValidationErrors |> List.map str)
-                            errorMessagesIfAny model.PasswordStartedTyping model.PasswordValidationErrors 
+                                 ]
+                            hasErrorsSpan model.PasswordStartedTyping model.PasswordValidationErrors 
                         ]
                       a [ 
                           Type "submit"
                           Class ("btn block full-width m-b " + buttonActive)
-                          OnClick (fun _ -> dispatch LogInClicked) ]
+                          OnClick (fun _ -> dispatch LogInClicked)
+                          onEnter LogInClicked dispatch 
+                          ]
                         [ str "Login" ] 
                       a [   Href (LoginFlowPage.ForgotPassword |> MenuPage.LoginFlow |> toHash) 
                             OnClick goToUrl ]

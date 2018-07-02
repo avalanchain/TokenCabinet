@@ -44,12 +44,12 @@ let mapMC f1 f2 (a, b) = f1 a, Cmd.map f2 b
 
 let switchTo (page: LoginFlowPage) (model: Model) = 
     match model, page with 
-    | RegisterPageModel m       , Login -> LoginPage.init m.InputUserName |> mapMC LoginPageModel LoginPageMsg
+    | RegisterPageModel m       , Login -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
     | ForgotPasswordPageModel m , Login -> LoginPage.init m.InputUserName |> mapMC LoginPageModel LoginPageMsg
     | LoginPageModel m          , Register -> RegisterPage.init m.InputEmail |> mapMC RegisterPageModel RegisterPageMsg
     | ForgotPasswordPageModel m , Register -> RegisterPage.init m.InputUserName |> mapMC RegisterPageModel RegisterPageMsg
     | LoginPageModel m          , ForgotPassword -> ForgotPasswordPage.init m.InputEmail |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
-    | RegisterPageModel m       , ForgotPassword -> ForgotPasswordPage.init m.InputUserName |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
+    | RegisterPageModel m       , ForgotPassword -> ForgotPasswordPage.init m.InputEmail |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
     | LoginPageModel _          , Login 
     | RegisterPageModel _       , Register
     | ForgotPasswordPageModel _ , ForgotPassword -> model, Cmd.none
