@@ -86,7 +86,7 @@ let view model (dispatch: Msg -> unit) =
                                         [ div [ ]
                                               [ img [ Alt "image"
                                                       Class "h55"
-                                                  Src "../lib/img/token_cab_1.png" ] ]
+                                                      Src "../lib/img/token_cab_1.png" ] ]
                                           h2 [ Class "font-bold" ]
                                             [ str "Forgot password" ]
                                           p [ ]
