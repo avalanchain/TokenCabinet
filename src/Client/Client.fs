@@ -32,6 +32,11 @@ open Shared.Utils
 open Client.Menu
 
 open LoginCommon
+open LoginPage
+open RegisterPage
+open ForgotPasswordPage
+open LoginFlowPage
+open Shared.Auth
 
 importAll "../../node_modules/bootstrap/dist/css/bootstrap.min.css"
 importAll "../Client/lib/css/inspinia/style.css"
@@ -72,8 +77,8 @@ module Server =
     open Fable.Remoting.Client
 
     /// A proxy you can use to talk to server directly
-    let adminApi : IAdminProtocol =
-        Proxy.remoting<IAdminProtocol> {
+    let loginFlowApi : ILoginFlowProtocol =
+        Proxy.remoting<ILoginFlowProtocol> {
             use_route_builder Route.builder
         }
 
@@ -82,12 +87,17 @@ module Server =
             use_route_builder Route.builder
         }        
 
-let cmdServerCall apiFunc args (completeMsg: 'T -> AppMsg) serverMethodName =
+    let adminApi : IAdminProtocol =
+        Proxy.remoting<IAdminProtocol> {
+            use_route_builder Route.builder
+        }
+
+let cmdServerCall (apiFunc: 'T -> Async<ServerResult<'R>>) (args: 'T) (completeMsg: 'R -> AppMsg) serverMethodName =
     Cmd.ofAsync
         apiFunc
         args
         (fun res -> match res with
-                    | Ok cc -> cc |> completeMsg
+                    | Ok cc             -> cc |> completeMsg
                     | Error serverError -> serverError |> ServerError |> ServerErrorMsg |> UnexpectedMsg
                     )
         (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
@@ -161,10 +171,13 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                 let cmd2 =
                     match externalMsg' with
                     | LoginFlowPage.ExternalMsg.NoOp -> Cmd.none
-                    | LoginFlowPage.ExternalMsg.LoginUser loginInfo -> 
-                        cmdServerCall (Server.tokenSaleApi.login) loginInfo (AuthMsg.LoggedIn >> AuthMsg) "login()"
-                    | LoginFlowPage.ExternalMsg.RegisterUser info -> Cmd.none // TODO: Implement 
-                    | LoginFlowPage.ExternalMsg.ForgotPasswordUser info -> Cmd.none // TODO: Implement
+                    | LoginFlowPage.ExternalMsg.LoginUser info -> 
+                        cmdServerCall (Server.loginFlowApi.login) info (LoginAttemptResult >> LoginPageMsg >> LoginFlowMsg) "login()" 
+                    | LoginFlowPage.ExternalMsg.RegisterUser info -> 
+                        cmdServerCall (Server.loginFlowApi.register) info (RegisteringAttemptResult >> RegisterPageMsg >> LoginFlowMsg) "register()" 
+                    | LoginFlowPage.ExternalMsg.ForgotPasswordUser info -> 
+                        cmdServerCall (Server.loginFlowApi.resetPassword) info (PasswordResetAttemptResult >> ForgotPasswordPageMsg >> LoginFlowMsg) "resetPassword()" 
+                    | LoginFlowPage.ExternalMsg.LoggedIn authToken -> authToken |> AuthMsg.LoggedIn |> AuthMsg |> Cmd.ofMsg
 
                 { model with PageModel = LoginFlowModel model' }, Cmd.batch [ Cmd.map LoginFlowMsg cmd'; cmd2 ]
             | _ -> model, ErrorMsg("Incorrect Message/Model combination for LoginFlow", LoginFlowMsg msg_, (string model)) |> Cmd.ofMsg           

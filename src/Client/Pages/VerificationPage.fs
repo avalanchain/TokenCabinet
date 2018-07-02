@@ -120,7 +120,7 @@ let tabs = comF tabs (fun o ->
                            [
                               comF tab (fun o -> o.eventKey <- Some (1 :> obj) 
                                                  o.title <- Some "Personal data" ) 
-                                       [ personalData ]
+                                        [ personalData ]
 
                               comF tab (fun o -> o.eventKey <- Some (2 :> obj) 
                                                  o.title <- Some "Registration address" ) 

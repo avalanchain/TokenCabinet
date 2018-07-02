@@ -5,13 +5,6 @@ open Auth
 
 type Counter = int
  
-type ServerError =
-    | AuthError of AuthError
-    | InternalError of exn
-    | NotImplementedError
-
-type ServerResult<'T> = Result<'T, ServerError>
-
 type CryptoCurrencySymbol = ETH | ETC | BTC | LTC | BCH | BTG | DASH
 
 module WalletPublic =
@@ -177,7 +170,6 @@ type IAdminProtocol = {
 }
 
 type ITokenSaleProtocol = {
-    login               : LoginInfo -> Async<ServerResult<AuthToken>>
     getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 

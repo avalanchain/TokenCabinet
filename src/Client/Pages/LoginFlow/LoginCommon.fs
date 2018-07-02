@@ -34,3 +34,8 @@ let onEnter msg dispatch =
         dispatch msg
     | _ -> ()
     |> OnKeyDown
+
+let handleLoginFlowServerError = function
+    | AccountBanned -> [ "Requested account is banned" ]
+    | DdosProtection blockedForRemaining -> [ sprintf "Please wait for %d seconds" (int blockedForRemaining.TotalSeconds) ] 
+    | LoginInternalError _ -> [ "Server internal error" ] 

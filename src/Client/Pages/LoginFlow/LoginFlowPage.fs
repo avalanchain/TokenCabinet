@@ -33,6 +33,7 @@ type ExternalMsg =
     | LoginUser          of LoginInfo
     | RegisterUser       of LoginInfo
     | ForgotPasswordUser of ForgotPasswordInfo
+    | LoggedIn           of AuthToken
 
 
 type Model = 
@@ -64,14 +65,16 @@ let rec update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
     | LoginPageModel model_, LoginPageMsg msg_ -> 
         let model', cmd', emsg' = LoginPage.update msg_ model_
         let emsg' = match emsg' with 
-                    | LoginPage.NoOp            -> NoOp
-                    | LoginPage.LoginUser info  -> LoginUser info
+                    | LoginPage.NoOp                    -> NoOp
+                    | LoginPage.LoginUser info          -> LoginUser info
+                    | LoginPage.UserLoggedIn authToken  -> LoggedIn authToken
         LoginPageModel model', Cmd.map LoginPageMsg cmd', emsg'                  
     | RegisterPageModel model_, RegisterPageMsg msg_ -> 
         let model', cmd', emsg' = RegisterPage.update msg_ model_
         let emsg' = match emsg' with 
-                    | RegisterPage.NoOp                 -> NoOp
-                    | RegisterPage.RegisterUser info    -> RegisterUser info
+                    | RegisterPage.NoOp                     -> NoOp
+                    | RegisterPage.RegisterUser info        -> RegisterUser info
+                    | RegisterPage.UserRegistered authToken -> LoggedIn authToken
         RegisterPageModel model', Cmd.map RegisterPageMsg cmd', emsg'                  
     | ForgotPasswordPageModel model_, ForgotPasswordPageMsg msg_ -> 
         let model', cmd', emsg' = ForgotPasswordPage.update msg_ model_

@@ -24,14 +24,14 @@ open Fable.Import.React
 type Msg = 
     | ChangeEmail           of string
     | ChangePassword        of string
-    // | LoginSuccess           of authToken: AuthToken
-    | LoginFailed           of errors:string list
+    | LoginAttemptResult    of Result<AuthToken, LoginError>
     | UpdateValidationErrors 
     | LogInClicked
 
 type ExternalMsg =
     | NoOp
-    | LoginUser of LoginInfo
+    | LoginUser     of LoginInfo
+    | UserLoggedIn  of AuthToken
 
 
 type Model = {
@@ -48,12 +48,12 @@ type Model = {
 let init email = 
     {   InputEmail               = email
         InputPassword            = ""
-        EmailValidationErrors    =  [ ]
-        PasswordValidationErrors =  [ ]
+        EmailValidationErrors    = [ ]
+        PasswordValidationErrors = [ ]
         EmailStartedTyping       = false
         PasswordStartedTyping    = false
         TryingToLogin            = false
-        LoginErrors              = [] }, Cmd.ofMsg UpdateValidationErrors
+        LoginErrors              = [ ] }, Cmd.ofMsg UpdateValidationErrors
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
@@ -61,12 +61,12 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with InputEmail = username; EmailStartedTyping = true; LoginErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->
         { model with InputPassword = password; PasswordStartedTyping = true; LoginErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    // | LoginSuccess token ->
-    //     { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
-    //                             InputPassword = "" 
-    //                             HasTriedToLogin = false }, Cmd.none, NoOp
-    | LoginFailed error -> 
-        { model with LoginErrors = error; TryingToLogin = false }, Cmd.none, NoOp
+    | LoginAttemptResult res -> 
+        match res with
+        | Ok authToken -> { model with TryingToLogin = false }, Cmd.none, UserLoggedIn authToken
+        | Error e -> match e with 
+                        | EmailNotFoundOrPasswordIncorrect -> { model with LoginErrors = [ "Email or password incorrect" ]; TryingToLogin = false }, Cmd.none, NoOp
+                        | LoginError.LoginServerError e -> { model with LoginErrors = handleLoginFlowServerError e; TryingToLogin = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
                         PasswordValidationErrors = InputValidators.passwordValidation model.InputPassword }, Cmd.none, NoOp
@@ -113,13 +113,13 @@ let view (model: Model) (dispatch: Msg -> unit) =
                                  ]
                             hasErrorsSpan model.PasswordStartedTyping model.PasswordValidationErrors 
                         ]
-                      a [ 
-                          Type "submit"
+                      a [ Type "submit"
                           Class ("btn block full-width m-b " + buttonActive)
                           OnClick (fun _ -> dispatch LogInClicked)
                           onEnter LogInClicked dispatch 
                           ]
-                        [ str "Login" ] 
+                        [  (if model.TryingToLogin then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                            else str "Login") ] 
                       a [   Href (LoginFlowPage.ForgotPassword |> MenuPage.LoginFlow |> toHash) 
                             OnClick goToUrl ]
                         [ small [ ]

@@ -20,18 +20,17 @@ open Client.LoginCommon
 open Client.Page
 
 type Msg = 
-    // | Login
-    | ChangeEmail           of string
-    | ChangePassword        of string
-    | ChangeConfPassword    of string
-    // | LoginSuccess      of authToken: AuthToken
-    | RegistrationFailed    of error:string list
+    | ChangeEmail               of string
+    | ChangePassword            of string
+    | ChangeConfPassword        of string
+    | RegisteringAttemptResult  of Result<AuthToken, RegisteringError>
     | UpdateValidationErrors 
     | RegisterClicked
 
 type ExternalMsg =
     | NoOp
-    | RegisterUser of LoginInfo
+    | RegisterUser      of LoginInfo
+    | UserRegistered    of AuthToken
 
 type Model = {
     InputEmail                  : string
@@ -72,8 +71,13 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
     //     { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
     //                             InputPassword = "" 
     //                             HasTriedToLogin = false }, Cmd.none, NoOp
-    | RegistrationFailed errors -> 
-        { model with RegisteringErrors = errors; TryingToRegister = false }, Cmd.none, NoOp
+    | RegisteringAttemptResult res -> 
+        match res with
+        | Ok authToken -> { model with TryingToRegister = false }, Cmd.none, UserRegistered authToken
+        | Error e -> match e with 
+                        | EmailAlreadyRegistered -> { model with RegisteringErrors = [ "Email already registered" ]; TryingToRegister = false }, Cmd.none, NoOp
+                        | ValidationErrors (emailErrors, pwdErrors) -> { model with RegisteringErrors = emailErrors @ pwdErrors; TryingToRegister = false }, Cmd.none, NoOp
+                        | RegisteringError.LoginServerError e -> { model with RegisteringErrors = handleLoginFlowServerError e; TryingToRegister = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
                         PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
@@ -137,7 +141,8 @@ let view model (dispatch: Msg -> unit) =
                               OnClick (fun _ -> dispatch RegisterClicked)
                               onEnter RegisterClicked dispatch 
                               ]
-                            [ str "Register" ] 
+                            [  (if model.TryingToRegister then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                                else str "Register") ] 
                           p [ Class "text-muted text-center" ]
                             [ small [ ]
                                 [ str "Already have an account?" ] ]

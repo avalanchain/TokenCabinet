@@ -37,8 +37,20 @@ let private login config (loginInfo: LoginInfo) = task {
     let userRigths = { AuthJwt.UserRights.UserName = loginInfo.UserName }
     let token = userRigths |> AuthJwt.encode |> AuthToken
     logins.[token] <- userRigths
-    return token |> Ok
+    return token |> Ok |> Ok
 }
+
+let private register config (loginInfo: LoginInfo) = task {  // TODO: Change this!!!
+    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.UserName }
+    let token = userRigths |> AuthJwt.encode |> AuthToken
+    logins.[token] <- userRigths
+    return token |> Ok |> Ok
+}
+
+let private resetPassword config (forgotPasswordInfo: ForgotPasswordInfo) = task { // TODO: Change this!!!
+    return "Reset email sent" |> Ok |> Ok
+}
+
 
 let private checkUserExists authToken =
     logins.ContainsKey authToken
@@ -244,24 +256,32 @@ let errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) =
         Ignore
 
 let webApp config =
-    let adminProtocol =
-        {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
-            initDb          = initDb            >> Async.AwaitTask }
-    let tokenSaleProtocol =
+    let loginProtocol =
         {   login               = login                 config    >> Async.AwaitTask
-            getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
+            register            = register              config    >> Async.AwaitTask
+            resetPassword       = resetPassword         config    >> Async.AwaitTask
+        }            
+    let tokenSaleProtocol =
+        {   getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
             getTokenSale        = getTokenSale          config    >> Async.AwaitTask
             getFullCustomer     = getFullCustomer       config    >> Async.AwaitTask
             getPriceTick        = getPriceTick          config    >> Async.AwaitTask
         }
+    let adminProtocol =
+        {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
+            initDb          = initDb            >> Async.AwaitTask }
         
         
     choose [
-        remoting adminProtocol {
+        remoting loginProtocol {
+            use_route_builder Route.builder
+            use_error_handler errorHandler
+        }        
+        remoting tokenSaleProtocol {
             use_route_builder Route.builder
             use_error_handler errorHandler
         }
-        remoting tokenSaleProtocol {
+        remoting adminProtocol {
             use_route_builder Route.builder
             use_error_handler errorHandler
         }
