@@ -21,13 +21,10 @@ open Client.Page
 
 
 type Msg = 
-    | Login
-    | ChangeUserName    of string
-    | ChangePassword    of string
-    | LoginSuccess      of authToken: AuthToken
-    | LoginFailed       of error:string
+    | ChangeEmail       of string
+    // | LoginSuccess      of authToken: AuthToken
     | UpdateValidationErrors 
-    | LogInClicked
+    | PasswordResetClicked
 
 type ExternalMsg =
     | NoOp
@@ -35,63 +32,42 @@ type ExternalMsg =
 
 
 type Model = {
-    InputUserName: string
-    UsernameValidationErrors: string list
-    PasswordValidationErrors: string list
-    InputPassword: string
-    HasTriedToLogin: bool
-    LoginError: string option
+    InputEmail              : string
+    EmailValidationErrors   : string list
+    EmailStartedTyping      : bool
+    TryingToReset           : bool
+    PasswordResetErrors     : string list
 }
 
-let init userName = 
-    {   InputUserName = userName
-        InputPassword = ""
-        UsernameValidationErrors =  [ ]
-        PasswordValidationErrors =  [ ]
-        HasTriedToLogin = false
-        LoginError      = None }, Cmd.ofMsg UpdateValidationErrors
-
-let validateInput (model: Model) =  
-    let usernameRules = 
-        [   String.IsNullOrWhiteSpace(model.InputUserName), "Field 'Username' cannot be empty"
-            model.InputUserName.Trim().Length < 5, "Field 'Username' must at least have 5 characters" ]
-    let passwordRules = 
-        [   String.IsNullOrWhiteSpace(model.InputPassword), "Field 'Password' cannot be empty"
-            model.InputPassword.Trim().Length < 8, "Field 'Password' must at least have 8 characters"
-            Regex("""(?=.*[a-z])""").IsMatch(model.InputPassword), "Field 'Password' must have at least 1 lowercase character"
-            Regex("""(?=.*[A-Z])""").IsMatch(model.InputPassword), "Field 'Password' must have at least 1 uppercase character"
-            Regex("""(?=.*[\d])""").IsMatch(model.InputPassword), "Field 'Password' must have at least 1 digit character"
-            Regex("""(?=.*[\W])""").IsMatch(model.InputPassword), "Field 'Password' must have at least 1 special character"
-            ]
-
-    let usernameValidationErrors = usernameRules |> List.filter fst |> List.map snd
-    let passwordValidationErrors = passwordRules |> List.filter fst |> List.map snd
-    usernameValidationErrors, passwordValidationErrors
+let init email = 
+    {   InputEmail               = email
+        EmailValidationErrors    = [ ]
+        EmailStartedTyping       = false
+        TryingToReset            = false
+        PasswordResetErrors      = [ ] }, Cmd.ofMsg UpdateValidationErrors
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
-    | Login -> 
-        { model with InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    | ChangeUserName username -> 
-        { model with InputUserName = username; InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    | ChangePassword password ->
-        { model with InputPassword = password; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
+    | ChangeEmail username -> 
+        { model with InputEmail = username; EmailStartedTyping = true; PasswordResetErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     // | LoginSuccess token ->
     //     { model with State =    LoggedIn { Token = token; UserName = model.InputUserName }
     //                             InputPassword = "" 
     //                             HasTriedToLogin = false }, Cmd.none, NoOp
-    | LoginFailed error -> 
-        { model with LoginError = Some error; HasTriedToLogin = false }, Cmd.none, NoOp
+    // | LoginFailed error -> 
+    //     { model with LoginError = Some error; HasTriedToLogin = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
-        let usernameValidationErrors, passwordValidationErrors = validateInput model
-        { model with    UsernameValidationErrors = usernameValidationErrors
-                        PasswordValidationErrors = passwordValidationErrors }, Cmd.none, NoOp
-    | LogInClicked ->
-        { model with HasTriedToLogin = true }, Cmd.none, ForgotPassword { UserName = model.InputUserName } // TODO: hash password
+        { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail }, Cmd.none, NoOp
+    | PasswordResetClicked ->
+        { model with TryingToReset = true }, Cmd.none, ForgotPassword { UserName = model.InputEmail } // TODO: hash password
 
 
 
 let view model (dispatch: Msg -> unit) =
+    let buttonActive =  if not model.PasswordResetErrors.IsEmpty 
+                            && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
+                            && (model.EmailStartedTyping)
+                        then "btn-disabled" else "btn-info" 
     div [ Class "login"
             // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
             ]
@@ -113,14 +89,20 @@ let view model (dispatch: Msg -> unit) =
                                             [ form [ Class "m-t"
                                                      Role "form"
                                                      Action "index.html" ]
-                                                [ div [ Class "form-group" ]
-                                                    [ input [ Type "email"
+                                                [ div [ Class ("form-group " + hasErrorsClass model.EmailStartedTyping model.EmailValidationErrors) ]
+                                                    [ input [ Id "email"
+                                                              Type "email"
                                                               Class "form-control"
-                                                              Placeholder "Email address" ] ]
+                                                              Placeholder "Email address"
+                                                              DefaultValue model.InputEmail
+                                                              OnChange (fun ev -> dispatch (ChangeEmail !!ev.target?value))
+                                                              AutoFocus true ]
+                                                      hasErrorsSpan model.EmailStartedTyping model.EmailValidationErrors
+                                                    ]
                                                   button [  Type "submit"
                                                             Class "btn btn-info block full-width m-b"
-                                                            OnClick (fun _ -> dispatch LogInClicked)
-                                                            onEnter LogInClicked dispatch ]
+                                                            OnClick (fun _ -> dispatch PasswordResetClicked)
+                                                            onEnter PasswordResetClicked dispatch ]
                                                     [ str "Reset password" ]
                                                   p [ Class "text-muted text-center" ]
                                                     [ small [ ]

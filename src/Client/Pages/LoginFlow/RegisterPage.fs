@@ -86,7 +86,7 @@ let view model (dispatch: Msg -> unit) =
     let buttonActive =  if not model.RegisteringErrors.IsEmpty 
                             && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
                             && hasErrors model.PasswordStartedTyping model.PasswordValidationErrors |> not
-                            && (model.EmailStartedTyping || model.PasswordStartedTyping)
+                            && (model.EmailStartedTyping || model.PasswordStartedTyping || model.PasswordConfStartedTyping)
                         then "btn-disabled" else "btn-info"        
     div [ Class "login"
             // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
@@ -109,7 +109,7 @@ let view model (dispatch: Msg -> unit) =
                             [   input [ Id "email"
                                         Type "email" 
                                         ClassName "form-control"
-                                        Placeholder "Email" 
+                                        Placeholder "Email address" 
                                         DefaultValue model.InputEmail
                                         OnChange (fun ev -> dispatch (ChangeEmail !!ev.target?value))
                                         AutoFocus true ]

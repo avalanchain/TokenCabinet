@@ -98,7 +98,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
                         [   input [ Id "email"
                                     Type "email" 
                                     ClassName "form-control"
-                                    Placeholder "Email" 
+                                    Placeholder "Email address" 
                                     DefaultValue model.InputEmail
                                     OnChange (fun ev -> dispatch (ChangeEmail !!ev.target?value))
                                     AutoFocus true ]
