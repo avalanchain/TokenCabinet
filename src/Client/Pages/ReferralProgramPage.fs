@@ -33,16 +33,17 @@ open FormHelpers
 //      ]
 // ]
 
-let helper = Ibox.btRow "Referral Program" [
-        Ibox.emptyRow[
-        div [ Class "col-md-1 text-center" ] [
-                    i [ Class "fa fa-users fa-2x" ] [ ]
-                ]
-        div [ Class "col-md-11" ] [
-            p [ Class "p-xss" ] [
-                str "You can attract new users and get a bonus for them. To do this, copy the link in the box below this block. "
-            ]
-        ]]]
+let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
+        
+        p [ Class "p-xs" ] 
+          [
+            div [ Class "pull-left m-r-md" ]
+                [ i [ Class "fa fa-globe text-info mid-icon" ] [ ] ]    
+            h2 [ ] [
+               str "Referral Program" ]
+            span [ ] [
+                    str "You can attract new users and get a bonus for them. To do this, copy the link in the box below this block. "
+           ]]]
         
         // div[ Class "col-sm-10 input-group"]
 let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
