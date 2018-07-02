@@ -95,7 +95,7 @@ let view model (dispatch: Msg -> unit) =
                 [     div [ ]
                         [ img [ Alt "image"
                                 Class "h55"
-                                Src "../lib/img/avalanchain.png" ] ]
+                                Src "../lib/img/token_cab_1.png" ] ]
                     //   br [ ]
                       h3 [ ]
                         [ str "Register to Token Cabinet" ]

@@ -88,7 +88,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
               [   div [ ]
                     [ img [ Alt "image"
                             Class "h55"
-                            Src "../lib/img/avalanchain.png" ] ]
+                            Src "../lib/img/token_cab_1.png" ] ]
                   h3 [ ]
                     [ str "Welcome to avalanchain" ]
                   form [ Class "m-t"
