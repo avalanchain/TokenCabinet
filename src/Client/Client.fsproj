@@ -58,9 +58,10 @@
     <Compile Include="Page.fs" />
 
     <Compile Include="Pages/LoginFlow/LoginCommon.fs" />
+    <Compile Include="Pages/LoginFlow/LoginPage.fs" />
     <Compile Include="Pages/LoginFlow/ForgotPasswordPage.fs" />
     <Compile Include="Pages/LoginFlow/RegisterPage.fs" />
-    <Compile Include="Pages/LoginFlow/LoginPage.fs" />
+    <Compile Include="Pages/LoginFlow/PasswordResetPage.fs" />
     <Compile Include="Pages/LoginFlow/LoginFlowPage.fs" />
     
     <Compile Include="Pages/CabinetModel.fs" />

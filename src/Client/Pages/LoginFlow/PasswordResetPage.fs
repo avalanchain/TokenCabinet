@@ -1,4 +1,4 @@
-module Client.RegisterPage
+module Client.PasswordResetPage
 
 open System
 open System.Text.RegularExpressions
@@ -20,74 +20,67 @@ open Client.LoginCommon
 open Client.Page
 
 type Msg = 
-    | ChangeEmail               of string
     | ChangePassword            of string
     | ChangeConfPassword        of string
-    | RegisteringAttemptResult  of Result<AuthToken, RegisteringError>
+    | ResetAttemptResult        of Result<AuthToken, RegisteringError>
     | UpdateValidationErrors 
     | RegisterClicked
 
 type ExternalMsg =
     | NoOp
-    | RegisterUser      of LoginInfo
-    | UserRegistered    of AuthToken
+    | ResetPassword        of PwdResetInfo
+    | UserPasswordReset    of AuthToken
 
 type Model = {
-    InputEmail                  : string
+    Email                       : string
+    PwdResetToken               : string
     InputPassword               : string
     InputPasswordConf           : string
-    EmailValidationErrors       : string list
     PasswordValidationErrors    : string list
     PasswordConfValidationErrors: string list
-    EmailStartedTyping          : bool
     PasswordStartedTyping       : bool
     PasswordConfStartedTyping   : bool
-    TryingToRegister            : bool
-    RegisteringErrors           : string list
+    TryingToReset               : bool
+    ResettingErrors             : string list
 }
 
-let init email = 
-    {   InputEmail                   = email
+let init email pwdResetToken = 
+    {   Email                        = email
+        PwdResetToken                = pwdResetToken
         InputPassword                = ""
         InputPasswordConf            = ""
-        EmailValidationErrors        = [ ]
         PasswordValidationErrors     = [ ]
         PasswordConfValidationErrors = [ ]
-        EmailStartedTyping           = false
         PasswordStartedTyping        = false
         PasswordConfStartedTyping    = false
-        TryingToRegister             = false
-        RegisteringErrors            = [ ] }, Cmd.ofMsg UpdateValidationErrors
+        TryingToReset                = false
+        ResettingErrors              = [ ] }, Cmd.ofMsg UpdateValidationErrors
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
-    | ChangeEmail username -> 
-        { model with InputEmail = username; EmailStartedTyping = true; RegisteringErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->
-        { model with InputPassword = password; PasswordStartedTyping = true; RegisteringErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
+        { model with InputPassword = password; PasswordStartedTyping = true; ResettingErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangeConfPassword password ->
-        { model with InputPasswordConf = password; PasswordConfStartedTyping = true; RegisteringErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
-    | RegisteringAttemptResult res -> 
+        { model with InputPasswordConf = password; PasswordConfStartedTyping = true; ResettingErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
+    | ResetAttemptResult res -> 
         match res with
-        | Ok authToken -> { model with TryingToRegister = false }, Cmd.none, UserRegistered authToken
+        | Ok authToken -> { model with TryingToReset = false }, Cmd.none, UserPasswordReset authToken
         | Error e -> match e with 
-                        | EmailAlreadyRegistered -> { model with RegisteringErrors = [ "Email already registered" ]; TryingToRegister = false }, Cmd.none, NoOp
-                        | ValidationErrors (emailErrors, pwdErrors) -> { model with RegisteringErrors = emailErrors @ pwdErrors; TryingToRegister = false }, Cmd.none, NoOp
-                        | RegisteringError.LoginServerError e -> { model with RegisteringErrors = handleLoginFlowServerError e; TryingToRegister = false }, Cmd.none, NoOp
+                        | EmailAlreadyRegistered -> { model with ResettingErrors = [ "Email already registered" ]; TryingToReset = false }, Cmd.none, NoOp
+                        | ValidationErrors (emailErrors, pwdErrors) -> { model with ResettingErrors = emailErrors @ pwdErrors; TryingToReset = false }, Cmd.none, NoOp
+                        | RegisteringError.LoginServerError e -> { model with ResettingErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
-        { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
-                        PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
+        { model with    PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
                         PasswordConfValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword }, Cmd.none, NoOp
     | RegisterClicked ->
-        { model with TryingToRegister = true }, Cmd.none, RegisterUser { Email = model.InputEmail; Password = model.InputPassword } // TODO: hash password
+        { model with TryingToReset = true }, Cmd.none, ResetPassword { PwdResetToken = model.PwdResetToken; Password = model.InputPassword } // TODO: hash password
 
 
 let view model (dispatch: Msg -> unit) =
-    let buttonActive =  if not model.RegisteringErrors.IsEmpty 
-                            && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
+    let buttonActive =  if not model.ResettingErrors.IsEmpty 
                             && hasErrors model.PasswordStartedTyping model.PasswordValidationErrors |> not
                             && hasErrors model.PasswordConfStartedTyping model.PasswordConfValidationErrors |> not
-                            && (model.EmailStartedTyping || model.PasswordStartedTyping || model.PasswordConfStartedTyping)
+                            && (model.PasswordStartedTyping || model.PasswordConfStartedTyping)
                         then "btn-disabled" else "btn-info"        
     div [ Class "login"
             // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
@@ -95,22 +88,18 @@ let view model (dispatch: Msg -> unit) =
             [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
                 [     div [ ]
                         [ img [ Alt "image"
-                                Class "h90"
+                                Class "h55"
                                 Src "../lib/img/token_cab_1.png" ] ]
+                    //   br [ ]
+                      h3 [ ]
+                        [ str "Please reset your password" ]
+                      p [ ]
+                        [ str "Please reset your password." ]
                       form [ Class "m-t"
                              Role "form"
                              Action "#" ]
                         [ 
-                          div [ Class ("form-group " + hasErrorsClass model.EmailStartedTyping model.EmailValidationErrors) ]
-                            [   input [ Id "email"
-                                        Type "email" 
-                                        ClassName "form-control"
-                                        Placeholder "Email address" 
-                                        DefaultValue model.InputEmail
-                                        OnChange (fun ev -> dispatch (ChangeEmail !!ev.target?value))
-                                        AutoFocus true ]
-                                hasErrorsSpan model.EmailStartedTyping model.EmailValidationErrors
-                            ]
+                          str model.Email  // TODO: ADD PROPER LABEL
                           div [ Class ("form-group " + hasErrorsClass model.PasswordStartedTyping model.PasswordValidationErrors) ]
                             [   input [ Type "password" 
                                         ClassName "form-control" 
@@ -133,7 +122,7 @@ let view model (dispatch: Msg -> unit) =
                               OnClick (fun _ -> dispatch RegisterClicked)
                               onEnter RegisterClicked dispatch 
                               ]
-                            [  (if model.TryingToRegister then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                            [  (if model.TryingToReset then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                                 else str "Register") ] 
                           p [ Class "text-muted text-center" ]
                             [ small [ ]

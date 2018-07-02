@@ -71,7 +71,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
                         PasswordValidationErrors = InputValidators.passwordValidation model.InputPassword }, Cmd.none, NoOp
     | LogInClicked ->
-        { model with TryingToLogin = true }, Cmd.none, LoginUser { UserName = model.InputEmail; Password = model.InputPassword } // TODO: hash password
+        { model with TryingToLogin = true }, Cmd.none, LoginUser { Email = model.InputEmail; Password = model.InputPassword } // TODO: hash password
 
 
 let view (model: Model) (dispatch: Msg -> unit) = 

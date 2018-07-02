@@ -34,14 +34,14 @@ let initDb () = task {  printfn "\n\ninitDb() called\n\n"
 let private logins = new System.Collections.Concurrent.ConcurrentDictionary<AuthToken, AuthJwt.UserRights>() //TODO: store in the db
 
 let private login config (loginInfo: LoginInfo) = task { 
-    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.UserName }
+    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.Email }
     let token = userRigths |> AuthJwt.encode |> AuthToken
     logins.[token] <- userRigths
     return token |> Ok |> Ok
 }
 
 let private register config (loginInfo: LoginInfo) = task {  // TODO: Change this!!!
-    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.UserName }
+    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.Email }
     let token = userRigths |> AuthJwt.encode |> AuthToken
     logins.[token] <- userRigths
     return token |> Ok |> Ok

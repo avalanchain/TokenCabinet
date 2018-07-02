@@ -27,12 +27,14 @@ type Msg =
     | LoginPageMsg          of LoginPage.Msg
     | RegisterPageMsg       of RegisterPage.Msg
     | ForgotPasswordPageMsg of ForgotPasswordPage.Msg
+    | PasswordResetPageMsg  of PasswordResetPage.Msg
 
 type ExternalMsg =
     | NoOp
     | LoginUser          of LoginInfo
     | RegisterUser       of LoginInfo
     | ForgotPasswordUser of ForgotPasswordInfo
+    | ResetPassword      of PwdResetInfo
     | LoggedIn           of AuthToken
 
 
@@ -40,6 +42,7 @@ type Model =
     | LoginPageModel            of LoginPage.Model
     | RegisterPageModel         of RegisterPage.Model
     | ForgotPasswordPageModel   of ForgotPasswordPage.Model
+    | PasswordResetPageModel    of PasswordResetPage.Model
 
 let mapMC f1 f2 (a, b) = f1 a, Cmd.map f2 b 
 
@@ -47,13 +50,20 @@ let switchTo (page: LoginFlowPage) (model: Model) =
     match model, page with 
     | RegisterPageModel m       , Login -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
     | ForgotPasswordPageModel m , Login -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
+    | PasswordResetPageModel m  , Login -> LoginPage.init m.Email      |> mapMC LoginPageModel LoginPageMsg
     | LoginPageModel m          , Register -> RegisterPage.init m.InputEmail |> mapMC RegisterPageModel RegisterPageMsg
     | ForgotPasswordPageModel m , Register -> RegisterPage.init m.InputEmail |> mapMC RegisterPageModel RegisterPageMsg
+    | PasswordResetPageModel m  , Register -> RegisterPage.init m.Email |> mapMC RegisterPageModel RegisterPageMsg
     | LoginPageModel m          , ForgotPassword -> ForgotPasswordPage.init m.InputEmail |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
     | RegisterPageModel m       , ForgotPassword -> ForgotPasswordPage.init m.InputEmail |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
+    | PasswordResetPageModel m  , ForgotPassword -> ForgotPasswordPage.init m.Email |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
+    | LoginPageModel m          , PasswordReset -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
+    | RegisterPageModel m       , PasswordReset -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
+    | ForgotPasswordPageModel m , PasswordReset -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
     | LoginPageModel _          , Login 
     | RegisterPageModel _       , Register
-    | ForgotPasswordPageModel _ , ForgotPassword -> model, Cmd.none
+    | ForgotPasswordPageModel _ , ForgotPassword
+    | PasswordResetPageModel _  , PasswordReset -> model, Cmd.none
 
 
 let init () = 
@@ -82,6 +92,13 @@ let rec update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
                     | ForgotPasswordPage.NoOp                   -> NoOp
                     | ForgotPasswordPage.ForgotPassword info    -> ForgotPasswordUser info
         ForgotPasswordPageModel model', Cmd.map ForgotPasswordPageMsg cmd', emsg'   
+    | PasswordResetPageModel model_, PasswordResetPageMsg msg_ -> 
+        let model', cmd', emsg' = PasswordResetPage.update msg_ model_
+        let emsg' = match emsg' with 
+                    | PasswordResetPage.NoOp                        -> NoOp
+                    | PasswordResetPage.ResetPassword resetPwdInfo  -> ResetPassword resetPwdInfo
+                    | PasswordResetPage.UserPasswordReset authToken -> LoggedIn authToken
+        PasswordResetPageModel model', Cmd.map PasswordResetPageMsg cmd', emsg'   
     | _ ->
         console.error(sprintf "Impossible Msg '%A' Model '%A' combination" msg model)
         let model', cmd' =
@@ -89,6 +106,7 @@ let rec update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
             | LoginPageMsg _          -> switchTo LoginFlowPage.Login model
             | RegisterPageMsg _       -> switchTo LoginFlowPage.Register model
             | ForgotPasswordPageMsg _ -> switchTo LoginFlowPage.ForgotPassword model
+            | PasswordResetPageMsg _  -> switchTo LoginFlowPage.PasswordReset model
         let model'', cmd'', emsg'' = update msg model'
         model'', Cmd.batch [cmd'; cmd''], emsg''
 let [<Literal>] ENTER_KEY = 13.
@@ -98,3 +116,4 @@ let view model (dispatch: Msg -> unit) =
     | LoginPageModel m          -> LoginPage.view m (LoginPageMsg >> dispatch)
     | RegisterPageModel m       -> RegisterPage.view m (RegisterPageMsg >> dispatch) 
     | ForgotPasswordPageModel m -> ForgotPasswordPage.view m (ForgotPasswordPageMsg >> dispatch)
+    | PasswordResetPageModel m  -> PasswordResetPage.view m (PasswordResetPageMsg >> dispatch)

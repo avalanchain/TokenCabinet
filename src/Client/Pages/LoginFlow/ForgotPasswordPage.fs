@@ -37,8 +37,8 @@ type Model = {
     InputEmail              : string
     EmailValidationErrors   : string list
     EmailStartedTyping      : bool
-    TryingToReset           : bool
-    PasswordResetErrors     : string list
+    TryingToSendReset       : bool
+    ForgotPasswordErrors    : string list
     ShowSuccessPage         : bool
 }
 
@@ -46,32 +46,32 @@ let init email =
     {   InputEmail               = email
         EmailValidationErrors    = [ ]
         EmailStartedTyping       = false
-        TryingToReset            = false
-        PasswordResetErrors      = [ ] 
+        TryingToSendReset        = false
+        ForgotPasswordErrors     = [ ] 
         ShowSuccessPage          = false }, Cmd.ofMsg UpdateValidationErrors
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
     | ChangeEmail username -> 
-        { model with InputEmail = username; EmailStartedTyping = true; PasswordResetErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
+        { model with InputEmail = username; EmailStartedTyping = true; ForgotPasswordErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | PasswordResetAttemptResult res -> 
         match res with
-        | Ok _ -> { model with ShowSuccessPage = true; TryingToReset = false }, Cmd.none, NoOp
-        | Error e -> match e with 
-                        | LoginServerError e -> { model with PasswordResetErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
+        | Ok _      -> { model with ShowSuccessPage = true; TryingToSendReset = false }, Cmd.none, NoOp
+        | Error e   -> match e with 
+                        | LoginServerError e -> { model with ForgotPasswordErrors = handleLoginFlowServerError e; TryingToSendReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with EmailValidationErrors = InputValidators.emailValidation model.InputEmail }, Cmd.none, NoOp
     | PasswordResetClicked ->
-        { model with TryingToReset = true }, Cmd.none, ForgotPassword { UserName = model.InputEmail } // TODO: hash password
+        { model with TryingToSendReset = true }, Cmd.none, ForgotPassword { UserName = model.InputEmail } // TODO: hash password
 
 
 
 let view model (dispatch: Msg -> unit) =
-    let buttonActive =  if not model.PasswordResetErrors.IsEmpty 
+    let buttonActive =  if not model.ForgotPasswordErrors.IsEmpty 
                             && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
                             && (model.EmailStartedTyping)
                         then "btn-disabled" else "btn-info" 
-    let errors = model.PasswordResetErrors @ model.EmailValidationErrors 
+    let errors = model.ForgotPasswordErrors @ model.EmailValidationErrors 
 
     if model.ShowSuccessPage then div [] [ str "Email sent Successfully"] // TODO: Add propoer content
     else
@@ -106,7 +106,7 @@ let view model (dispatch: Msg -> unit) =
                                                                 Class "btn btn-info block full-width m-b"
                                                                 OnClick (fun _ -> dispatch PasswordResetClicked)
                                                                 onEnter PasswordResetClicked dispatch ]
-                                                        [  (if model.TryingToReset then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                                                        [  (if model.TryingToSendReset then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                                                             else str "Reset password") ]
                                                       p [ Class "text-muted text-center" ]
                                                         [ small [ ]

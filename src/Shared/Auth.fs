@@ -4,7 +4,8 @@ open System
 module Auth =
 
     type AuthToken = AuthToken of string
-    type LoginInfo = { UserName: string; Password: string } // TODO: Send password hash only!!!
+    type LoginInfo = { Email: string; Password: string } // TODO: Send password hash only!!!
+    type PwdResetInfo = { PwdResetToken: string; Password: string } // TODO: Send password hash only!!!
     type ForgotPasswordInfo = { UserName: string }
 
     // possible authentication/authorization errors     
