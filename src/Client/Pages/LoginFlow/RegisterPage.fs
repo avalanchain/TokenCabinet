@@ -98,13 +98,8 @@ let view model (dispatch: Msg -> unit) =
             [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
                 [     div [ ]
                         [ img [ Alt "image"
-                                Class "h55"
+                                Class "h90"
                                 Src "../lib/img/token_cab_1.png" ] ]
-                    //   br [ ]
-                      h3 [ ]
-                        [ str "Register to Token Cabinet" ]
-                      p [ ]
-                        [ str "Create account to see it in action." ]
                       form [ Class "m-t"
                              Role "form"
                              Action "#" ]

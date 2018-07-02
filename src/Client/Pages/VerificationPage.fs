@@ -24,16 +24,10 @@ open Helpers
 //     | Some m -> Ibox.btRow "Timeline" ([ body m ])
 //     | None   -> Ibox.btRow "Timeline" ([ str "No model loaded" ]) 
 
-
-let formT body = comF form (fun o -> 
-                          //  o.className <- Some "panel-body" 
-                           o.horizontal <- Some true )
-                           body 
-
 let personalData =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-6 b-r" ]
-            [ formT
+            [ formHorizontal
                 [ 
                   fGroupO (FormElement.Input InputType.Text) "First Name" "Enter a brief First Name"
                   div [ Class "hr-line-dashed" ] [ ]
@@ -48,7 +42,7 @@ let personalData =
                    ] ]
           div [ Class "col-lg-6" ]
             [ 
-              formT
+              formHorizontal
                 [ 
                   fGroupO (FormElement.Input InputType.Date) "Birthday" "Enter a brief Birthday"
                   div [ Class "hr-line-dashed" ] [ ]
@@ -68,7 +62,7 @@ let personalData =
 let address =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-12 b-r" ]
-            [ formT
+            [ formHorizontal
                 [ fGroupO (FormElement.Input InputType.Date) "Country" "Enter a Country"
                   div [ Class "hr-line-dashed" ] [ ]
                   

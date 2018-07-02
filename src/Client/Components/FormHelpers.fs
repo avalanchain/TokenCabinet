@@ -40,6 +40,11 @@ let inputType inType =
                     | Number    -> "number"
                     | File      -> "file")
 
+let formHorizontal body = comF form (fun o -> 
+                          //  o.className <- Some "panel-body" 
+                           o.horizontal <- Some true )
+                           body 
+
 let inputControl inType = comF formControl (fun o -> o.``type`` <- Some (inputType inType))[]
 
 let selectControl optionList = comF formControl (fun o ->  o.componentClass <- Some "select")
@@ -47,27 +52,36 @@ let selectControl optionList = comF formControl (fun o ->  o.componentClass <- S
                                     option [ Value name ][ str value ]
                                     // comF option (fun o ->  o.componentClass <- Some )
                                 ]
-let fGroupI element labelText helpText = 
+
+
+let labelG labelText = comF controlLabel  (fun o -> o.className <- Some "col-sm-2" )
+                            [ str labelText ]
+
+let inputG (element:FormElement) helpText = 
+    [
+        (
+        match element with 
+        | Input inputType       -> inputControl inputType
+        | Select optionList     -> selectControl optionList
+        | Radio                 -> inputControl InputType.Text
+        | Checkbox              -> inputControl InputType.Text
+        | Textarea              -> inputControl InputType.Text
+        | Static                -> inputControl InputType.Text
+        )
+        span [ Class "help-block m-b-none text-muted" ]
+             [ str helpText ]
+   ]
+
+let fGroupI (element:FormElement) labelText helpText = 
     
          [
-           comF controlLabel  (fun o -> o.className <- Some "col-sm-2" )
-            [ str labelText ]
-
-           div[ Class "col-sm-10"]
-              [
-                
-                (
-                match element with 
-                | Input inputType       -> inputControl inputType
-                | Select optionList     -> selectControl optionList
-                | Radio                 -> inputControl InputType.Text
-                | Checkbox              -> inputControl InputType.Text
-                | Textarea              -> inputControl InputType.Text
-                | Static                -> inputControl InputType.Text
-                )
-                span [ Class "help-block m-b-none text-muted" ]
-                     [ str helpText ]
-              ]
-           ]
+           labelG labelText
+           div [ Class "col-sm-10"]
+               (inputG element helpText) ]
+           
 let fGroupO (element:FormElement) labelText helpText = 
     comE formGroup (fGroupI element labelText helpText)
+
+
+let fGroupEmpty body = 
+    comE formGroup (body)

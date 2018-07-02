@@ -85,12 +85,8 @@ let view model (dispatch: Msg -> unit) =
                                     [ div [ Class "ibox-content" ]
                                         [ div [ ]
                                               [ img [ Alt "image"
-                                                      Class "h55"
+                                                      Class "h90"
                                                       Src "../lib/img/token_cab_1.png" ] ]
-                                          h2 [ Class "font-bold" ]
-                                            [ str "Forgot password" ]
-                                          p [ ]
-                                            [ str "Enter your email address and your password will be reset and emailed to you." ]
                                           div [ Class "row" ]
                                             [ div [ Class "col-lg-12" ]
                                                 [ form [ Class "m-t"

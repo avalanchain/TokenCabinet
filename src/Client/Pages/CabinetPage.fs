@@ -93,7 +93,7 @@ let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) =
         | Verification      -> [ VerificationPage.view ]
         | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch]
         | Investments     -> [ str "My Investments view" ]
-        | ReferralProgram   -> [ str "Referral Program view" ]
+        | ReferralProgram   -> [ ReferralProgramPage.view ]
         | Contacts               -> 
             [   str "Contacts view"
                 comE buttonToolbar [

@@ -68,6 +68,7 @@
     <Compile Include="Components/FormHelpers.fs" />
     
     <Compile Include="Views/DashboardView.fs" />
+    <Compile Include="Pages/ReferralProgramPage.fs" />
     <Compile Include="Pages/VerificationPage.fs" />
     <Compile Include="Pages/PurchaseTokenPage.fs" />
     <Compile Include="Pages/CabinetPage.fs" />

@@ -87,10 +87,8 @@ let view (model: Model) (dispatch: Msg -> unit) =
         [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
               [   div [ ]
                     [ img [ Alt "image"
-                            Class "h55"
+                            Class "h90"
                             Src "../lib/img/token_cab_1.png" ] ]
-                  h3 [ ]
-                    [ str "Welcome to avalanchain" ]
                   form [ Class "m-t"
                          Role "form"
                          Action "#" ]
