@@ -147,7 +147,12 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                 model, ("Server error ", msg, string model) |> ErrorMsg |> Cmd.ofMsg
         | ErrorMsg(text, msg, m) -> 
             console.error(sprintf "%s Msg '%A' on Model '%A'" text msg m)
-            model, Cmd.none
+            let cmd = Toastr.message text
+                    |> Toastr.withProgressBar
+                    |> Toastr.position BottomRight
+                    |> Toastr.timeout 1000
+                    |> Toastr.error
+            model, cmd
 
         | LoginFlowMsg msg_ ->
             match model.PageModel with

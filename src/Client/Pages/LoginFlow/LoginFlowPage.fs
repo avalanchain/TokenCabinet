@@ -46,31 +46,13 @@ let switchTo (page: LoginFlowPage) (model: Model) =
     match model, page with 
     | RegisterPageModel m       , Login -> LoginPage.init m.InputUserName |> mapMC LoginPageModel LoginPageMsg
     | ForgotPasswordPageModel m , Login -> LoginPage.init m.InputUserName |> mapMC LoginPageModel LoginPageMsg
-    | LoginPageModel m          , Register -> RegisterPage.init m.InputUserName |> mapMC RegisterPageModel RegisterPageMsg
+    | LoginPageModel m          , Register -> RegisterPage.init m.InputEmail |> mapMC RegisterPageModel RegisterPageMsg
     | ForgotPasswordPageModel m , Register -> RegisterPage.init m.InputUserName |> mapMC RegisterPageModel RegisterPageMsg
-    | LoginPageModel m          , ForgotPassword -> ForgotPasswordPage.init m.InputUserName |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
+    | LoginPageModel m          , ForgotPassword -> ForgotPasswordPage.init m.InputEmail |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
     | RegisterPageModel m       , ForgotPassword -> ForgotPasswordPage.init m.InputUserName |> mapMC ForgotPasswordPageModel ForgotPasswordPageMsg
     | LoginPageModel _          , Login 
     | RegisterPageModel _       , Register
     | ForgotPasswordPageModel _ , ForgotPassword -> model, Cmd.none
-
-module InputValidators =  
-    let userNameRules userName = 
-        [   String.IsNullOrWhiteSpace(userName), "Field 'User Name' cannot be empty"
-            userName.Trim().Length < 5, "Field 'User Name' must at least have 5 characters"
-            Regex("""^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$""").IsMatch(userName), "Field 'User Name' must be a valid email address"
-             ]
-    let passwordRules password = 
-        [   String.IsNullOrWhiteSpace(password), "Field 'Password' cannot be empty"
-            password.Trim().Length < 8, "Field 'Password' must at least have 8 characters"
-            Regex("""(?=.*[a-z])""").IsMatch(password), "Field 'Password' must have at least 1 lowercase character"
-            Regex("""(?=.*[A-Z])""").IsMatch(password), "Field 'Password' must have at least 1 uppercase character"
-            Regex("""(?=.*[\d])""").IsMatch(password), "Field 'Password' must have at least 1 digit character"
-            Regex("""(?=.*[\W])""").IsMatch(password), "Field 'Password' must have at least 1 special character"
-            ]
-
-    let userNameValidation = userNameRules >> List.filter fst >> List.map snd
-    let passwordValidation = passwordRules >> List.filter fst >> List.map snd
 
 
 let init () = 

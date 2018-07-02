@@ -5,6 +5,8 @@
   <ItemGroup>
     <Compile Include="../Shared/Utils.fs" />
     <Compile Include="../Shared/Auth.fs" />
+    <Compile Include="../Shared/InputValidators.fs" />
+
     <Compile Include="../Shared/Entities/VerificationsModel.fs" />
     <Compile Include="../Shared/Entities/CryptoCurrenciesModel.fs" />
     <Compile Include="../Shared/Entities/SaleTokensModel.fs" />
