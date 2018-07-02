@@ -62,8 +62,6 @@ let init userName =
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
-    // | Login -> 
-    //     { model with InputPassword = ""; RegisteringError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangeEmail username -> 
         { model with InputEmail = username; EmailStartedTyping = true; RegisteringErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->

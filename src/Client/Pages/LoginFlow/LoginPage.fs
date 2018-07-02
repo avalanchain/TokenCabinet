@@ -22,7 +22,6 @@ open Shared.InputValidators
 open Fable.Import.React
 
 type Msg = 
-    // | Login
     | ChangeEmail           of string
     | ChangePassword        of string
     // | LoginSuccess           of authToken: AuthToken
@@ -58,8 +57,6 @@ let init email =
 
 let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg = 
     match msg with
-    // | Login -> 
-    //     { model with InputPassword = ""; LoginError = None }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangeEmail username -> 
         { model with InputEmail = username; EmailStartedTyping = true; LoginErrors = [] }, Cmd.ofMsg UpdateValidationErrors, NoOp
     | ChangePassword password ->

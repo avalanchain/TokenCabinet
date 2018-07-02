@@ -117,9 +117,11 @@ let view model (dispatch: Msg -> unit) =
                                                     [ input [ Type "email"
                                                               Class "form-control"
                                                               Placeholder "Email address" ] ]
-                                                  button [ Type "submit"
-                                                           Class "btn btn-info block full-width m-b" ]
-                                                    [ str "Send new password" ]
+                                                  button [  Type "submit"
+                                                            Class "btn btn-info block full-width m-b"
+                                                            OnClick (fun _ -> dispatch LogInClicked)
+                                                            onEnter LogInClicked dispatch ]
+                                                    [ str "Reset password" ]
                                                   p [ Class "text-muted text-center" ]
                                                     [ small [ ]
                                                         [ str "Go back to Login" ] ]
