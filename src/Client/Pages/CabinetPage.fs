@@ -18,6 +18,7 @@ open Shared
 open Client.CabinetModel
 open Client.LoginCommon
 open Fable.Import.JS
+open Fable
 
 // type Model = 
 //     | VerificationModel     of string
@@ -36,7 +37,8 @@ let init authToken =
         CurrenciesCurentPrices  = { Prices = [] }
         ActiveSymbol            = ETH
         TokenSale               = None
-        FullCustomer            = None }
+        FullCustomer            = None 
+        BuyTokens               = 10m}
 
    
 
@@ -60,8 +62,10 @@ let init authToken =
 let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
     match msg with
     | VerificationMsg    -> model, Cmd.none
-    | PurchaseTokenMsg (ActiveSymbolChanged symbol) -> 
-        { model with ActiveSymbol = symbol }, Cmd.none
+    | PurchaseTokenMsg msg_  -> 
+        match msg_ with 
+        | ActiveSymbolChanged symbol  -> { model with ActiveSymbol = symbol }, Cmd.none
+        | CCAmountChanges buytokens -> { model with BuyTokens = buytokens }, Cmd.none
     | MyInvestmentsMsg   -> model, Cmd.none
     | ReferralProgramMsg -> model, Cmd.none
     | ContactsMsg        -> model, Cmd.none

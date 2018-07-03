@@ -52,7 +52,7 @@ let spanBtn = span [ Class "input-group-btn" ]
 
 
 
-let fullInput = ((inputG (FormElement.Input InputType.Text) "") @ [spanBtn])
+let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
 let bodyLink = formHorizontal 
                         ([fGroupEmpty ([labelG "Link"
                                         div [ Class "col-sm-10"] 

@@ -15,6 +15,7 @@ open Elmish.React
 open ReactBootstrap
 open Helpers
 open FormHelpers
+open Fable
 
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
@@ -38,7 +39,7 @@ let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass 
 
 
 
-let fullInput = ((inputG (FormElement.Input InputType.Text) "") @ [spanBtn])
+let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
 let bodyLink = formHorizontal 
                         ([fGroupEmpty ([labelG "Link"
                                         div [ Class "col-sm-10"] 

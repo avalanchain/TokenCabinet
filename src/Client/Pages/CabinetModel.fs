@@ -19,6 +19,7 @@ and ServerMsg =
     | PriceTick                     of ViewModels.CurrencyPriceTick
 and PurchaseTokenMsg = 
     | ActiveSymbolChanged of symbol: CryptoCurrencySymbol
+    | CCAmountChanges     of decimal
 
 type Model = {
     Auth                   : AuthModel
@@ -29,4 +30,5 @@ type Model = {
 
     TokenSale              : ViewModels.TokenSale option
     FullCustomer           : ViewModels.FullCustomer option
+    BuyTokens              : decimal
 }

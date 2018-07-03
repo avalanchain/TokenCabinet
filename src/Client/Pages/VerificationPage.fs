@@ -29,31 +29,31 @@ let personalData =
         [ div [ Class "col-lg-6 b-r" ]
             [ formHorizontal
                 [ 
-                  fGroupO (FormElement.Input InputType.Text) "First Name" "Enter a brief First Name"
+                  fGroupO (FormElement.Input InputType.Text) (None) "First Name" "Enter a brief First Name"
                   div [ Class "hr-line-dashed" ] [ ]
 
-                  fGroupO (FormElement.Input InputType.Text) "Last Name" "Enter a brief Last Name"
+                  fGroupO (FormElement.Input InputType.Text) (None) "Last Name" "Enter a brief Last Name"
                   div [ Class "hr-line-dashed" ] [ ]
 
-                  fGroupO (FormElement.Input InputType.Text) "Middle Name" "Enter a brief Middle Name"
+                  fGroupO (FormElement.Input InputType.Text) (None) "Middle Name" "Enter a brief Middle Name"
                   div [ Class "hr-line-dashed" ] [ ]
 
-                  fGroupO (FormElement.Select [ "Sex", ""; "Male", "Male"; "Female", "Female"]) "Sex" "Enter a brief description"
+                  fGroupO (FormElement.Select [ "Sex", ""; "Male", "Male"; "Female", "Female"]) (None) "Sex" "Enter a brief description"
                    ] ]
           div [ Class "col-lg-6" ]
             [ 
               formHorizontal
                 [ 
-                  fGroupO (FormElement.Input InputType.Date) "Birthday" "Enter a brief Birthday"
+                  fGroupO (FormElement.Input InputType.Date) (None) "Birthday" "Enter a brief Birthday"
                   div [ Class "hr-line-dashed" ] [ ]
                   
-                  fGroupO (FormElement.Input InputType.Text) "Number of the document" "Enter a Series and number of the document"
+                  fGroupO (FormElement.Input InputType.Text) (None) "Number of the document" "Enter a Series and number of the document"
                   div [ Class "hr-line-dashed" ] [ ]
 
-                  fGroupO (FormElement.Input InputType.Text) "Country of issue" "Enter a Country of issue of the document"
+                  fGroupO (FormElement.Input InputType.Text) (None) "Country of issue" "Enter a Country of issue of the document"
                   div [ Class "hr-line-dashed" ] [ ]
                   
-                  fGroupO (FormElement.Input InputType.Date ) "Registration Date" "Enter a Registration Date"
+                  fGroupO (FormElement.Input InputType.Date ) (None) "Registration Date" "Enter a Registration Date"
                
                   div [ ]
                     [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-right m-t-n-xs")
@@ -63,16 +63,16 @@ let address =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-12 b-r" ]
             [ formHorizontal
-                [ fGroupO (FormElement.Input InputType.Date) "Country" "Enter a Country"
+                [ fGroupO (FormElement.Input InputType.Date) (None) "Country" "Enter a Country"
                   div [ Class "hr-line-dashed" ] [ ]
                   
-                  fGroupO (FormElement.Input InputType.Text) "City" "Enter a City"
+                  fGroupO (FormElement.Input InputType.Text) (None) "City" "Enter a City"
                   div [ Class "hr-line-dashed" ] [ ]
 
-                  fGroupO (FormElement.Input InputType.Text) "Address" "Enter a Address"
+                  fGroupO (FormElement.Input InputType.Text) (None) "Address" "Enter a Address"
                   div [ Class "hr-line-dashed" ] [ ]
 
-                  fGroupO (FormElement.Input InputType.Text) "Zipcode" "Enter a Zipcode"
+                  fGroupO (FormElement.Input InputType.Text) (None) "Zipcode" "Enter a Zipcode"
 
                   div [ ]
                     [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-left m-t-n-xs")

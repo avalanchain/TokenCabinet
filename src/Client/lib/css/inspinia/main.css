@@ -561,3 +561,17 @@ button.dim .price {
     background: none;
     border: none;
 }
+
+.grayImg {
+    height: 21px;
+    filter: grayscale(100%);
+}
+
+.w25{
+    width: 25px
+}
+
+.timeline.shift .status h4 {
+    left: inherit;
+    padding-right: 10px;
+}
