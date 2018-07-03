@@ -47,10 +47,16 @@ let private register config (loginInfo: LoginInfo) = task {  // TODO: Change thi
     return token |> Ok |> Ok
 }
 
-let private resetPassword config (forgotPasswordInfo: ForgotPasswordInfo) = task { // TODO: Change this!!!
+let private forgotPassword config (forgotPasswordInfo: ForgotPasswordInfo) = task { // TODO: Change this!!!
     return "Reset email sent" |> Ok |> Ok
 }
 
+let private resetPassword config resetPasswordInfo = task { // TODO: Change this!!!
+    let userRigths = { AuthJwt.UserRights.UserName = "trader@cryptoinvestor.com" }
+    let token = userRigths |> AuthJwt.encode |> AuthToken
+    logins.[token] <- userRigths
+    return token |> Ok |> Ok
+}
 
 let private checkUserExists authToken =
     logins.ContainsKey authToken
@@ -143,7 +149,7 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
                     Password = "!!!ChangeMe!!!"
                     PasswordSalt = "!!PwdSalt!!"
                     Avatar = "MyPicture"
-                    Email = "email@gmail.com"
+                    Email = "trader@cryptoinvestor.com"
                 }
 
             let customerPreference: CustomerPreferences.CustomerPreference = 
@@ -259,6 +265,7 @@ let webApp config =
     let loginProtocol =
         {   login               = login                 config    >> Async.AwaitTask
             register            = register              config    >> Async.AwaitTask
+            forgotPassword      = forgotPassword        config    >> Async.AwaitTask
             resetPassword       = resetPassword         config    >> Async.AwaitTask
         }            
     let tokenSaleProtocol =

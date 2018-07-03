@@ -37,17 +37,23 @@ module Auth =
         | ValidationErrors of email: string list * password: string list
         | LoginServerError of LoginFlowServerError
 
-    type PasswordResetError = 
+    type ForgotPasswordError = 
         | LoginServerError of LoginFlowServerError
 
-    type LoginResult         = ServerResult<Result<AuthToken, LoginError>>
-    type RegisteringResult   = ServerResult<Result<AuthToken, RegisteringError>>
-    type PasswordResetResult = ServerResult<Result<string, PasswordResetError>>
+    type PasswordResetError = 
+        | ValidationErrors of email: string list * password: string list
+        | LoginServerError of LoginFlowServerError        
+
+    type LoginResult          = ServerResult<Result<AuthToken, LoginError>>
+    type RegisteringResult    = ServerResult<Result<AuthToken, RegisteringError>>
+    type ForgotPasswordResult = ServerResult<Result<string, ForgotPasswordError>>
+    type PasswordResetResult  = ServerResult<Result<AuthToken, PasswordResetError>>
 
     type ILoginFlowProtocol = {   
-        login               : LoginInfo -> Async<LoginResult>
-        register            : LoginInfo -> Async<RegisteringResult>
-        resetPassword       : ForgotPasswordInfo -> Async<PasswordResetResult>
+        login               : LoginInfo             -> Async<LoginResult>
+        register            : LoginInfo             -> Async<RegisteringResult>
+        forgotPassword      : ForgotPasswordInfo    -> Async<ForgotPasswordResult>
+        resetPassword       : PwdResetInfo          -> Async<PasswordResetResult>
     }
 
 

@@ -17,14 +17,13 @@ open Helpers
 open FormHelpers
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
-        
-        p [ Class "p-xs" ] 
-          [
-            div [ Class "pull-left m-r-md" ]
-                [ i [ Class "fa fa-envelope text-info mid-icon" ] [ ] ]    
-            h2 [ ] [
-               str "Please, contact us" ]
-            a [ Href "info@avalanchain.com" ] [ str "info@avalanchain.com" ]
-                               ]]
+              p [ Class "p-xs" ] 
+                [
+                  div [ Class "pull-left m-r-md" ]
+                      [ i [ Class "fa fa-envelope text-info mid-icon" ] [ ] ]    
+                  h2 [ ] [
+                     str "Please, contact us" ]
+                  a [ Href "info@avalanchain.com" ] [ str "info@avalanchain.com" ]
+                                     ]]
   
 let view = Ibox.emptyRow [ helper ]

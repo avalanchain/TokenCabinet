@@ -35,6 +35,7 @@ open LoginCommon
 open LoginPage
 open RegisterPage
 open ForgotPasswordPage
+open PasswordResetPage
 open LoginFlowPage
 open Shared.Auth
 
@@ -176,7 +177,9 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                     | LoginFlowPage.ExternalMsg.RegisterUser info -> 
                         cmdServerCall (Server.loginFlowApi.register) info (RegisteringAttemptResult >> RegisterPageMsg >> LoginFlowMsg) "register()" 
                     | LoginFlowPage.ExternalMsg.ForgotPasswordUser info -> 
-                        cmdServerCall (Server.loginFlowApi.resetPassword) info (PasswordResetAttemptResult >> ForgotPasswordPageMsg >> LoginFlowMsg) "resetPassword()" 
+                        cmdServerCall (Server.loginFlowApi.forgotPassword) info (ForgotPasswordAttemptResult >> ForgotPasswordPageMsg >> LoginFlowMsg) "resetPassword()" 
+                    | LoginFlowPage.ExternalMsg.ResetPassword info -> 
+                        cmdServerCall (Server.loginFlowApi.resetPassword) info (ResetAttemptResult >> PasswordResetPageMsg >> LoginFlowMsg) "resetPassword()" 
                     | LoginFlowPage.ExternalMsg.LoggedIn authToken -> authToken |> AuthMsg.LoggedIn |> AuthMsg |> Cmd.ofMsg
 
                 { model with PageModel = LoginFlowModel model' }, Cmd.batch [ Cmd.map LoginFlowMsg cmd'; cmd2 ]

@@ -95,7 +95,7 @@ let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) =
         | Investments       -> [ InvestmentPage.view ]
         | ReferralProgram   -> [ ReferralProgramPage.view ]
         | Contacts          -> [ ContactsPage.view ]
-        | Dashboard          -> [ DashboardView.view ]
+        // | Dashboard          -> [ DashboardView.view ]
         // | Book ed, BookListModel m -> viewPageStatic<Book> ed m dispatch
         // | Individual ed, IndividualListModel m -> viewPageStatic<Individual> ed m dispatch
         // | Organization ed, OrganizationListModel m -> viewPageStatic<Organization> ed m dispatch

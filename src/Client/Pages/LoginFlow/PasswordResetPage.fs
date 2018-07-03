@@ -22,7 +22,7 @@ open Client.Page
 type Msg = 
     | ChangePassword            of string
     | ChangeConfPassword        of string
-    | ResetAttemptResult        of Result<AuthToken, RegisteringError>
+    | ResetAttemptResult        of Result<AuthToken, PasswordResetError>
     | UpdateValidationErrors 
     | RegisterClicked
 
@@ -66,9 +66,8 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         match res with
         | Ok authToken -> { model with TryingToReset = false }, Cmd.none, UserPasswordReset authToken
         | Error e -> match e with 
-                        | EmailAlreadyRegistered -> { model with ResettingErrors = [ "Email already registered" ]; TryingToReset = false }, Cmd.none, NoOp
                         | ValidationErrors (emailErrors, pwdErrors) -> { model with ResettingErrors = emailErrors @ pwdErrors; TryingToReset = false }, Cmd.none, NoOp
-                        | RegisteringError.LoginServerError e -> { model with ResettingErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
+                        | LoginServerError e -> { model with ResettingErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
                         PasswordConfValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword }, Cmd.none, NoOp

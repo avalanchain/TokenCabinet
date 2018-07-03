@@ -72,7 +72,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         | Ok authToken -> { model with TryingToRegister = false }, Cmd.none, UserRegistered authToken
         | Error e -> match e with 
                         | EmailAlreadyRegistered -> { model with RegisteringErrors = [ "Email already registered" ]; TryingToRegister = false }, Cmd.none, NoOp
-                        | ValidationErrors (emailErrors, pwdErrors) -> { model with RegisteringErrors = emailErrors @ pwdErrors; TryingToRegister = false }, Cmd.none, NoOp
+                        | RegisteringError.ValidationErrors (emailErrors, pwdErrors) -> { model with RegisteringErrors = emailErrors @ pwdErrors; TryingToRegister = false }, Cmd.none, NoOp
                         | RegisteringError.LoginServerError e -> { model with RegisteringErrors = handleLoginFlowServerError e; TryingToRegister = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail

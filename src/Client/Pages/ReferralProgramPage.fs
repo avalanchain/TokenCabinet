@@ -34,16 +34,15 @@ open FormHelpers
 // ]
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
-        
-        p [ Class "p-xs" ] 
-          [
-            div [ Class "pull-left m-r-md" ]
-                [ i [ Class "fa fa-globe text-info mid-icon" ] [ ] ]    
-            h2 [ ] [
-               str "Referral Program" ]
-            span [ ] [
-                    str "You can attract new users and get a bonus for them. To do this, copy the link in the box below this block. "
-           ]]]
+                p [ Class "p-xs" ] 
+                  [
+                    div [ Class "pull-left m-r-md" ]
+                        [ i [ Class "fa fa-globe text-info mid-icon" ] [ ] ]    
+                    h2 [ ] [
+                       str "Referral Program" ]
+                    span [ ] [
+                            str "You can attract new users and get a bonus for them. To do this, copy the link in the box below this block. "
+                   ]]]
         
         // div[ Class "col-sm-10 input-group"]
 let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
@@ -71,18 +70,18 @@ let referalLink = Ibox.btRow "Referal Link" [bodyLink]
 
 
 let referals = Ibox.btRow "Referals" [
-    comE table [
-        thead [][
-            tr[][
-                th [][str "#" ]
-                th [][str "Registration Date" ]
-                th [][str "Full name" ]
-                th [][str "Email" ]
-            ]
-        ]
-        tbody [][]
-    ]
-]
+                    comE table [
+                        thead [][
+                            tr[][
+                                th [][str "#" ]
+                                th [][str "Registration Date" ]
+                                th [][str "Full name" ]
+                                th [][str "Email" ]
+                            ]
+                        ]
+                        tbody [][]
+                    ]
+                ]
 
 let view = Ibox.emptyRow [ helper
                            referalLink
