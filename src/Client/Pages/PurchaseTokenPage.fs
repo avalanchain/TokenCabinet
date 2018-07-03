@@ -47,6 +47,16 @@ let bodySomeNone (model: Model) body =
     | Some m ->  body m 
     | None   ->  str "No model loaded" 
 
+let symbolLogo = function
+                    | ETH  -> "../lib/img/coins/eth_logo.png"
+                    | ETC  -> "../lib/img/coins/etc_logo.png"
+                    | BTC  -> "../lib/img/coins/btc_logo.png"
+                    | LTC  -> "../lib/img/coins/ltc_logo.png"
+                    | BCH  -> "../lib/img/coins/bch_logo.png"
+                    | BTG  -> "../lib/img/coins/btg_logo.png"
+                    | DASH -> "../lib/img/coins/dash_logo.png"                
+
+
 let cur symbol image price isActive dispatch =
                     div [ Class "col-md-1"]
                         [ comF button (fun o -> o.bsClass <- "btn btn-default dim btn-large-dim btn-outline " + (if isActive then "active" else "") |> Some 
@@ -54,7 +64,7 @@ let cur symbol image price isActive dispatch =
                                       [ div [ Class "name" ]
                                             [str (symbol.ToString())]
                                         img [ Class "currencylogo"
-                                              Src "https://www.cryptocompare.com/media/20646/eth_logo.png" ]
+                                              Src (symbolLogo symbol) ]
                                         div [ Class "price" ]
                                             [str (price.ToString() + " $")] ] ]
  

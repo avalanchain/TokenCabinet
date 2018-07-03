@@ -22,7 +22,7 @@ let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
                   [
                     div [ Class "pull-left m-r-md" ]
                         [ img [ Class "w100"
-                                Src "https://www.cryptocompare.com/media/20646/eth_logo.png" ] ]    
+                                Src "../lib/img/coins/eth_logo.png" ] ]    
                     h2 [ ] 
                        [ str "Ethereum address" ]
                     h4 [ Class "text-muted" ] 
