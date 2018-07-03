@@ -45,15 +45,12 @@ let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
                    ]]]
         
         // div[ Class "col-sm-10 input-group"]
-let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
+let spanBtn = span [ Class "input-group-btn" ] 
+                   [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
                         [ strong [ ]
                             [ str "Copy" ] ] ]    
 
 
-// labelG "Link"
-
-let tt = div [ Class "col-sm-10"] 
-               (inputG (FormElement.Input InputType.Text) "")
 
 let fullInput = ((inputG (FormElement.Input InputType.Text) "") @ [spanBtn])
 let bodyLink = formHorizontal 

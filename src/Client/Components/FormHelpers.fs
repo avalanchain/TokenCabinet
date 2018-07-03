@@ -84,4 +84,4 @@ let fGroupO (element:FormElement) labelText helpText =
 
 
 let fGroupEmpty body = 
-    comE formGroup (body)
+    comE formGroup [Ibox.emptyRow body]

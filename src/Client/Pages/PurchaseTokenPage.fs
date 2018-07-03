@@ -17,6 +17,7 @@ open ViewModels
 open Client.CabinetModel
 open Helpers
 open ReactBootstrap
+open FormHelpers
 
 // let buttonToolbar = ReactBootstrap.buttonToolbar
 let bodyTL m = 
@@ -97,7 +98,7 @@ let bodyC (model: Model) dispatch =
 let bodyP m = div [ Class "text-center" ]
                                 [ div [ Class "m-b-md" ]
                                     [ h1 [ Class "font-bold no-margins" ]
-                                        [ str m.SaleToken.Symbol ]
+                                         [ str m.SaleToken.Symbol ]
                                         ]
                                   img [ Src "../lib/img/logo.png" //m.SaleToken.LogoUrl
                                         Class " m-b-md h90" ]
@@ -112,6 +113,24 @@ let ActiveSymbol (model: Model) =
 let currencies (model: Model) dispatch =  div [ Class "row seven-cols"] 
                                               (bodyC model dispatch) 
                                     
+let selectedCurrency (model: Model) dispatch = 
+                                    div [] 
+                                        [
+                                           h2 []
+                                              [
+                                                  str "Current:"
+                                              ] 
+                                           h3 []
+                                              [
+                                                  str " Ethereum" //model.ActiveSymbol
+                                              ]
+                                        ]
+let currenciesGroup (model: Model) dispatch = 
+        Ibox.emptyRow [ div [ Class "col-md-9" ] 
+                           [ currencies model dispatch]
+                        div [ Class "col-md-3" ] 
+                           [ selectedCurrency model dispatch]  
+                           ]
 
 let bodyCouner m = dl [ Class "dl-horizontal" ]
                         [ dt [ ]
@@ -119,30 +138,30 @@ let bodyCouner m = dl [ Class "dl-horizontal" ]
                                  [ str "Current discount:" ] ]
                           dd [ ]
                             [ span [ Class "label label-active" ]
-                                [ str "12.5%" ] ]
+                                [ str "20%" ] ]
                           br [ ]
                           dt [ ]
-                             [ h4 [ ]
-                                  [ str "Amount:" ] ]
+                             [ str "Amount:" ]
                           dd [ ]
                             [ div [ Class "col-lg-6 no-side-padding" ]
-                                [ input [ Id "demo3"
-                                          Type "text"
-                                          Name "demo1" ] ]
+                                [ inputControl  InputType.Number
+                                //   input [ Id "demo3"
+                                //           Type "text"
+                                //           Name "demo1" ] 
+                                          ]
                               div [ Class "col-lg-6 " ]
-                                [ a [ Class "btn btn-danger btn-sm" ]
+                                [ a [ Class "btn btn-primary btn-sm" ]
                                     [ str "ACQUIRE" ] ] ]
                           br [ ]
                           dt [ ]
-                            [ h4 [ ]
-                                 [ str ( m.SaleToken.Symbol + " :") ] ]
+                            [ str ( m.SaleToken.Symbol + " :") ]
                           dd [ ]
                             [ str "300" ]
                           br [ ]
                           dt [ ]
                             [ str "Discount(AIM):" ]
                           dd [ ]
-                            [ str "12,5" ] ]
+                            [ str "20.00" ] ]
 
 let counter m = div [ Class ("col-md-9") ]
                                  [ bodySomeNone m bodyCouner  ]
@@ -154,7 +173,8 @@ let volumes m = div [ Class ("col-md-9") ]
 let counterRow m = Ibox.emptyRow [ counter m
                                    volumes m ]   
 
-let invest m dispatch = Ibox.btCol "Invest" "9" ([ currencies m dispatch
+let invest m dispatch = Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
+                                                   div [ Class "hr-line-dashed" ] [ ]
                                                    counterRow m])
                                                   
 let price (model: Model) = Ibox.btCol "Coin Price" "3" ([bodySomeNone model bodyP])
