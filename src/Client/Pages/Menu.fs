@@ -77,7 +77,7 @@ let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
                 | Investments     -> "fa fa-briefcase"  
                 | ReferralProgram   -> "fa fa-refresh"
                 | Contacts          -> "fa fa-phone"            
-                | Dashboard         -> "fa fa-th-large"         
+                // | Dashboard         -> "fa fa-th-large"         
     let home = 
         let page = MenuPage.Home
         [   navViewLink page "Main view" "fa fa-th-large" ( menuPage = page )]

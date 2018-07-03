@@ -520,6 +520,10 @@ button.dim .price {
     width: 40px;
 }
 
+.w100{
+    width: 100px;
+}
+
 /* 7 Columns */
 
 @media (min-width: 768px){

@@ -92,26 +92,10 @@ let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) =
     match page with
         | Verification      -> [ VerificationPage.view ]
         | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch]
-        | Investments     -> [ str "My Investments view" ]
+        | Investments       -> [ InvestmentPage.view ]
         | ReferralProgram   -> [ ReferralProgramPage.view ]
-        | Contacts               -> 
-            [   str "Contacts view"
-                comE buttonToolbar [
-                    comE button [
-                        str "Default"
-                    ]
-                    comF button (fun o -> o.bsStyle <- Some "primary" ) [
-                        div [] [str "Default"]
-                        div [] [str "Default"]
-                        div [] [str "Default"]
-                    ]
-                    comF button (fun o ->   o.bsStyle <- Some "warning"
-                                            o.onClick <- Some (MouseEventHandler(fun e -> e.stopPropagation())) ) [
-                        str "Default"
-                    ]    
-                ] 
-            ]
-        | Dashboard             -> [ DashboardView.view ]
+        | Contacts          -> [ ContactsPage.view ]
+        | Dashboard          -> [ DashboardView.view ]
         // | Book ed, BookListModel m -> viewPageStatic<Book> ed m dispatch
         // | Individual ed, IndividualListModel m -> viewPageStatic<Individual> ed m dispatch
         // | Organization ed, OrganizationListModel m -> viewPageStatic<Organization> ed m dispatch

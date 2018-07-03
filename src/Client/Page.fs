@@ -35,7 +35,7 @@ and CabinetPagePage =
     | ReferralProgram
     | Verification
     | Contacts
-    | Dashboard
+    // | Dashboard
     with static member Default = PurchaseToken  
 
 let toHash =
