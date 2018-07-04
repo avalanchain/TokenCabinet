@@ -11,6 +11,11 @@ open Fable.Import.React
 open Fable.Core.JsInterop
 open ReactBootstrap
 
+
+module Option = 
+    let map2 f a b = match a, b with    | Some a, Some b -> f a b |> Some 
+                                        | _ -> None
+
 module React =
     type Component<'P> = Fable.Import.React.Component<'P, obj>
 

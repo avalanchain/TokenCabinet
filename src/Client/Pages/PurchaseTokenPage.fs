@@ -21,6 +21,12 @@ open FormHelpers
 
 // let buttonToolbar = ReactBootstrap.buttonToolbar
 
+let calcPrice activeSymbol (tick: ViewModels.CurrencyPriceTick) f =
+    tick.Prices 
+    |> List.tryFind(fun p -> p.Symbol = activeSymbol)
+    |> f
+    |> Option.defaultValue 0m
+
 let roundFour (v:decimal) = Math.Round(v, 4)
 
 let bodyTL m = 
@@ -48,13 +54,13 @@ let bodyRowSomeNone (model: Model) body =
 
 let bodySomeNone (model: Model) body dispatch =
     match model.TokenSale with
-    | Some m ->  body m model.PurchaseTokenModel.CCTokens dispatch
+    | Some m ->  body m dispatch
     | None   ->  str "No model loaded" 
 
 
 let bodySomeNoneTwoModels (model: Model) body dispatch =
     match model.TokenSale with
-    | Some m ->  body m model.PurchaseTokenModel  dispatch
+    | Some m ->  body m model.PurchaseTokenModel dispatch
     | None   ->  str "No model loaded" 
 let symbolLogo = function
                     | ETH  -> "../lib/img/coins/eth_logo.png"
@@ -85,33 +91,35 @@ let bodyC (model: Model) dispatch =
             ]
 
 
-let bodyP m bt dispatch= 
+let bodyP model  = 
+    let tokenToCC = roundFour (calcPrice model.ActiveSymbol model.CurrenciesCurentPrices (Option.map2(fun (m: ViewModels.TokenSale) p -> (m.TokenSaleState.PriceUsd) / p.PriceUsd ) model.TokenSale ))
     div [ Class "text-center p-lg" ]
-      [
-        img [ Src "../lib/img/logo.png" //m.SaleToken.LogoUrl
+        [
+        img [ Src "../lib/img/logo.png" 
               Class " m-b-md h90" ]
         h3 [ Class "font-bold no-margins" ]
-           [ str "1 AIM = 0.02 ETH" ] 
+           [ str ("1 AIM = " + tokenToCC.ToString() + " " + model.ActiveSymbol.ToString() ) ]
         span [ Class "text-navy"]
-             [ str ("Discount 20%" )]   ]//+ m.SaleToken.TotalSupply.ToString()
+             [ str ("Discount 20%" )] ]
+
  
-let discount m bt dispatch= 
+let discAr = [10, 100; 20, 200; 30, 300; 40, 400; 50, 500; 60, 600; 70, 700; 80, 800; 90, 900; 100, 1000]
+
+let discount (m: PurchaseTokenModel) dispatch= 
       ul [ Class "timeline shift"
            Id "timeline" ]
            [
-             for stage in m.TokenSaleStages ->
-               li [ Class ("li" + (match stage.Status with 
-                                    | TokenSaleStageStatus.Active       -> " active" 
-                                    | TokenSaleStageStatus.Completed    -> " complete"
-                                    | TokenSaleStageStatus.Cancelled    -> " cancelled"
-                                    | TokenSaleStageStatus.Paused       
-                                    | TokenSaleStageStatus.Expectation       -> " " )) ]
+             for (per, tokens) in discAr ->
+               let ttt per (tokens: decimal) = if (decimal per) > tokens then " "
+                                               else "complete"
+               
+               li [ Class ("li " + (ttt per m.BuyTokens))]
                   [ div [ Class "timestamp" ]
                       [ span [ Class "author" ]
-                          [ str (stage.CapUsd.ToString() + " $") ] ]
+                          [ str (tokens.ToString() + " $") ] ]
                     div [ Class "status" ]
                       [ h4 [ ]
-                          [ str (stage.CapEth.ToString() + " %") ] ] ]
+                          [ str (per.ToString() + " %") ] ] ]
            ]
 let currencies (model: Model) dispatch =  div [ Class "row seven-cols"] 
                                               (bodyC model dispatch) 
@@ -199,7 +207,7 @@ let invest m dispatch = Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
                                                    div [ Class "hr-line-dashed" ] [ ]
                                                    counterRow m (PurchaseTokenMsg >> dispatch)
                                                    div [ Class "hr-line-dashed" ] [ ]
-                                                   bodySomeNone m discount dispatch])
+                                                   discount m.PurchaseTokenModel dispatch])
 
 
 let compares = Ibox.btCol "AIM" "3" [
@@ -251,12 +259,12 @@ let compares = Ibox.btCol "AIM" "3" [
                         ]
                     ]
                 ]                                                
-let price (model: Model) dispatch = Ibox.btColContentOnly "3" ([bodySomeNone model bodyP dispatch])
+let price (model: Model) = Ibox.btColContentOnly "3" ([ bodyP model ])
 
 let firstRow m dispatch = Ibox.emptyRow [ bodyRowSomeNone m bodyTL
-                                          price m dispatch]
+                                          price m ]
 let secondRow m dispatch = Ibox.emptyRow [ invest m dispatch
-                                           compares]
+                                           compares ]
 let view (model: Model) dispatch =
     div [  ]
         [ firstRow model dispatch

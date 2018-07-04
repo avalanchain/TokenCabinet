@@ -21,6 +21,7 @@ open Fable.Import.JS
 open Fable
 open Elmish.Browser
 open Elmish.Toastr
+open Helpers
 
 // type Model = 
 //     | VerificationModel     of string
@@ -65,17 +66,12 @@ let init authToken =
     //     let m,cmd = EntityDefs.billOfLading.Init user
     //     m |> BillOfLadingListModel, Cmd.map (BillOfLadingMsg) cmd  
 
-module Option = 
-    let map2 f a b = match a, b with    | Some a, Some b -> f a b |> Some 
-                                        | _ -> None
+
 
 let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
     
-    let ccTotalPrice activeSymbol cCTokens (tick: ViewModels.CurrencyPriceTick) =
-        tick.Prices 
-        |> List.tryFind(fun p -> p.Symbol = activeSymbol)
-        |> Option.map(fun p -> p.PriceUsd * cCTokens)
-        |> Option.defaultValue 0m
+    let ccTotalPrice activeSymbol cCTokens (tick: ViewModels.CurrencyPriceTick) = 
+        PurchaseTokenPage.calcPrice activeSymbol tick (Option.map(fun p -> p.PriceUsd * cCTokens))
 
     let tokenTotalPrice (model: ViewModels.TokenSale option) activeSymbol tokens (tick: ViewModels.CurrencyPriceTick) =
         
@@ -84,23 +80,14 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
             | Some t -> t.TokenSaleState.PriceUsd
             | None -> 0m
 
-        tick.Prices 
-        |> List.tryFind(fun p -> p.Symbol = activeSymbol)
-        |> Option.map(fun p -> (tokensPrice model) * tokens)
-        |> Option.defaultValue 0m
+        PurchaseTokenPage.calcPrice activeSymbol tick (Option.map(fun _ -> (tokensPrice model) * tokens))
 
     let tokenPrice activeSymbol ccTokens (tick: ViewModels.CurrencyPriceTick) = 
-        tick.Prices 
-        |> List.tryFind(fun p -> p.Symbol = activeSymbol)
-        |> Option.map2(fun (m: ViewModels.TokenSale) p -> (p.PriceUsd * ccTokens) / m.TokenSaleState.PriceUsd ) model.TokenSale
-        |> Option.defaultValue 0m
+        PurchaseTokenPage.calcPrice activeSymbol tick (Option.map2(fun (m: ViewModels.TokenSale) p -> (p.PriceUsd * ccTokens) / m.TokenSaleState.PriceUsd ) model.TokenSale)
     
     let ccPrice activeSymbol tokens (tick: ViewModels.CurrencyPriceTick) = 
-        tick.Prices 
-        |> List.tryFind(fun p -> p.Symbol = activeSymbol)
-        |> Option.map2(fun (m: ViewModels.TokenSale) p -> (m.TokenSaleState.PriceUsd * tokens) / p.PriceUsd ) model.TokenSale
-        |> Option.defaultValue 0m
-
+        PurchaseTokenPage.calcPrice activeSymbol tick (Option.map2(fun (m: ViewModels.TokenSale) p -> (m.TokenSaleState.PriceUsd * tokens) / p.PriceUsd ) model.TokenSale)
+     
     match msg with
     | VerificationMsg    -> model, Cmd.none
     | PurchaseTokenMsg msg_  -> 
