@@ -44,44 +44,44 @@ module WalletPublic =
 
 module ViewModels = 
     type TokenSale = {
-        SaleToken: SaleToken
+        SaleToken   : SaleToken
 
-        SoftCapEth: decimal
-        HardCapEth: decimal
-        SoftCapUsd: decimal
-        HardCapUsd: decimal
+        SoftCapEth  : decimal
+        HardCapEth  : decimal
+        SoftCapUsd  : decimal
+        HardCapUsd  : decimal
         Expectations: decimal
-        StartDate: System.DateTime
-        EndDate: System.DateTime
+        StartDate   : DateTime
+        EndDate     : DateTime
         
         TokenSaleState: TokenSaleState
 
         TokenSaleStages: TokenSaleStage list
     }
     and SaleToken = {
-        Symbol: string
-        Name: string
-        LogoUrl: string
-        TotalSupply: decimal
+        Symbol      : string
+        Name        : string
+        LogoUrl     : string
+        TotalSupply : decimal
     }
     and TokenSaleState = {
-        TokenSaleStatus: TokenSaleStatus
-        ActiveStage: TokenSaleStage
-        PriceUsd: decimal
-        PriceEth: decimal
-        BonusPercent: decimal
-        BonusTokens: decimal
-        StartDate: System.DateTime
-        EndDate: System.DateTime
+        TokenSaleStatus : TokenSaleStatus
+        ActiveStage     : TokenSaleStage
+        PriceUsd        : decimal
+        PriceEth        : decimal
+        BonusPercent    : decimal
+        BonusTokens     : decimal
+        StartDate       : DateTime
+        EndDate         : DateTime
     }
     and TokenSaleStage = {
-        Id: int
-        Name: string
-        CapEth: decimal
-        CapUsd: decimal
-        StartDate: System.DateTime
-        EndDate: System.DateTime
-        Status: TokenSaleStageStatus
+        Id          : int
+        Name        : string
+        CapEth      : decimal
+        CapUsd      : decimal
+        StartDate   : DateTime
+        EndDate     : DateTime
+        Status      : TokenSaleStageStatus
     }
     and [<RequireQualifiedAccess>] TokenSaleStatus = 
         | NotStarted
@@ -99,14 +99,14 @@ module ViewModels =
         | Paused
 
     type Customer = {
-        Id: System.Guid
-        FirstName: string
-        LastName: string
-        EthAddress: string
-        Password: string
+        Id          : Guid
+        FirstName   : string
+        LastName    : string
+        EthAddress  : string
+        Password    : string
         PasswordSalt: string
-        Avatar: string
-        Email: string
+        Avatar      : string
+        Email       : string
     }
     type FullCustomer = {
         Customer            : Customer
@@ -122,24 +122,31 @@ module ViewModels =
         | Tier3
     and InvestmentHistory = InvestmentHistoryItem list
     and InvestmentHistoryItem = {
-        Date: DateTime
-        AmountTokens: decimal
-        PricePaidUsd: decimal
-        PricePaidEth: decimal
-        TokenSaleDeal: TokenSaleDeals.TokenSaleDeal
-        Status: InvestmentHistoryItemStatus
+        Date            : DateTime
+        AmountTokens    : decimal
+        PricePaidUsd    : decimal
+        PricePaidEth    : decimal
+        TokenSaleDeal   : TokenSaleDeals.TokenSaleDeal
+        Status          : InvestmentHistoryItemStatus
     }
     and InvestmentHistoryItemStatus =
         | Expected
         | Transferred
     and Referals = Referal list
     and Referal = {
-        DateRegistered: DateTime
-        FullName: string
-        Email: string
+        DateRegistered  : DateTime
+        FullName        : string
+        Email           : string
     } 
+    and CustomerVerificationEvent = {
+        Id          : Guid
+        CustomerId  : Guid
+        EventType   : string
+        CreatedOn   : DateTime
+        CreatedBy   : DateTime
+        Proof       : string
+    }
 
-   
     type CryptoCurrency = {
         Symbol    : CryptoCurrencySymbol
         Name      : string
@@ -147,11 +154,11 @@ module ViewModels =
     }
 
     type CryptoCurrencyPrice = {
-        Symbol: CryptoCurrencySymbol
-        CryptoCurrencyName: string
-        PriceUsd: decimal
-        PriceEth: decimal
-        PriceAt: System.DateTime
+        Symbol              : CryptoCurrencySymbol
+        CryptoCurrencyName  : string
+        PriceUsd            : decimal
+        PriceEth            : decimal
+        PriceAt             : DateTime
     }
 
     type CurrencyPriceTick = { Prices: CryptoCurrencyPrice list } 
