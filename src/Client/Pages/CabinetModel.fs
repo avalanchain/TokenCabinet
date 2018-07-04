@@ -20,6 +20,7 @@ and ServerMsg =
 and PurchaseTokenMsg = 
     | ActiveSymbolChanged of symbol: CryptoCurrencySymbol
     | CCAmountChanges     of decimal
+    | TAmountChanges     of decimal
 
 type Model = {
     Auth                   : AuthModel
@@ -30,5 +31,13 @@ type Model = {
 
     TokenSale              : ViewModels.TokenSale option
     FullCustomer           : ViewModels.FullCustomer option
-    BuyTokens              : decimal
+
+    PurchaseTokenModel     : PurchaseTokenModel
 }
+and PurchaseTokenModel = {
+    CCTokens               : decimal
+    BuyTokens              : decimal
+    // CCPrice                : decimal
+    TotalPrice             : decimal
+} 
+
