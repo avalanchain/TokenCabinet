@@ -573,5 +573,11 @@ button.dim .price {
 
 .timeline.shift .status h4 {
     left: inherit;
-    padding-right: 10px;
+    /* padding-right: 10px; */
+    padding-left: 10px;
+}
+
+.timeline.shift .timestamp {
+    left: inherit;
+    padding-left: 5px;
 }

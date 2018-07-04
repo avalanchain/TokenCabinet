@@ -116,7 +116,7 @@ let discount (m: PurchaseTokenModel) dispatch=
                li [ Class ("li " + (ttt per m.BuyTokens))]
                   [ div [ Class "timestamp" ]
                       [ span [ Class "author" ]
-                          [ str (tokens.ToString() + " $") ] ]
+                          [ str (tokens.ToString()) ] ]
                     div [ Class "status" ]
                       [ h4 [ ]
                           [ str (per.ToString() + " %") ] ] ]
