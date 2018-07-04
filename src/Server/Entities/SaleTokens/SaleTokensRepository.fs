@@ -25,3 +25,6 @@ module Database =
     use connection = new SqliteConnection(connectionString)
     execute connection "DELETE FROM SaleTokens WHERE Id=@Id" (dict ["id" => id])
 
+  let deleteAll connectionString : Task<Result<SaleToken   seq, exn>> =
+    use connection = new SqliteConnection(connectionString)
+    query connection "DELETE FROM SaleTokens" None

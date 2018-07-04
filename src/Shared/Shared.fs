@@ -111,9 +111,9 @@ module ViewModels =
     type FullCustomer = {
         Customer            : Customer
         IsVerified          : bool
-        VerificationEvent   : CustomerVerificationEvents.CustomerVerificationEvent option
+        VerificationEvent   : CustomerVerificationEvent option
         CustomerTier        : CustomerTier
-        CustomerPreference  : CustomerPreferences.CustomerPreference
+        CustomerPreference  : CustomerPreference
         Wallet              : WalletPublic.WalletPublicPart
     }
     and CustomerTier = 
@@ -126,7 +126,7 @@ module ViewModels =
         AmountTokens    : decimal
         PricePaidUsd    : decimal
         PricePaidEth    : decimal
-        TokenSaleDeal   : TokenSaleDeals.TokenSaleDeal
+        TokenSaleDeal   : TokenSaleDeal
         Status          : InvestmentHistoryItemStatus
     }
     and InvestmentHistoryItemStatus =
@@ -141,10 +141,20 @@ module ViewModels =
     and CustomerVerificationEvent = {
         Id          : Guid
         CustomerId  : Guid
-        EventType   : string
-        CreatedOn   : DateTime
-        CreatedBy   : DateTime
-        Proof       : string
+        EventType   : CustomerVerificationEventType
+    }
+    and CustomerVerificationEventType = | Verified
+    and CustomerPreference = {
+        CustomerId  : Guid
+        Language    : string
+    }
+    and TokenSaleDeal = {
+        Id          : int
+        SaleTokenId : string
+        PriceUsd    : decimal
+        PriceEth    : decimal
+        BonusPercent: decimal
+        BonusTokens : decimal
     }
 
     type CryptoCurrency = {

@@ -19,7 +19,6 @@ open Fable.Import
 open JsInterop
 
 open Fable.Core.JsInterop
-open CryptoCurrencyPrices
 
 open Client.Page
 open ClientMsgs

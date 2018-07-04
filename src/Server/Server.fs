@@ -65,6 +65,75 @@ let private isTokenValid authToken =
     let (AuthToken authToken) = authToken
     authToken |> AuthJwt.checkValid |> Option.isSome
 
+module Seed =
+    // let seed config deleteAll lst = task {
+    //     let cryptoCurrencies = getUnionCaseNames<CryptoCurrencySymbol> |> List.map (fun cc -> { CryptoCurrencySymbol.Id = cc; Name = cc; LogoUrl = ""; UpdateUrl = "" })
+    //     let! _ = CryptoCurrencies.Database.deleteAll config
+    //     for cc in cryptoCurrencies do
+    //         let! _ = CryptoCurrencies.Database.insert config cc
+    //         ()
+    // }
+
+    let seedT config deleteAll insert lst = task {
+        let! _ = deleteAll config
+        for l in lst do
+            let! _ = insert config l
+            ()
+    }
+
+    let saleTokenSeed config = [{   Symbol = "AIM"
+                                    Name = "AIM Network"
+                                    LogoUrl = "assets/AIMLogo.jpg"
+                                    TotalSupply = 100_000_000M }] 
+                                |> seedT config SaleTokens.Database.deleteAll SaleTokens.Database.insert 
+
+    let stageStatusesSeed config = [   {    Id = 1
+                                            Name = "Private Sale"
+                                            CapEth = 300M
+                                            CapUsd = 150_000M
+                                            StartDate = DateTime.Today
+                                            EndDate = DateTime.Today.AddMonths 1
+                                            Status = TokenSaleStageStatus.Completed }
+                                        {   Id = 2
+                                            Name = "Pre ICO"
+                                            CapEth = 1000M
+                                            CapUsd = 500_000M
+                                            StartDate = DateTime.Today.AddMonths 1
+                                            EndDate = DateTime.Today.AddMonths 2
+                                            Status = TokenSaleStageStatus.Active }
+
+                                        {   Id = 3
+                                            Name = "ICO"
+                                            CapEth = 30000M
+                                            CapUsd = 15_000_000M
+                                            StartDate = DateTime.Today.AddMonths 2
+                                            EndDate = DateTime.Today.AddMonths 3
+                                            Status = TokenSaleStageStatus.Expectation } ]
+                                    |> seedT config TokenSaleStageStatuses.Database.deleteAll TokenSaleStageStatuses.Database.insert  
+    let stagesSeed config = [   {   Id = 1
+                                    Name = "Private Sale"
+                                    CapEth = 300M
+                                    CapUsd = 150_000M
+                                    StartDate = DateTime.Today
+                                    EndDate = DateTime.Today.AddMonths 1
+                                    Status = TokenSaleStageStatus.Completed }
+                                {   Id = 2
+                                    Name = "Pre ICO"
+                                    CapEth = 1000M
+                                    CapUsd = 500_000M
+                                    StartDate = DateTime.Today.AddMonths 1
+                                    EndDate = DateTime.Today.AddMonths 2
+                                    Status = TokenSaleStageStatus.Active }
+
+                                {   Id = 3
+                                    Name = "ICO"
+                                    CapEth = 30000M
+                                    CapUsd = 15_000_000M
+                                    StartDate = DateTime.Today.AddMonths 2
+                                    EndDate = DateTime.Today.AddMonths 3
+                                    Status = TokenSaleStageStatus.Expectation } ]
+                            |> seedT config TokenSaleStages.Database.deleteAll TokenSaleStages.Database.insert                             
+
 let getCryptoCurrencies config () = task { 
     printfn "getCryptoCurrencies() called"
     let! res = CryptoCurrencies.Database.getAll(config.connectionString) 
@@ -76,37 +145,49 @@ let getCryptoCurrencies config () = task {
                             exn |> InternalError |> Error
 }
 
+let getAllFromDb<'T,'U> config (getAll: string -> Task<Result<seq<'T>, exn>>) (f: 'T -> 'U) : Task<Result<'U list, ServerError>> = task {
+    printfn "get%s() called" typeof<'T>.Name
+    let! res = getAll(config.connectionString) 
+    return match res with
+            | Ok o -> o |> Seq.map f |> List.ofSeq |> Ok
+            | Error exn ->  printfn "Data access exception: '%A'" exn
+                            exn |> InternalError |> Error
+}
+
+let getSaleToken config = task {
+    let! st = getAllFromDb config SaleTokens.Database.getAll (fun t -> {    Symbol     = t.Id
+                                                                            Name       = t.Name
+                                                                            LogoUrl    = t.LogoUrl
+                                                                            TotalSupply = t.TotalSupply })
+    return st |> Result.map Seq.head } // SaleToken should be 1 record always
+
+let getTokenSaleStages config = task {  
+    let processStage (stage: TokenSaleStages.TokenSaleStage) = task {
+        let! statusRes = TokenSaleStageStatuses.Database.getByStageId config.connectionString stage.Id
+        let status = match statusRes with 
+                        | Ok (Some status) -> status.Status
+                        | Ok None -> failwithf "Incorrect Database setup for TokenSaleStage %d Status table" stage.Id
+                        | Error exn -> raise exn
+        return {TokenSaleStage.Id        = stage.Id
+                TokenSaleStage.Name      = stage.Name
+                TokenSaleStage.CapEth    = stage.CapEth
+                TokenSaleStage.CapUsd    = stage.CapUsd
+                TokenSaleStage.StartDate = stage.StartDate
+                TokenSaleStage.EndDate   = stage.EndDate
+                TokenSaleStage.Status    = match getUnionCaseFromString status with 
+                                            | Some s -> s 
+                                            | None -> failwithf "Unsupported status %s for TokenSaleStage %d" status stage.Id }
+    }
+
+    return! getAllFromDb config TokenSaleStages.Database.getAll processStage
+}
+
+
 let getTokenSale config () = task { 
     printfn "getTokenSale() called"
 
-    let saleToken: SaleToken = {    Symbol = "AIM"
-                                    Name = "AIM Network"
-                                    LogoUrl = "assets/AIMLogo.jpg"
-                                    TotalSupply = 100_000_000M }
+    let saleToken = getSaleToken config
 
-    let privateSaleStage: TokenSaleStage = {Id = 1
-                                            Name = "Private Sale"
-                                            CapEth = 300M
-                                            CapUsd = 150_000M
-                                            StartDate = System.DateTime.Today
-                                            EndDate = System.DateTime.Today.AddMonths 1
-                                            Status = TokenSaleStageStatus.Completed }
-
-    let preICOStage: TokenSaleStage =   {   Id = 2
-                                            Name = "Pre ICO"
-                                            CapEth = 1000M
-                                            CapUsd = 500_000M
-                                            StartDate = System.DateTime.Today.AddMonths 1
-                                            EndDate = System.DateTime.Today.AddMonths 2
-                                            Status = TokenSaleStageStatus.Active }
-
-    let ICOStage: TokenSaleStage =      {   Id = 3
-                                            Name = "ICO"
-                                            CapEth = 30000M
-                                            CapUsd = 15_000_000M
-                                            StartDate = System.DateTime.Today.AddMonths 2
-                                            EndDate = System.DateTime.Today.AddMonths 3
-                                            Status = TokenSaleStageStatus.Expectation }
 
     let tokenSaleState: TokenSaleState = {  TokenSaleStatus = TokenSaleStatus.Active
                                             ActiveStage = preICOStage
@@ -123,8 +204,8 @@ let getTokenSale config () = task {
                                             SoftCapUsd  = 10_000_000M
                                             HardCapUsd  = 50_000_000M
                                             Expectations = 50_000_000M
-                                            StartDate   = System.DateTime.Today
-                                            EndDate     = System.DateTime.Today.AddMonths 3
+                                            StartDate   = DateTime.Today
+                                            EndDate     = DateTime.Today.AddMonths 3
                                             
                                             TokenSaleState = tokenSaleState
 
@@ -152,9 +233,9 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
                     Email = "trader@cryptoinvestor.com"
                 }
 
-            let customerPreference: CustomerPreferences.CustomerPreference = 
-                {   Id = customer.Id
-                    Language = CustomerPreferences.Validation.supportedLangs.[0] }
+            let customerPreference: CustomerPreference = 
+                {   CustomerId = customer.Id
+                    Language   = CustomerPreferences.Validation.supportedLangs.[0] }
 
             let fullCustomer =
                 {   Customer = customer
@@ -179,37 +260,37 @@ module PriceUpdater =
                                 CryptoCurrencyName = "Bitcoin"
                                 PriceUsd = prices.Btc.Usd |> decimal
                                 PriceEth = prices.Btc.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                             {   Symbol = ETH
                                 CryptoCurrencyName = "Ethereum"
                                 PriceUsd = prices.Eth.Usd |> decimal
                                 PriceEth = prices.Eth.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                             {   Symbol = LTC
                                 CryptoCurrencyName = "Litecoin"
                                 PriceUsd = prices.Ltc.Usd |> decimal
                                 PriceEth = prices.Ltc.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                             {   Symbol = BCH
                                 CryptoCurrencyName = "Bitcoin Cash"
                                 PriceUsd = prices.Bch.Usd |> decimal
                                 PriceEth = prices.Bch.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                             {   Symbol = BTG
                                 CryptoCurrencyName = "Bitcoin Gold"
                                 PriceUsd = prices.Btg.Usd |> decimal
                                 PriceEth = prices.Btg.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                             {   Symbol = ETC
                                 CryptoCurrencyName = "Ethereum Classic"
                                 PriceUsd = prices.Etc.Usd |> decimal
                                 PriceEth = prices.Etc.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                             {   Symbol = DASH
                                 CryptoCurrencyName = "Dash"
                                 PriceUsd = prices.Dash.Usd |> decimal
                                 PriceEth = prices.Dash.Eth |> decimal
-                                PriceAt = System.DateTime.Now }
+                                PriceAt = DateTime.Now }
                         ] }
     }
 
