@@ -9,7 +9,6 @@ open Fable.DateFunctions
 open System
 open Fable.Import.React
 open Fable.Core.JsInterop
-open ReactBootstrap
 
 
 module Option = 

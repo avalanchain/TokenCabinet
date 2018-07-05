@@ -44,7 +44,7 @@ let init authToken =
         PurchaseTokenModel      = { CCTokens = 10m
                                     BuyTokens = 0m
                                     TotalPrice = 0m
-                                    // CCPrice = 0m 
+                                    CCAddress = "" 
                                     }
     }
 
@@ -87,12 +87,20 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
     
     let ccPrice activeSymbol tokens (tick: ViewModels.CurrencyPriceTick) = 
         PurchaseTokenPage.calcPrice activeSymbol tick (Option.map2(fun (m: ViewModels.TokenSale) p -> (m.TokenSaleState.PriceUsd * tokens) / p.PriceUsd ) model.TokenSale)
-     
+
+    let changeCurrentAddress (fc:ViewModels.FullCustomer) model = ( (fc.Wallet.ForSymbol model.ActiveSymbol).Address.Value )
+
+    let changeCurrentAddressOption (fc: ViewModels.FullCustomer option) model = 
+            match fc with 
+            | Some t -> changeCurrentAddress t model
+            | None -> ""
+
     match msg with
     | VerificationMsg    -> model, Cmd.none
     | PurchaseTokenMsg msg_  -> 
         match msg_ with 
-        | ActiveSymbolChanged symbol    -> { model with ActiveSymbol = symbol }, model.PurchaseTokenModel.BuyTokens |> TAmountChanges |> PurchaseTokenMsg |> Cmd.ofMsg
+        | ActiveSymbolChanged symbol    -> { model with ActiveSymbol = symbol 
+                                                        PurchaseTokenModel = { model.PurchaseTokenModel with CCAddress = changeCurrentAddressOption model.FullCustomer model } }, model.PurchaseTokenModel.BuyTokens |> TAmountChanges |> PurchaseTokenMsg |> Cmd.ofMsg
         | CCAmountChanges ccTokens      -> 
             { model with PurchaseTokenModel = 
                                                         { model.PurchaseTokenModel with CCTokens = ccTokens 
@@ -111,7 +119,8 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
         match msg_ with
         | GetCryptoCurrenciesCompleted cc   -> { model with CryptoCurrencies = cc } , Cmd.none
         | GetTokenSaleCompleted tc          -> { model with TokenSale = Some (tc) } , Cmd.none
-        | GetFullCustomerCompleted fc       -> { model with FullCustomer = Some (fc) } , Cmd.none
+        | GetFullCustomerCompleted fc       -> { model with FullCustomer = Some (fc)  
+                                                            PurchaseTokenModel = { model.PurchaseTokenModel with CCAddress = changeCurrentAddress fc model } }, Cmd.none
         | PriceTick tick                    -> { model with CurrenciesCurentPrices = tick
                                                             PurchaseTokenModel = 
                                                             { model.PurchaseTokenModel with TotalPrice = ccTotalPrice model.ActiveSymbol model.PurchaseTokenModel.CCTokens tick } }, Cmd.none

@@ -18,9 +18,10 @@ open Client.CabinetModel
 open Helpers
 open ReactBootstrap
 open FormHelpers
+open Shared.WalletPublic
 
 // let buttonToolbar = ReactBootstrap.buttonToolbar
-
+importAll "../../../node_modules/qrcode.react/lib/index.js"
 let calcPrice activeSymbol (tick: ViewModels.CurrencyPriceTick) f =
     tick.Prices 
     |> List.tryFind(fun p -> p.Symbol = activeSymbol)
@@ -57,7 +58,6 @@ let bodySomeNone (model: Model) body dispatch =
     | Some m ->  body m dispatch
     | None   ->  str "No model loaded" 
 
-
 let bodySomeNoneTwoModels (model: Model) body dispatch =
     match model.TokenSale with
     | Some m ->  body m model.PurchaseTokenModel dispatch
@@ -74,7 +74,7 @@ let symbolLogo = function
 
 let cur symbol image price isActive dispatch =
                     span [ ]//Class "col-md-1"
-                        [ comF button (fun o -> o.bsClass <- "btn btn-default dim btn-large-dim btn-outline " + (if isActive then "active" else "") |> Some 
+                        [ comF button (fun o -> o.bsClass <- "crypto btn btn-default dim btn-large-dim btn-outline " + (if isActive then "active" else "") |> Some 
                                                 o.onClick <- React.MouseEventHandler(fun _ -> symbol |> ActiveSymbolChanged |> PurchaseTokenMsg |> dispatch) |> Some)
                                       [ div [ Class "name" ]
                                             [str (symbol.ToString())]
@@ -121,27 +121,38 @@ let discount (m: PurchaseTokenModel) dispatch=
                       [ h4 [ ]
                           [ str (per.ToString() + " %") ] ] ]
            ]
-let currencies (model: Model) dispatch =  div [ Class "row seven-cols"] 
-                                              (bodyC model dispatch) 
+// [<Pojo>]
+// type QrCodeProps =
+//   { 
+//       value : string
+//   }
+
+// let qrCodeProps:QrCodeProps = {
+//     value = "avalanchain.com"
+// }
+
+// let getAddress account activeSymbol = 
+//     if(account=activeSymbol)
+            
+let qrCode address = ofImport "default" "qrcode.react" (createObj [ "value" ==> address 
+                                                                    "size" ==> 100 ]) []
                                     
 let selectedCurrency (model: Model) dispatch = 
-                                    div [] 
-                                        [
-                                           h2 []
-                                              [
-                                                  str "Current:"
-                                              ] 
-                                           h3 []
-                                              [
-                                                  str (model.ActiveSymbol.ToString()) 
-                                              ]
-                                        ]
+        div [] 
+            [
+               h2 []
+                  [ str ("Current " + model.ActiveSymbol.ToString() + " Address:") ] 
+               p []
+                  [ str ( model.PurchaseTokenModel.CCAddress) ]
+            ]
+            // bodyUserSomeNone
 let currenciesGroup (model: Model) dispatch = 
-        Ibox.emptyRow [ div [ Class "col-md-9" ] 
+        Ibox.emptyRow [ div [ Class "col-md-8" ] 
                             (bodyC model dispatch)
-                        div [ Class "col-md-3" ] 
-                           [ selectedCurrency model dispatch]  
-                           ]
+                        div [ Class "col-md-4" ] 
+                           [ selectedCurrency model dispatch
+                             qrCode model.PurchaseTokenModel.CCAddress]  
+                            ]
 
 let bodyCounter m (model:PurchaseTokenModel) dispatch = 
     dl [ Class "dl-horizontal" ]
@@ -198,17 +209,58 @@ let counter (m: Model) dispatch = div [ Class ("col-md-6") ]
                                       [ bodySomeNoneTwoModels m bodyCounter dispatch ]
 
 
+let tokenSale (m:ViewModels.TokenSale) dispatch = 
+    div [Class "col-md-4 col-md-offset-1"]
+        [
+         ul [ Class "stat-list" ]
+            [ li [ ]
+                [ h2 [ Class "no-margins " ]
+                    [ str ("5431.34567 ETH" + string m.TokenSaleState.BonusTokens) ]
+                  small [ ]
+                    [ str "Total income" ]
+                  div [ Class "stat-percent" ]
+                    [ str "52%"
+                      i [ Class "fa fa-bolt text-navy" ]
+                        [ ] ]
+                  div [ Class "progress progress-mini" ]
+                    [ div [ 
+                        // HTMLAttr.Custom ("style", "width: 52%;")
+                            Class "progress-bar-success" ]
+                        [ ] ] ]
+              li [ ]
+                [ h2 [ Class "no-margins" ]
+                    [ str "16" ]
+                  small [ ]
+                    [ str "Total days left" ]
+                  div [ Class "progress progress-mini" ]
+                    [ div [ 
+                        // HTMLAttr.Custom ("style", "width: 48%;")
+                            Class "progress-bar" ]
+                        [ ] ] ]
+              li [ ]
+                [ h2 [ Class "no-margins " ]
+                    [ str "20" ]
+                  small [ ]
+                    [ str "Participants in lst week" ]
+                  div [ Class "progress progress-mini" ]
+                    [ div [ 
+                        // HTMLAttr.Custom ("style", "width: 60%;")
+                            Class "progress-bar-success" ]
+                        [ ] ] ] ]
+
+        ]
 // let volumes m = div [ Class ("col-md-9") ]
 //                                  [ div [] [ str "sds" ] ]
 
-let counterRow (m: Model) dispatch = Ibox.emptyRow [ counter m dispatch ]   
+
+let counterRow (m: Model) dispatch = Ibox.emptyRow [ counter m dispatch 
+                                                     bodySomeNone m tokenSale dispatch]   
 
 let invest m dispatch = Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
                                                    div [ Class "hr-line-dashed" ] [ ]
                                                    counterRow m (PurchaseTokenMsg >> dispatch)
                                                    div [ Class "hr-line-dashed" ] [ ]
                                                    discount m.PurchaseTokenModel dispatch])
-
 
 let compares = Ibox.btCol "AIM" "3" [
                     comE table [
@@ -228,7 +280,7 @@ let compares = Ibox.btCol "AIM" "3" [
                                         [ str "ETH" ]
                                       td [ Class "text-right" ]
                                         [ span [ Class "text-info font-bold" ]
-                                            [ str "1125.00 " ]
+                                            [ str "185.00 " ]
                                           img [ Alt "image"
                                                 Class "w25"
                                                 Src "../lib/img/logo.png" ] ] ]
@@ -240,7 +292,7 @@ let compares = Ibox.btCol "AIM" "3" [
                                         [ str "BTC" ]
                                       td [ Class "text-right" ]
                                         [ span [ Class "text-info font-bold" ]
-                                            [ str "11532.00 " ]
+                                            [ str "1532.00 " ]
                                           img [ Alt "image"
                                                 Class "w25"
                                                 Src "../lib/img/logo.png" ] ] ]
@@ -268,5 +320,5 @@ let secondRow m dispatch = Ibox.emptyRow [ invest m dispatch
 let view (model: Model) dispatch =
     div [  ]
         [ firstRow model dispatch
-          secondRow model dispatch ]
+          secondRow model dispatch]
 

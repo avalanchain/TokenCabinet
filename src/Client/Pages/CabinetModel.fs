@@ -2,6 +2,7 @@ module Client.CabinetModel
 
 open Shared
 open LoginCommon
+open Shared.WalletPublic
 
 
 type Msg =
@@ -37,7 +38,7 @@ type Model = {
 and PurchaseTokenModel = {
     CCTokens               : decimal
     BuyTokens              : decimal
-    // CCPrice                : decimal
+    CCAddress              : string
     TotalPrice             : decimal
 } 
 

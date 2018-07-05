@@ -10,6 +10,7 @@ type CryptoCurrencySymbol = ETH | ETC | BTC | LTC | BCH | BTG | DASH
 module WalletPublic =
 
     type CCAddress = CCAddress of string
+        with member __.Value = match __ with CCAddress addr -> addr 
     type CCPubKey  = CCPubKey  of string
     type CCPrivKey = CCPrivKey of string
 
