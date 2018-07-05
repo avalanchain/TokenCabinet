@@ -215,9 +215,9 @@ let tokenSale (m:ViewModels.TokenSale) dispatch =
          ul [ Class "stat-list" ]
             [ li [ ]
                 [ h2 [ Class "no-margins " ]
-                    [ str ("5431.34567 ETH" + string m.TokenSaleState.BonusTokens) ]
+                    [ str (m.SoftCapEth.ToString() + " ETH" ) ]
                   small [ ]
-                    [ str "Total income" ]
+                    [ str "SoftCap" ]
                   div [ Class "stat-percent" ]
                     [ str "52%"
                       i [ Class "fa fa-bolt text-navy" ]
@@ -229,9 +229,9 @@ let tokenSale (m:ViewModels.TokenSale) dispatch =
                         [ ] ] ]
               li [ ]
                 [ h2 [ Class "no-margins" ]
-                    [ str "16" ]
+                    [ str (m.HardCapEth.ToString() + " ETH" ) ]
                   small [ ]
-                    [ str "Total days left" ]
+                    [ str "HardCap" ]
                   div [ Class "progress progress-mini" ]
                     [ div [ 
                         // HTMLAttr.Custom ("style", "width: 48%;")
@@ -239,9 +239,9 @@ let tokenSale (m:ViewModels.TokenSale) dispatch =
                         [ ] ] ]
               li [ ]
                 [ h2 [ Class "no-margins " ]
-                    [ str "20" ]
+                    [ str (m.Expectations.ToString() + " ETH" ) ]
                   small [ ]
-                    [ str "Participants in lst week" ]
+                    [ str "Expectations" ]
                   div [ Class "progress progress-mini" ]
                     [ div [ 
                         // HTMLAttr.Custom ("style", "width: 60%;")
