@@ -184,6 +184,37 @@ module Seed =
                     // StartDate           = tokenSaleStages.[0].StartDate
                     // EndDate             = (tokenSaleStages |> Array.last).EndDate 
 
+    let customerPreferencesSeed connectionString =
+        let lst: CustomerPreferences.CustomerPreference list = 
+            [   {   Id          = Guid.NewGuid()
+                    Language    = CustomerPreferences.Validation.supportedLangs.[0] } ]
+        lst |> seedT connectionString CustomerPreferences.Database.deleteAll CustomerPreferences.Database.insert       
+
+
+    let customerSeed connectionString =
+        let lst: Customers.Customer list = 
+            [   {   Id = System.Guid.NewGuid()
+                    Email = "trader@cryptoinvestor.com"
+                    FirstName = "John"
+                    LastName = "Smith"
+                    EthAddress = "0x001002003004005006007008009"
+                    Password = "!!!ChangeMe!!!"
+                    PasswordSalt = "!!PwdSalt!!"
+                    Avatar = "MyPicture"
+                } ]
+        lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert        
+
+    // let fullCustomerSeed connectionString =
+    //     let lst: Customers.Customer list  = 
+    //         [   {   Customer = customer
+    //                 IsVerified = false
+    //                 VerificationEvent = None
+    //                 CustomerPreference = customerPreference
+    //                 CustomerTier = Tier1
+    //                 Wallet = (createCustomerWallet customer.Id).PublicPart TestEnv
+    //             } ]
+    //     lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert    
+
     let seedAll connectionString = task {
         do! saleTokenSeed connectionString
         printfn "Seeding ..."
@@ -193,6 +224,9 @@ module Seed =
         let endDate   = DateTime.Today.AddMonths 3
         do! tokenSaleStatusSeed connectionString startDate endDate
         do! tokenSaleSeed connectionString startDate endDate
+
+        do! customerPreferencesSeed connectionString
+        do! customerSeed connectionString
     }
 
 let getCryptoCurrencies config () = task { 
@@ -307,28 +341,40 @@ let getTokenSale config () = task {
     return tokenSale 
 }                                
 
+let getCustomerPreferences config = task {
+    let processStatus (prefs: CustomerPreferences.CustomerPreference) = 
+        {   CustomerId = prefs.Id
+            Language   = prefs.Language }
+    let! st = getAllFromDb config CustomerPreferences.Database.getAll processStatus
+    return st |> Result.map Seq.head 
+} // SaleToken should be 1 record always
 
+let getCustomer config = task {
+    let processStatus (customer: Customers.Customer) = 
+        {   Id          = customer.Id
+            Email       = customer.Email
+            FirstName   = customer.FirstName
+            LastName    = customer.LastName
+            EthAddress  = customer.EthAddress
+            Password    = customer.Password
+            PasswordSalt = customer.PasswordSalt
+            Avatar      = customer.Avatar
+        }
+    let! st = getAllFromDb config Customers.Database.getAll processStatus
+    return st |> Result.map Seq.head 
+} // SaleToken should be 1 record always
 let  getFullCustomer config (request: SecureVoidRequest) = task { 
     printfn "getFullCustomer() called"
 
-    return 
-        if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error
-        elif request.Token |> checkUserExists |> not then UserDoesNotHaveAccess |> AuthError |> Error
-        else 
-            let customer: Customer = 
-                {   Id = System.Guid.NewGuid()
-                    FirstName = "John"
-                    LastName = "Smith"
-                    EthAddress = "0x001002003004005006007008009"
-                    Password = "!!!ChangeMe!!!"
-                    PasswordSalt = "!!PwdSalt!!"
-                    Avatar = "MyPicture"
-                    Email = "trader@cryptoinvestor.com"
-                }
+    return! 
+        if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error |> Task.FromResult
+        elif request.Token |> checkUserExists |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
+        else task {
+            let! customerPreferenceRes = getCustomerPreferences config
+            let customerPreference = customerPreferenceRes |> unwrapResult
 
-            let customerPreference: ViewModels.CustomerPreference = 
-                {   CustomerId = customer.Id
-                    Language   = CustomerPreferences.Validation.supportedLangs.[0] }
+            let! customerRes = getCustomer config
+            let customer = customerRes |> unwrapResult
 
             let fullCustomer =
                 {   Customer = customer
@@ -338,7 +384,8 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
                     CustomerTier = Tier1
                     Wallet = (createCustomerWallet customer.Id).PublicPart TestEnv
                 }
-            fullCustomer |> Ok
+            return fullCustomer |> Ok
+        }
 }   
 
 module PriceUpdater = 

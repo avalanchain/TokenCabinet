@@ -3,6 +3,7 @@ namespace Customers
 [<CLIMutable>]
 type Customer = {
   Id: System.Guid
+  Email: string
   FirstName: string
   LastName: string
   EthAddress: string
