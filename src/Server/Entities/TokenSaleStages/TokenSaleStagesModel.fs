@@ -10,7 +10,7 @@ type TokenSaleStage = {
   StartDate   : System.DateTime
   EndDate     : System.DateTime
   CreatedOn   : System.DateTime
-  CreatedBy   : System.DateTime
+  CreatedBy   : string
   Proof       : string
 }
 

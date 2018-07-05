@@ -25,6 +25,6 @@ module Database =
     use connection = new SqliteConnection(connectionString)
     execute connection "DELETE FROM CryptoCurrencies WHERE Id=@Id" (dict ["id" => id])
 
-  let deleteAll connectionString : Task<Result<CryptoCurrency seq, exn>> =
+  let deleteAll connectionString : Task<Result<int, exn>> =
     use connection = new SqliteConnection(connectionString)
-    query connection "DELETE FROM CryptoCurrencies" None
+    execute connection "DELETE FROM CryptoCurrencies" None

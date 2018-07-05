@@ -1,25 +1,26 @@
 namespace TokenSales
+open System
 
 [<CLIMutable>]
 type TokenSale = {
   Id: int
-  SaleTokenId: string
-  SoftCapEth: decimal
-  HardCapEth: decimal
-  SoftCapUsd: decimal
-  HardCapUsd: decimal
+  Symbol      : string
+  SoftCapEth  : decimal
+  HardCapEth  : decimal
+  SoftCapUsd  : decimal
+  HardCapUsd  : decimal
   Expectations: decimal
-  StartDate: System.DateTime
-  EndDate: System.DateTime
-  CreatedOn: System.DateTime
-  CreatedBy: System.DateTime
-  Proof: string
+  StartDate   : DateTime
+  EndDate     : DateTime
+  CreatedOn   : DateTime
+  CreatedBy   : string
+  Proof       : string
 }
 
 module Validation =
   let validate v =
     let validators = [
-      fun u -> if isNull u.SaleTokenId then Some ("SaleTokenId", "'Sale Token Id' shouldn't be empty") else None
+      fun u -> if isNull u.Symbol then Some ("Symbol", "'Symbol' shouldn't be empty") else None
     ]
 
     validators

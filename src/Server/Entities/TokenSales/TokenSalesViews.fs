@@ -32,7 +32,7 @@ module Views =
             for o in objs do
               yield tr [] [
                 td [] [rawText (string o.Id)]
-                td [] [rawText (string o.SaleTokenId)]
+                td [] [rawText (string o.Symbol)]
                 td [] [rawText (string o.SoftCapEth)]
                 td [] [rawText (string o.HardCapEth)]
                 td [] [rawText (string o.SoftCapUsd)]
@@ -65,7 +65,7 @@ module Views =
 
         ul [] [
           li [] [ strong [] [rawText "Id: "]; rawText (string o.Id) ]
-          li [] [ strong [] [rawText "SaleTokenId: "]; rawText (string o.SaleTokenId) ]
+          li [] [ strong [] [rawText "Symbol: "]; rawText (string o.Symbol) ]
           li [] [ strong [] [rawText "SoftCapEth: "]; rawText (string o.SoftCapEth) ]
           li [] [ strong [] [rawText "HardCapEth: "]; rawText (string o.HardCapEth) ]
           li [] [ strong [] [rawText "SoftCapUsd: "]; rawText (string o.SoftCapUsd) ]
@@ -120,7 +120,7 @@ module Views =
           if not validationResult.IsEmpty then
             yield validationMessage
           yield field (fun i -> (string i.Id)) "Id" "Id" 
-          yield field (fun i -> (string i.SaleTokenId)) "SaleTokenId" "SaleTokenId" 
+          yield field (fun i -> (string i.Symbol)) "Symbol" "Symbol" 
           yield field (fun i -> (string i.SoftCapEth)) "SoftCapEth" "SoftCapEth" 
           yield field (fun i -> (string i.HardCapEth)) "HardCapEth" "HardCapEth" 
           yield field (fun i -> (string i.SoftCapUsd)) "SoftCapUsd" "SoftCapUsd" 
