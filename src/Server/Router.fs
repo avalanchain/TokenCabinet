@@ -43,6 +43,8 @@ let browserRouter = scope {
     forward "/investmenttranstatusids" InvestmentTranStatusIds.Controller.resource
     forward "/investments" Investments.Controller.resource
     forward "/tokensalestatusids" TokenSaleStatusIds.Controller.resource
+
+    forward "/wallets" Wallets.Controller.resource
 }
 
 //Other scopes may use different pipelines and error handlers

@@ -37,7 +37,6 @@ module Utils =
 
     let [<PassGenerics>] getUnionCases<'t> = 
         FSharpType.GetUnionCases typeof<'t>
-        |> Seq.filter(fun c -> c.Name <> "Book")
         |> List.ofSeq
 
     let [<PassGenerics>] allUnionCases<'T> =

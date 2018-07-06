@@ -22,6 +22,8 @@
     <Compile Include="201806101836.Investment.fs" />
     <Compile Include="201806101841.TokenSaleStatusId.fs" />
     <Compile Include="201806101923.TokenSaleStageStatusId.fs" />
+    <Compile Include="201807061726.WalletItem.fs" />
+    <Compile Include="201807061841.WalletKV.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

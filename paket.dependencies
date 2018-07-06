@@ -12,6 +12,8 @@ group Server
 
     nuget FSharp.Data = 3.0.0-beta3
     nuget jose-jwt
+    nuget TypeShape
+    nuget FParsec
 
     nuget Nethereum.Hex
     nuget Nethereum.Web3

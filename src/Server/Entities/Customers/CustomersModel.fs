@@ -10,6 +10,7 @@ type Customer = {
   Password    : string
   PasswordSalt: string
   Avatar      : string
+  CustomerTier: string
 }
 
 module Validation =

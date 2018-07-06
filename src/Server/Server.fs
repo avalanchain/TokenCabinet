@@ -22,6 +22,8 @@ open Microsoft.AspNetCore.Http
 open NBitcoin.Protocol
 open Dapper
 
+open TypeShape.Tools
+
 let publicPath = Path.GetFullPath "../Client/public"
 
 let port = 8085us
@@ -194,14 +196,15 @@ module Seed =
 
     let customerSeed connectionString =
         let lst: Customers.Customer list = 
-            [   {   Id = System.Guid.NewGuid().ToString("N")
-                    Email = "trader@cryptoinvestor.com"
-                    FirstName = "John"
-                    LastName = "Smith"
-                    EthAddress = "0x001002003004005006007008009"
-                    Password = "!!!ChangeMe!!!"
-                    PasswordSalt = "!!PwdSalt!!"
-                    Avatar = "MyPicture"
+            [   {   Id              = System.Guid.NewGuid().ToString("N")
+                    Email           = "trader@cryptoinvestor.com"
+                    FirstName       = "John"
+                    LastName        = "Smith"
+                    EthAddress      = "0x001002003004005006007008009"
+                    Password        = "!!!ChangeMe!!!"
+                    PasswordSalt    = "!!PwdSalt!!"
+                    Avatar          = "MyPicture"
+                    CustomerTier    = Tier1.ToString()
                 } ]
         lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert        
 
@@ -216,6 +219,11 @@ module Seed =
     //             } ]
     //     lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert    
 
+    let walletsSeed connectionString = task {
+        let! _ = WalletsKV.Database.deleteAll connectionString
+        ()
+    }
+
     let seedAll connectionString = task {
         do! saleTokenSeed connectionString
         printfn "Seeding ..."
@@ -228,6 +236,8 @@ module Seed =
 
         do! customerPreferencesSeed connectionString
         do! customerSeed connectionString
+
+        do! walletsSeed connectionString
     }
 
 let getCryptoCurrencies config () = task { 
@@ -243,7 +253,7 @@ let getCryptoCurrencies config () = task {
 
 let getAllFromDb<'T,'U> config (getAll: string -> Task<Result<seq<'T>, exn>>) (f: 'T -> 'U) : Task<Result<'U list, ServerError>> = task {
     printfn "get%s() called" typeof<'T>.Name
-    let! res = getAll(config.connectionString) 
+    let! res = getAll config.connectionString 
     return match res with
             | Ok o -> o |> Seq.map f |> List.ofSeq |> Ok
             | Error exn ->  printfn "Data access exception: '%A'" exn
@@ -360,10 +370,25 @@ let getCustomer config = task {
             Password    = customer.Password
             PasswordSalt = customer.PasswordSalt
             Avatar      = customer.Avatar
-        }
+        }, customer
     let! st = getAllFromDb config Customers.Database.getAll processStatus
     return st |> Result.map Seq.head 
-} // SaleToken should be 1 record always
+} 
+
+let getWallet config (customerId: Guid) = task {
+    let! walletRes = WalletsKV.Database.getById config.connectionString (customerId.ToString("N"))
+    let walletOpt = walletRes |> unwrapResult
+    return! match walletOpt with
+            | Some wallet -> wallet.Wallet |> Json.fromJson |> Task.FromResult
+            | None -> task {
+                    let wallet = createCustomerWallet customerId
+                    let walletKV: WalletsKV.WalletKV = {CustomerId  = customerId.ToString("N")
+                                                        Wallet      = Json.toJson wallet } 
+                    let! _ = walletKV |> WalletsKV.Database.insert config.connectionString
+                    return wallet 
+                }
+}
+
 let  getFullCustomer config (request: SecureVoidRequest) = task { 
     printfn "getFullCustomer() called"
 
@@ -375,15 +400,18 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
             let customerPreference = customerPreferenceRes |> unwrapResult
 
             let! customerRes = getCustomer config
-            let customer = customerRes |> unwrapResult
+            let customer, customerDTO = customerRes |> unwrapResult
+
+            let! wallet = getWallet config customer.Id
 
             let fullCustomer =
                 {   Customer = customer
                     IsVerified = false
                     VerificationEvent = None
                     CustomerPreference = customerPreference
-                    CustomerTier = Tier1
-                    Wallet = (createCustomerWallet customer.Id).PublicPart TestEnv
+                    CustomerTier =  if customerDTO.CustomerTier |> System.String.IsNullOrWhiteSpace then Unassigned
+                                    else (getUnionCaseFromString<CustomerTier> customerDTO.CustomerTier).Value
+                    Wallet = wallet.PublicPart TestEnv
                 }
             return fullCustomer |> Ok
         }

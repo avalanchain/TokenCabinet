@@ -4,9 +4,14 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="Libs\TypeShape.Tools\TypeShape.Tools.fsproj">
+      <Name>TypeShape.Tools.fsproj</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="ServerFableMocks.fs" />
     <Compile Include="Database.fs" />
-    <Compile Include="Config.fs" />
+    <Compile Include="Config.fs" />    
     <Compile Include="Templates/App.fs" />
     <Compile Include="Templates/Index.fs" />
     <Compile Include="Templates/NotFound.fs" />
@@ -94,6 +99,14 @@
     <Compile Include="Entities/Investments/InvestmentsViews.fs" />
     <Compile Include="Entities/Investments/InvestmentsRepository.fs" />
     <Compile Include="Entities/Investments/InvestmentsController.fs" />
+    <Compile Include="Entities/Wallets/WalletsModel.fs" />
+    <Compile Include="Entities/Wallets/WalletsViews.fs" />
+    <Compile Include="Entities/Wallets/WalletsRepository.fs" />
+    <Compile Include="Entities/Wallets/WalletsController.fs" />
+    <Compile Include="Entities/WalletsKV/WalletsKVModel.fs" />
+    <Compile Include="Entities/WalletsKV/WalletsKVViews.fs" />
+    <Compile Include="Entities/WalletsKV/WalletsKVRepository.fs" />
+    <Compile Include="Entities/WalletsKV/WalletsKVController.fs" />
     <Compile Include="Router.fs" />
 
     <Compile Include="Customer/Wallet.fs" />

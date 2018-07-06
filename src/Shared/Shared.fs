@@ -117,7 +117,8 @@ module ViewModels =
         CustomerPreference  : CustomerPreference
         Wallet              : WalletPublic.WalletPublicPart
     }
-    and CustomerTier = 
+    and CustomerTier =
+        | Unassigned 
         | Tier1
         | Tier2
         | Tier3
