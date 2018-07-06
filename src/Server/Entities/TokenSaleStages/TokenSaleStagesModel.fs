@@ -2,15 +2,16 @@ namespace TokenSaleStages
 
 [<CLIMutable>]
 type TokenSaleStage = {
-  Id: int
-  TokenSaleId: int
-  CapEth: decimal
-  CapUsd: decimal
-  StartDate: System.DateTime
-  EndDate: System.DateTime
-  CreatedOn: System.DateTime
-  CreatedBy: System.DateTime
-  Proof: string
+  Id          : int
+  TokenSaleId : int
+  Name        : string
+  CapEth      : decimal
+  CapUsd      : decimal
+  StartDate   : System.DateTime
+  EndDate     : System.DateTime
+  CreatedOn   : System.DateTime
+  CreatedBy   : string
+  Proof       : string
 }
 
 module Validation =

@@ -6,7 +6,6 @@ open Giraffe.GiraffeViewEngine
 open Saturn
 
 module Views =
-  let inline format (guid: Guid) = guid.ToString("N")
   let index (ctx : HttpContext) (objs : Customer list) =
     let cnt = [
       div [_class "container "] [
@@ -36,9 +35,9 @@ module Views =
                 td [] [rawText (string o.PasswordSalt)]
                 td [] [rawText (string o.Avatar)]
                 td [] [
-                  a [_class "button is-text"; _href (Links.withId ctx (format o.Id) )] [rawText "Show"]
-                  a [_class "button is-text"; _href (Links.edit ctx (format o.Id) )] [rawText "Edit"]
-                  a [_class "button is-text is-delete"; attr "data-href" (Links.withId ctx (format o.Id) ) ] [rawText "Delete"]
+                  a [_class "button is-text"; _href (Links.withId ctx o.Id )] [rawText "Show"]
+                  a [_class "button is-text"; _href (Links.edit ctx o.Id )] [rawText "Edit"]
+                  a [_class "button is-text is-delete"; attr "data-href" (Links.withId ctx o.Id ) ] [rawText "Delete"]
                 ]
               ]
           ]
@@ -64,7 +63,7 @@ module Views =
           li [] [ strong [] [rawText "PasswordSalt: "]; rawText (string o.PasswordSalt) ]
           li [] [ strong [] [rawText "Avatar: "]; rawText (string o.Avatar) ]
         ]
-        a [_class "button is-text"; _href (Links.edit ctx (format o.Id))] [rawText "Edit"]
+        a [_class "button is-text"; _href (Links.edit ctx o.Id)] [rawText "Edit"]
         a [_class "button is-text"; _href (Links.index ctx )] [rawText "Back"]
       ]
     ]
@@ -103,7 +102,7 @@ module Views =
 
     let cnt = [
       div [_class "container "] [
-        form [ _action (if isUpdate then Links.withId ctx (format o.Value.Id) else Links.index ctx ); _method "post"] [
+        form [ _action (if isUpdate then Links.withId ctx o.Value.Id else Links.index ctx ); _method "post"] [
           if not validationResult.IsEmpty then
             yield validationMessage
           yield field (fun i -> (string i.Id)) "Id" "Id" 

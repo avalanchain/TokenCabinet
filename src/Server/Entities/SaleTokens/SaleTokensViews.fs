@@ -16,7 +16,7 @@ module Views =
               th [] [rawText "Id"]
               th [] [rawText "Name"]
               th [] [rawText "LogoUrl"]
-              th [] [rawText "UpdateUrl"]
+              th [] [rawText "TotalSupply"]
               th [] []
             ]
           ]
@@ -26,7 +26,7 @@ module Views =
                 td [] [rawText (string o.Id)]
                 td [] [rawText (string o.Name)]
                 td [] [rawText (string o.LogoUrl)]
-                td [] [rawText (string o.UpdateUrl)]
+                td [] [rawText (string o.TotalSupply)]
                 td [] [
                   a [_class "button is-text"; _href (Links.withId ctx o.Id )] [rawText "Show"]
                   a [_class "button is-text"; _href (Links.edit ctx o.Id )] [rawText "Edit"]
@@ -51,7 +51,7 @@ module Views =
           li [] [ strong [] [rawText "Id: "]; rawText (string o.Id) ]
           li [] [ strong [] [rawText "Name: "]; rawText (string o.Name) ]
           li [] [ strong [] [rawText "LogoUrl: "]; rawText (string o.LogoUrl) ]
-          li [] [ strong [] [rawText "UpdateUrl: "]; rawText (string o.UpdateUrl) ]
+          li [] [ strong [] [rawText "TotalSupply: "]; rawText (string o.TotalSupply) ]
         ]
         a [_class "button is-text"; _href (Links.edit ctx o.Id)] [rawText "Edit"]
         a [_class "button is-text"; _href (Links.index ctx )] [rawText "Back"]
@@ -98,7 +98,7 @@ module Views =
           yield field (fun i -> (string i.Id)) "Id" "Id" 
           yield field (fun i -> (string i.Name)) "Name" "Name" 
           yield field (fun i -> (string i.LogoUrl)) "LogoUrl" "LogoUrl" 
-          yield field (fun i -> (string i.UpdateUrl)) "UpdateUrl" "UpdateUrl" 
+          yield field (fun i -> (string i.TotalSupply)) "TotalSupply" "TotalSupply" 
           yield buttons
         ]
       ]

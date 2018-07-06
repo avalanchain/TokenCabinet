@@ -20,7 +20,6 @@ open JsInterop
 
 
 open Fable.Core.JsInterop
-open CryptoCurrencyPrices
 open Client.Page
 
 type RemotingError =

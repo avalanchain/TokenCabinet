@@ -5,7 +5,7 @@ type SaleToken = {
   Id: string
   Name: string
   LogoUrl: string
-  UpdateUrl: string
+  TotalSupply: decimal
 }
 
 module Validation =

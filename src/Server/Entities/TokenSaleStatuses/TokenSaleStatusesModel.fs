@@ -4,7 +4,7 @@ namespace TokenSaleStatuses
 type TokenSaleStatus = {
   Id: int
   TokenSaleId: int
-  TokenSaleStatusId: int
+  TokenSaleStatus: string
   ActiveStageId: int
   SaleTokenId: int
   PriceUsd: decimal
@@ -14,7 +14,7 @@ type TokenSaleStatus = {
   StartDate: System.DateTime
   EndDate: System.DateTime
   CreatedOn: System.DateTime
-  CreatedBy: System.DateTime
+  CreatedBy: string
   Proof: string
 }
 

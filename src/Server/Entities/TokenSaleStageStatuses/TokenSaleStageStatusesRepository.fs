@@ -11,7 +11,11 @@ module Database =
 
   let getById connectionString id : Task<Result<TokenSaleStageStatus option, exn>> =
     use connection = new SqliteConnection(connectionString)
-    querySingle connection "SELECT Id, TokenSaleStageId, Status, CreatedOn, CreatedBy, Proof FROM TokenSaleStageStatuses WHERE Id=@Id" (Some <| dict ["id" => id])
+    querySingle connection "SELECT Id, TokenSaleStageId, Status, CreatedOn, CreatedBy, Proof FROM TokenSaleStageStatuses WHERE Id=@Id LIMIT 1" (Some <| dict ["Id" => id])
+
+  let getByStageId connectionString stageId : Task<Result<TokenSaleStageStatus option, exn>> =
+    use connection = new SqliteConnection(connectionString)
+    querySingle connection "SELECT Id, TokenSaleStageId, Status, CreatedOn, CreatedBy, Proof FROM TokenSaleStageStatuses WHERE TokenSaleStageId=@stageId ORDER BY CreatedOn DESC LIMIT 1" (Some <| dict ["stageId" => stageId])
 
   let update connectionString v : Task<Result<int,exn>> =
     use connection = new SqliteConnection(connectionString)
@@ -25,3 +29,6 @@ module Database =
     use connection = new SqliteConnection(connectionString)
     execute connection "DELETE FROM TokenSaleStageStatuses WHERE Id=@Id" (dict ["id" => id])
 
+  let deleteAll connectionString : Task<Result<int, exn>> =
+    use connection = new SqliteConnection(connectionString)
+    execute connection "DELETE FROM TokenSaleStageStatuses" None

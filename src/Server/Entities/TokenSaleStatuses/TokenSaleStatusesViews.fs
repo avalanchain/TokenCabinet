@@ -35,7 +35,7 @@ module Views =
               yield tr [] [
                 td [] [rawText (string o.Id)]
                 td [] [rawText (string o.TokenSaleId)]
-                td [] [rawText (string o.TokenSaleStatusId)]
+                td [] [rawText (string o.TokenSaleStatus)]
                 td [] [rawText (string o.ActiveStageId)]
                 td [] [rawText (string o.SaleTokenId)]
                 td [] [rawText (string o.PriceUsd)]
@@ -70,7 +70,7 @@ module Views =
         ul [] [
           li [] [ strong [] [rawText "Id: "]; rawText (string o.Id) ]
           li [] [ strong [] [rawText "TokenSaleId: "]; rawText (string o.TokenSaleId) ]
-          li [] [ strong [] [rawText "TokenSaleStatusId: "]; rawText (string o.TokenSaleStatusId) ]
+          li [] [ strong [] [rawText "TokenSaleStatusId: "]; rawText (string o.TokenSaleStatus) ]
           li [] [ strong [] [rawText "ActiveStageId: "]; rawText (string o.ActiveStageId) ]
           li [] [ strong [] [rawText "SaleTokenId: "]; rawText (string o.SaleTokenId) ]
           li [] [ strong [] [rawText "PriceUsd: "]; rawText (string o.PriceUsd) ]
@@ -127,7 +127,7 @@ module Views =
             yield validationMessage
           yield field (fun i -> (string i.Id)) "Id" "Id" 
           yield field (fun i -> (string i.TokenSaleId)) "TokenSaleId" "TokenSaleId" 
-          yield field (fun i -> (string i.TokenSaleStatusId)) "TokenSaleStatusId" "TokenSaleStatusId" 
+          yield field (fun i -> (string i.TokenSaleStatus)) "TokenSaleStatusId" "TokenSaleStatusId" 
           yield field (fun i -> (string i.ActiveStageId)) "ActiveStageId" "ActiveStageId" 
           yield field (fun i -> (string i.SaleTokenId)) "SaleTokenId" "SaleTokenId" 
           yield field (fun i -> (string i.PriceUsd)) "PriceUsd" "PriceUsd" 

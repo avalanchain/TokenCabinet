@@ -25,3 +25,6 @@ module Database =
     use connection = new SqliteConnection(connectionString)
     execute connection "DELETE FROM CustomerPreferences WHERE Id=@Id" (dict ["id" => id])
 
+  let deleteAll connectionString : Task<Result<int, exn>> =
+    use connection = new SqliteConnection(connectionString)
+    execute connection "DELETE FROM CustomerPreferences" None

@@ -4,9 +4,9 @@ namespace TokenSaleStageStatuses
 type TokenSaleStageStatus = {
   Id: int
   TokenSaleStageId: int
-  Status: int
+  Status: string
   CreatedOn: System.DateTime
-  CreatedBy: System.DateTime
+  CreatedBy: string
   Proof: string
 }
 
