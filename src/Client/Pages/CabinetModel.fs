@@ -21,7 +21,7 @@ and ServerMsg =
 and PurchaseTokenMsg = 
     | ActiveSymbolChanged of symbol: CryptoCurrencySymbol
     | CCAmountChanges     of decimal
-    | TAmountChanges     of decimal
+    | TAmountChanges      of decimal
 
 type Model = {
     Auth                   : AuthModel
