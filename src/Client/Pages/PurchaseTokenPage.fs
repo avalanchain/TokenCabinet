@@ -53,9 +53,9 @@ let bodyRowSomeNone (model: Model) body =
     | Some m -> Ibox.btCol "Timeline" "9" ([ body m ])
     | None   -> Ibox.btCol "Timeline" "9" ([ str "No model loaded" ]) 
 
-let bodySomeNone (model: Model) body dispatch =
+let bodySomeNone (model: Model) body =
     match model.TokenSale with
-    | Some m ->  body m dispatch
+    | Some m ->  body m 
     | None   ->  str "No model loaded" 
 
 let bodySomeNoneTwoModels (model: Model) body dispatch =
@@ -105,7 +105,7 @@ let bodyP model  =
  
 let discAr = [10, 100; 20, 200; 30, 300; 40, 400; 50, 500; 60, 600; 70, 700; 80, 800; 90, 900; 100, 1000]
 
-let discount (m: PurchaseTokenModel) dispatch= 
+let bonus (m: PurchaseTokenModel) dispatch= 
       ul [ Class "timeline shift"
            Id "timeline" ]
            [
@@ -209,7 +209,7 @@ let counter (m: Model) dispatch = div [ Class ("col-md-6") ]
                                       [ bodySomeNoneTwoModels m bodyCounter dispatch ]
 
 
-let tokenSale (m:ViewModels.TokenSale) dispatch = 
+let tokenSale (m:ViewModels.TokenSale) = 
     div [Class "col-md-4 col-md-offset-1"]
         [
          ul [ Class "stat-list" ]
@@ -252,16 +252,21 @@ let tokenSale (m:ViewModels.TokenSale) dispatch =
 // let volumes m = div [ Class ("col-md-9") ]
 //                                  [ div [] [ str "sds" ] ]
 
+let bounusCommon ptm dispatch = bonus ptm dispatch
+    // div [ Class "row" ]
+    //     [ 
+    //         bonus ptm dispatch
+    //     ]
 
 let counterRow (m: Model) dispatch = Ibox.emptyRow [ counter m dispatch 
-                                                     bodySomeNone m tokenSale dispatch]   
+                                                     bodySomeNone m tokenSale]   
 
 let invest m dispatch = Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
                                                    div [ Class "hr-line-dashed" ] [ ]
                                                    counterRow m (PurchaseTokenMsg >> dispatch)
                                                    div [ Class "hr-line-dashed" ] [ ]
-                                                   discount m.PurchaseTokenModel dispatch])
-
+                                                   bounusCommon m.PurchaseTokenModel dispatch])
+//compares not usedbonus
 let compares = Ibox.btCol "AIM" "3" [
                     comE table [
                         thead [][
@@ -311,14 +316,91 @@ let compares = Ibox.btCol "AIM" "3" [
                         ]
                     ]
                 ]                                                
-let price (model: Model) = Ibox.btColContentOnly "3" ([ bodyP model ])
 
-let firstRow m dispatch = Ibox.emptyRow [ bodyRowSomeNone m bodyTL
-                                          price m ]
-let secondRow m dispatch = Ibox.emptyRow [ invest m dispatch
-                                           compares ]
+
+let timelineItem (stage:TokenSaleStage) =
+     div [ Class "timeline-item" ] 
+         [ 
+             Ibox.emptyRow 
+                [   div [ Class "col-xs-4 date" ] 
+                        [
+                           i [ Class ("fa " + (match stage.Status with 
+                                                | TokenSaleStageStatus.Active       -> "fa-play text-navy" 
+                                                | TokenSaleStageStatus.Completed    -> "fa-check-square-o text-navy"
+                                                | TokenSaleStageStatus.Cancelled    -> "fa-close "
+                                                | TokenSaleStageStatus.Paused       -> "fa-pause"
+                                                | TokenSaleStageStatus.Expectation  -> "fa-clock-o " )) ][]
+                           div [  ]
+                               [ 
+                                   span [ Class "font-bold" ] 
+                                        [ str "Start Date: "]
+
+                                   span [ Class "border-bottom" ] 
+                                        [ str (stage.StartDate.ToShortDateString())]
+                                ]        
+                           div [ Class "m-t-sm" ]
+                               [   
+                                   span [ Class "font-bold" ] 
+                                        [ str "End Date: "]
+
+                                   span [ Class "border-bottom"  ] 
+                                        [ str (stage.EndDate.ToShortDateString())]
+                               ]             
+                         ]
+                    div [ Class "col-xs-7 content" ] //no-top-border if first 
+                        [
+                            p [ Class "m-b-xs" ]
+                              [
+                                  strong [] 
+                                         [ str stage.Name ]
+                              ]
+                            p [ Class "m-b-xs" ]
+                              [
+                                  div [ Class ""  ] 
+                                       [ str ("Status: " + string stage.Status)]
+
+                                  div [ Class "m-t-sm"  ] 
+                                       [ str "Cap: " 
+                                         span [ Class "font-bold" ] 
+                                              [ str ((string stage.CapEth) + " ETH")] ]
+
+                                  div [ Class "m-t-sm m-b-sm"  ] 
+                                       [ str "Cap USD: "
+                                         span [ Class "font-bold" ] 
+                                              [ str ((string stage.CapUsd) + " $")] ]
+                              ]
+                         ]
+                ]    
+         ]
+let stages m = Ibox.btColEmpty "3" 
+                [
+                    Ibox.iboxTitle "Stages"
+                    Ibox.iboxContentOnly2 [
+                        div [ ] 
+                            [
+                                h3 [ ]
+                                   [ str "Active Sage" ]
+                                small [ ]
+                                   [ str "Details of this stage" ] 
+                            ]] "ibox-heading"
+                    Ibox.iboxContentOnly2 [ 
+                        div [ ] 
+                            [ 
+                                for stage in m.TokenSaleStages ->
+                                timelineItem stage ]] ""
+                ]
+let price (model: Model) = Ibox.btColContentOnly "3" ([ bodyP model ])
+let columnFirstRow m = div []
+                         [ price m
+                           bodySomeNone m stages ]
+let firstRow m dispatch = Ibox.emptyRow [ invest m dispatch 
+//bodyRowSomeNone m bodyTL
+                                          columnFirstRow m ]
+// let secondRow m dispatch = Ibox.emptyRow [ 
+//                                            compares ]
 let view (model: Model) dispatch =
     div [  ]
         [ firstRow model dispatch
-          secondRow model dispatch]
+        //   secondRow model dispatch
+          ]
 

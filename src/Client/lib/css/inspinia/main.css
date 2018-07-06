@@ -618,3 +618,12 @@ button.btn-default.dim.crypto  {
 button.dim.crypto{
     border-radius: 15px;
 }
+
+
+.timeline-item .date {
+    width: 33.33333333%;
+}
+
+.timeline-item {
+    min-width: 190px;
+}

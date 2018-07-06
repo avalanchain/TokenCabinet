@@ -3,8 +3,14 @@ module Client.Ibox
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
-let iboxContentOnly body = div [ Class "ibox ibox-content" ]
-                            body 
+
+let iboxEmpty body = div [ Class "ibox float-e-margins" ]
+                            body
+let iboxContentOnly body subClass = div [ Class ("ibox ibox-content " + subClass) ]
+                                        body 
+
+let iboxContentOnly2 body subClass = div [ Class ("ibox-content " + subClass) ]
+                                        body                                        
 let iboxContent body = div [ Class "ibox-content" ]
                             body 
 let iboxTitle title = div [ Class "ibox-title" ]
@@ -22,10 +28,13 @@ let btRow title body =
 let btCol title col body =
     div [ Class ("col-md-"+ col) ]
                 [ inner title body ]
+let btColEmpty col body =
+    div [ Class ("col-md-"+ col) ]
+                 body 
 
 let btColContentOnly col body =
     div [ Class ("col-md-"+ col) ]
-                [ iboxContentOnly body ]
+                [ iboxContentOnly body "" ]
 let emptyRow body =
     div [ Class "row" ]
             body
