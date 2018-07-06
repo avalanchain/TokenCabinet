@@ -20,6 +20,7 @@ open Customer.Wallet
 open System
 open Microsoft.AspNetCore.Http
 open NBitcoin.Protocol
+open Dapper
 
 let publicPath = Path.GetFullPath "../Client/public"
 
@@ -186,14 +187,14 @@ module Seed =
 
     let customerPreferencesSeed connectionString =
         let lst: CustomerPreferences.CustomerPreference list = 
-            [   {   Id          = Guid.NewGuid()
+            [   {   Id          = Guid.NewGuid().ToString("N")
                     Language    = CustomerPreferences.Validation.supportedLangs.[0] } ]
         lst |> seedT connectionString CustomerPreferences.Database.deleteAll CustomerPreferences.Database.insert       
 
 
     let customerSeed connectionString =
         let lst: Customers.Customer list = 
-            [   {   Id = System.Guid.NewGuid()
+            [   {   Id = System.Guid.NewGuid().ToString("N")
                     Email = "trader@cryptoinvestor.com"
                     FirstName = "John"
                     LastName = "Smith"
@@ -343,7 +344,7 @@ let getTokenSale config () = task {
 
 let getCustomerPreferences config = task {
     let processStatus (prefs: CustomerPreferences.CustomerPreference) = 
-        {   CustomerId = prefs.Id
+        {   CustomerId = prefs.Id |> Guid.Parse
             Language   = prefs.Language }
     let! st = getAllFromDb config CustomerPreferences.Database.getAll processStatus
     return st |> Result.map Seq.head 
@@ -351,7 +352,7 @@ let getCustomerPreferences config = task {
 
 let getCustomer config = task {
     let processStatus (customer: Customers.Customer) = 
-        {   Id          = customer.Id
+        {   Id          = Guid.Parse(customer.Id)
             Email       = customer.Email
             FirstName   = customer.FirstName
             LastName    = customer.LastName

@@ -2,7 +2,7 @@ namespace CustomerPreferences
 
 [<CLIMutable>]
 type CustomerPreference = {
-  Id: System.Guid
+  Id      : string
   Language: string
 }
 
@@ -12,7 +12,7 @@ module Validation =
 
   let validate v =
     let validators = [
-      fun u -> if u.Id = System.Guid.Empty then Some ("Id", "Id shouldn't be empty") else None
+      fun u -> if u.Id |> System.String.IsNullOrWhiteSpace then Some ("Id", "Id shouldn't be empty") else None
       fun u -> if isNull u.Language then Some ("Language", "Language shouldn't be empty") else None
     ]
 
