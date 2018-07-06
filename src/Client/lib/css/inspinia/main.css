@@ -627,3 +627,15 @@ button.dim.crypto{
 .timeline-item {
     min-width: 190px;
 }
+
+.active.timeline-item {
+    /* background: #f6f6f6; */
+}
+.active.timeline-item .date{
+    /* min-width: 190px; */
+}
+
+.active.timeline-item .content{
+    background: #1ab394;
+    color: white;
+}

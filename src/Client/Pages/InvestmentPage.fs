@@ -27,7 +27,7 @@ let bodySomeNoneCustomer model (fullCustomer: FullCustomer option)  body =
             | None    ->  str "No model loaded" 
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
-                p [ Class "p-xs" ] 
+                div [ Class "p-xs" ] 
                   [
                     div [ Class "pull-left m-r-md" ]
                         [ img [ Class "w100"
@@ -49,8 +49,11 @@ let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass 
 
 let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
 
-let transactions = Ibox.btRow "TRANSACTIONS" [
-                comE table [
+let transactions = 
+    Ibox.btRow "TRANSACTIONS" 
+        [
+            comE table 
+                [
                     thead [][
                         tr[][
                             th [][str "#" ]
@@ -78,7 +81,7 @@ let compares (model: Model) (m: FullCustomer)  =
             comE table [
                 thead [][
                     tr[][
-                        // th [ Class "text-center" ][str "Symbol" ]
+                        th [ Class "text-center" ][str "Symbol" ]
                         th [ Class "text-center" ][str "Name" ]
                         th [ Class "text-center" ][str "Address" ]
                     ]
@@ -88,6 +91,9 @@ let compares (model: Model) (m: FullCustomer)  =
                         for price in model.CurrenciesCurentPrices.Prices ->
                           tr [ ]
                                [ 
+                                  td [ Class "text-center" ]
+                                        [ img [ Class "w25"
+                                                Src (symbolLogo price.Symbol) ] ] 
                                   td [ Class "text-center" ]
                                      [ str ( string price.Symbol) ]
                                   td [ Class "" ]
@@ -110,6 +116,9 @@ let grouped m dispatch = Ibox.emptyRow [ helper
 
 let view (model: Model) dispatch = 
     Ibox.emptyRow [ 
-        Ibox.btColEmpty "8" [ grouped model dispatch ]
-        Ibox.btColEmpty "4" [ ccAdresses model model.FullCustomer ]
+        Ibox.btColEmpty "8" [ helper
+                              transactions ]
+        Ibox.btColEmpty "4" [ 
+            Ibox.emptyRow [
+                (ccAdresses model model.FullCustomer)] ]
     ]

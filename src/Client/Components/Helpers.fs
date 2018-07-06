@@ -9,11 +9,21 @@ open Fable.DateFunctions
 open System
 open Fable.Import.React
 open Fable.Core.JsInterop
-
+open Shared
 
 module Option = 
     let map2 f a b = match a, b with    | Some a, Some b -> f a b |> Some 
                                         | _ -> None
+
+let symbolLogo = function
+                    | ETH  -> "../lib/img/coins/eth_logo.png"
+                    | ETC  -> "../lib/img/coins/etc_logo.png"
+                    | BTC  -> "../lib/img/coins/btc_logo.png"
+                    | LTC  -> "../lib/img/coins/ltc_logo.png"
+                    | BCH  -> "../lib/img/coins/bch_logo.png"
+                    | BTG  -> "../lib/img/coins/btg_logo.png"
+                    | DASH -> "../lib/img/coins/dash_logo.png"                
+
 
 module React =
     type Component<'P> = Fable.Import.React.Component<'P, obj>
