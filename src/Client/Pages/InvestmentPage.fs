@@ -12,11 +12,19 @@ open Fable.Helpers.React.Props
 open Elmish
 open Elmish.React
 
+open Shared
+open ViewModels
+
 open ReactBootstrap
 open Helpers
 open FormHelpers
 open Fable
+open CabinetModel
 
+let bodySomeNoneCustomer model (fullCustomer: FullCustomer option)  body =
+    match fullCustomer with
+            | Some fc ->  body model fc 
+            | None    ->  str "No model loaded" 
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
                 p [ Class "p-xs" ] 
@@ -40,20 +48,8 @@ let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass 
 
 
 let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
-let bodyLink = formHorizontal 
-                        ([fGroupEmpty ([labelG "Link"
-                                        div [ Class "col-sm-10"] 
-                                            [div [ Class "input-group"] 
-                                                 fullInput
-                                            ]
-                                            ])] 
-                                            )
-                        // @ [spanBtn])
 
-let referalLink = Ibox.btRow "Referal Link" [bodyLink]
-
-
-let referals = Ibox.btRow "TRANSACTIONS" [
+let transactions = Ibox.btRow "TRANSACTIONS" [
                 comE table [
                     thead [][
                         tr[][
@@ -69,5 +65,51 @@ let referals = Ibox.btRow "TRANSACTIONS" [
                 ]
 ]
 
-let view = Ibox.emptyRow [ helper
-                           referals]
+let symbolAddress m = function
+                    | ETH  -> m.Wallet.Accounts.Eth.Address.Value
+                    | ETC  -> m.Wallet.Accounts.Etc.Address.Value
+                    | BTC  -> m.Wallet.Accounts.Btc.Address.Value
+                    | LTC  -> m.Wallet.Accounts.Ltc.Address.Value
+                    | BCH  -> m.Wallet.Accounts.Bch.Address.Value
+                    | BTG  -> m.Wallet.Accounts.Btg.Address.Value
+                    | DASH -> m.Wallet.Accounts.Dash.Address.Value    
+let compares (model: Model) (m: FullCustomer)  = 
+    Ibox.btCol "Crypto Addresses" "12" [
+            comE table [
+                thead [][
+                    tr[][
+                        // th [ Class "text-center" ][str "Symbol" ]
+                        th [ Class "text-center" ][str "Name" ]
+                        th [ Class "text-center" ][str "Address" ]
+                    ]
+                ]
+                tbody [][
+
+                        for price in model.CurrenciesCurentPrices.Prices ->
+                          tr [ ]
+                               [ 
+                                  td [ Class "text-center" ]
+                                     [ str ( string price.Symbol) ]
+                                  td [ Class "" ]
+                                    [ 
+                                      span [ Class "font-bold" ]
+                                           [ str (symbolAddress  m price.Symbol ) ]//model
+                                    ] ]
+                               
+                        ]
+                ]
+            ]
+                                                       
+
+// helper
+//                                       transactions
+let ccAdresses model m = bodySomeNoneCustomer model m compares
+
+let grouped m dispatch = Ibox.emptyRow [ helper
+                                         transactions]
+
+let view (model: Model) dispatch = 
+    Ibox.emptyRow [ 
+        Ibox.btColEmpty "8" [ grouped model dispatch ]
+        Ibox.btColEmpty "4" [ ccAdresses model model.FullCustomer ]
+    ]

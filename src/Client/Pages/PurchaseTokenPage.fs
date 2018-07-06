@@ -266,7 +266,7 @@ let invest m dispatch = Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
                                                    counterRow m (PurchaseTokenMsg >> dispatch)
                                                    div [ Class "hr-line-dashed" ] [ ]
                                                    bounusCommon m.PurchaseTokenModel dispatch])
-//compares not usedbonus
+//compares not used 
 let compares = Ibox.btCol "AIM" "3" [
                     comE table [
                         thead [][
