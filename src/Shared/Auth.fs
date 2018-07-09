@@ -4,6 +4,8 @@ open System
 module Auth =
 
     type AuthToken = AuthToken of string
+        with member __.Token = match __ with | AuthToken t -> t
+
     type LoginInfo = { Email: string; Password: string } // TODO: Send password hash only!!!
     type PwdResetInfo = { PwdResetToken: string; Password: string } // TODO: Send password hash only!!!
     type ForgotPasswordInfo = { UserName: string }
@@ -35,14 +37,14 @@ module Auth =
     type RegisteringError = 
         | EmailAlreadyRegistered
         | ValidationErrors of email: string list * password: string list
-        | LoginServerError of LoginFlowServerError
+        | RegisteringServerError of LoginFlowServerError
 
     type ForgotPasswordError = 
-        | LoginServerError of LoginFlowServerError
+        | ForgotPasswordServerError of LoginFlowServerError
 
     type PasswordResetError = 
         | ValidationErrors of email: string list * password: string list
-        | LoginServerError of LoginFlowServerError        
+        | PasswordResetServerError of LoginFlowServerError        
 
     type LoginResult          = ServerResult<Result<AuthToken, LoginError>>
     type RegisteringResult    = ServerResult<Result<AuthToken, RegisteringError>>

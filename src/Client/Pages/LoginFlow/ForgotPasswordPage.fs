@@ -58,7 +58,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         match res with
         | Ok _      -> { model with ShowSuccessPage = true; TryingToSendReset = false }, Cmd.none, NoOp
         | Error e   -> match e with 
-                        | ForgotPasswordError.LoginServerError e -> { model with ForgotPasswordErrors = handleLoginFlowServerError e; TryingToSendReset = false }, Cmd.none, NoOp
+                        | ForgotPasswordError.ForgotPasswordServerError e -> { model with ForgotPasswordErrors = handleLoginFlowServerError e; TryingToSendReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with EmailValidationErrors = InputValidators.emailValidation model.InputEmail }, Cmd.none, NoOp
     | PasswordResetClicked ->

@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ServerFableMocks.fs" />
+    <Compile Include="ServerUtils.fs" />
     <Compile Include="Database.fs" />
     <Compile Include="Config.fs" />    
     <Compile Include="Templates/App.fs" />
@@ -17,22 +18,6 @@
     <Compile Include="Templates/NotFound.fs" />
     <Compile Include="Templates/InternalError.fs" />
     <Compile Include="../Shared/Auth.fs" />
-    <!-- <Compile Include="../Shared/Entities/VerificationsModel.fs" />
-    <Compile Include="../Shared/Entities/CryptoCurrenciesModel.fs" />
-    <Compile Include="../Shared/Entities/SaleTokensModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSaleDealsModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSalesModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSaleStatusIdsModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSaleStagesModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSaleStageStatusIdsModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSaleStageStatusesModel.fs" />
-    <Compile Include="../Shared/Entities/TokenSaleStatusesModel.fs" />
-    <Compile Include="../Shared/Entities/CryptoCurrencyPricesModel.fs" />
-    <Compile Include="../Shared/Entities/CustomersModel.fs" />
-    <Compile Include="../Shared/Entities/CustomerPreferencesModel.fs" />
-    <Compile Include="../Shared/Entities/CustomerVerificationEventsModel.fs" />
-    <Compile Include="../Shared/Entities/InvestmentTranStatusIdsModel.fs" />
-    <Compile Include="../Shared/Entities/InvestmentsModel.fs" /> -->
     <Compile Include="../Shared/Utils.fs" />
     <Compile Include="../Shared/Shared.fs" />
     <Compile Include="Entities/Verifications/VerificationsModel.fs" />
@@ -107,6 +92,10 @@
     <Compile Include="Entities/WalletsKV/WalletsKVViews.fs" />
     <Compile Include="Entities/WalletsKV/WalletsKVRepository.fs" />
     <Compile Include="Entities/WalletsKV/WalletsKVController.fs" />
+    <Compile Include="Entities/AuthTokens/AuthTokensModel.fs" />
+    <Compile Include="Entities/AuthTokens/AuthTokensViews.fs" />
+    <Compile Include="Entities/AuthTokens/AuthTokensRepository.fs" />
+    <Compile Include="Entities/AuthTokens/AuthTokensController.fs" />
     <Compile Include="Router.fs" />
 
     <Compile Include="Customer/Wallet.fs" />

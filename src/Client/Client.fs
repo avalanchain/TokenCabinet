@@ -63,11 +63,11 @@ Browser.console.log web3
 // console.log("web3: " + (string W3.web3))
 
 module LocalStorage = 
-    let loadUser () : Auth.AuthToken option =
+    let loadUser () : AuthModel option =
         BrowserLocalStorage.load "user"
 
-    let saveUserCmd user =
-        Cmd.ofFunc (BrowserLocalStorage.save "user") user (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
+    let saveUserCmd (authModel: AuthModel) =
+        Cmd.ofFunc (BrowserLocalStorage.save "user") authModel (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
 
     let deleteUserCmd =
         Cmd.ofFunc BrowserLocalStorage.delete "user" (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
@@ -105,19 +105,23 @@ let cmdServerCall (apiFunc: 'T -> Async<ServerResult<'R>>) (args: 'T) (completeM
                     exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg)
 
 let init urlParsingResult : AppModel * Cmd<AppMsg> =
+    Browser.console.log (sprintf "Passed Url: '%A'" urlParsingResult)
     let model = {   Loading                 = false
                     Page                    = MenuPage.Default
                     PageModel               = NoPageModel
                 }
-
-
-    model, Cmd.none
+    let cmd = match LocalStorage.loadUser() with 
+                | Some authModel -> authModel.Token |> AuthMsg.LoggedIn |> AuthMsg |> Cmd.ofMsg
+                | None -> Cmd.none  
+    model, cmd
 
 let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
     let enforceLogin model =
+        let deleteAuthModelCmd = LocalStorage.deleteUserCmd
         let loginFlowModel, cmd = LoginFlowPage.init ()
+        let cmd = Cmd.batch [ deleteAuthModelCmd; Cmd.map LoginFlowMsg cmd ]
         { model with    Page = MenuPage.LoginFlow LoginFlowPage.Default
-                        PageModel = loginFlowModel |> PageModel.LoginFlowModel } , Cmd.map LoginFlowMsg cmd
+                        PageModel = loginFlowModel |> PageModel.LoginFlowModel } , cmd
 
     let (model', cmd') : AppModel * Cmd<AppMsg> =  
         match msg with

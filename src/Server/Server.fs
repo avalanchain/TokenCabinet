@@ -15,6 +15,8 @@ open Shared
 open Shared.ViewModels
 open Shared.Auth
 open Shared.Utils
+open Shared.Result
+open ServerUtils
 
 open Customer.Wallet
 open System
@@ -24,6 +26,7 @@ open Dapper
 
 open TypeShape.Tools
 
+
 let publicPath = Path.GetFullPath "../Client/public"
 
 let port = 8085us
@@ -32,23 +35,80 @@ let getInitCounter () : Task<ServerResult<Counter>> = task { return Ok 42 }
 let initDb () = task {  printfn "\n\ninitDb() called\n\n" 
                         return Ok () }
 
-// let private syncRoot = new obj()
-// let get
+let createCustomer email password ethAddress : Customers.Customer =
+    let id = System.Guid.NewGuid().ToString("N") 
+    {   Id              = id
+        Email           = email
+        FirstName       = ""
+        LastName        = ""
+        EthAddress      = ethAddress
+        Password        = password
+        PasswordSalt    = id + email
+        Avatar          = "MyPicture"
+        CustomerTier    = Tier1.ToString() }
 
-let private logins = new System.Collections.Concurrent.ConcurrentDictionary<AuthToken, AuthJwt.UserRights>() //TODO: store in the db
 
-let private login config (loginInfo: LoginInfo) = task { 
-    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.Email }
-    let token = userRigths |> AuthJwt.encode |> AuthToken
-    logins.[token] <- userRigths
-    return token |> Ok |> Ok
+// let private logins = new System.Collections.Concurrent.ConcurrentDictionary<AuthToken, AuthJwt.UserRights>() //TODO: store in the db
+
+let issueAuthToken email =
+    let userRigths = { AuthJwt.UserRights.UserName = email }
+    userRigths |> AuthJwt.encode |> AuthToken
+
+let saveAuthToken connectionString (authToken: AuthToken) customerId =
+    let auth: AuthTokens.AuthToken = {  AuthToken = authToken.Token
+                                        CustomerId = customerId
+                                        Issued = DateTime.Now
+                                        Expires = DateTime.Now.AddMonths 1 }
+    AuthTokens.Database.insert connectionString auth |> Ok 
+
+let private isTokenValid authToken =
+    let (AuthToken authToken) = authToken
+    authToken |> AuthJwt.checkValid |> Option.isSome
+
+let private checkAuthTokenValid config authToken =
+    //logins.ContainsKey authToken
+    true
+
+let private login config (loginInfo: LoginInfo) : Task<LoginResult> = task {
+    let! customerRes = Customers.Database.getByEmail config.connectionString loginInfo.Email
+    let r = result {
+        let! customerOpt = customerRes |> Result.mapError (LoginInternalError >> LoginServerError)
+        let! customer = customerOpt |> Result.ofOption EmailNotFoundOrPasswordIncorrect
+        let authToken = issueAuthToken customer.Email
+        
+        let! _ = saveAuthToken config.connectionString authToken customer.Id 
+                    |> Result.mapError (LoginInternalError >> LoginServerError) // TODO: Add reaction to non-zero return code
+
+        return authToken 
+    }
+
+    return r |> Ok 
 }
 
-let private register config (loginInfo: LoginInfo) = task {  // TODO: Change this!!!
-    let userRigths = { AuthJwt.UserRights.UserName = loginInfo.Email }
-    let token = userRigths |> AuthJwt.encode |> AuthToken
-    logins.[token] <- userRigths
-    return token |> Ok |> Ok
+let private register config (loginInfo: LoginInfo) : Task<RegisteringResult> = task {  // TODO: Change this!!!
+    let authToken = issueAuthToken loginInfo.Email
+    let customer = createCustomer loginInfo.Email loginInfo.Password ""
+    let! res = Customers.Database.insert config.connectionString customer
+    let! authInsertRes = 
+        match res with
+        | Ok code when code = 0 -> saveAuthToken config.connectionString authToken customer.Id 
+        | Ok code -> 
+            let msg = sprintf "Error creating new customer. Code: '%d'" code
+            printfn "%s" msg
+            InternalError (new Exception(msg)) |> Error
+        | Error exn -> exn |> InternalError |> Error
+        |> Result.reWrap
+    return 
+        match authInsertRes with 
+        | Ok r -> 
+            match r with 
+            | Ok code when code = 0 -> authToken |> Ok |> Ok 
+            | Ok code -> 
+                let msg = sprintf "Error when saving authToken, Code: '%d'" code
+                printfn "%s" msg
+                InternalError (new Exception(msg)) |> Error 
+            | Error exn -> exn |> InternalError |> Error 
+        | Error exn -> exn |> Error 
 }
 
 let private forgotPassword config (forgotPasswordInfo: ForgotPasswordInfo) = task { // TODO: Change this!!!
@@ -58,16 +118,9 @@ let private forgotPassword config (forgotPasswordInfo: ForgotPasswordInfo) = tas
 let private resetPassword config resetPasswordInfo = task { // TODO: Change this!!!
     let userRigths = { AuthJwt.UserRights.UserName = "trader@cryptoinvestor.com" }
     let token = userRigths |> AuthJwt.encode |> AuthToken
-    logins.[token] <- userRigths
+    // logins.[token] <- userRigths
     return token |> Ok |> Ok
 }
-
-let private checkUserExists authToken =
-    logins.ContainsKey authToken
-
-let private isTokenValid authToken =
-    let (AuthToken authToken) = authToken
-    authToken |> AuthJwt.checkValid |> Option.isSome
 
 module Seed =
     // let seed config deleteAll lst = task {
@@ -193,19 +246,9 @@ module Seed =
                     Language    = CustomerPreferences.Validation.supportedLangs.[0] } ]
         lst |> seedT connectionString CustomerPreferences.Database.deleteAll CustomerPreferences.Database.insert       
 
-
     let customerSeed connectionString =
         let lst: Customers.Customer list = 
-            [   {   Id              = System.Guid.NewGuid().ToString("N")
-                    Email           = "trader@cryptoinvestor.com"
-                    FirstName       = "John"
-                    LastName        = "Smith"
-                    EthAddress      = "0x001002003004005006007008009"
-                    Password        = "!!!ChangeMe!!!"
-                    PasswordSalt    = "!!PwdSalt!!"
-                    Avatar          = "MyPicture"
-                    CustomerTier    = Tier1.ToString()
-                } ]
+            [ createCustomer "trader@cryptoinvestor.com" "!!!ChangeMe111" "0x001002003004005006007008009" ]
         lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert        
 
     // let fullCustomerSeed connectionString =
@@ -224,6 +267,12 @@ module Seed =
         ()
     }
 
+    let authTokenSeed connectionString = task {
+        let! _ = AuthTokens.Database.deleteAll connectionString
+        ()
+    }
+    
+
     let seedAll connectionString = task {
         do! saleTokenSeed connectionString
         printfn "Seeding ..."
@@ -238,6 +287,7 @@ module Seed =
         do! customerSeed connectionString
 
         do! walletsSeed connectionString
+        do! authTokenSeed connectionString
     }
 
 let getCryptoCurrencies config () = task { 
@@ -394,7 +444,7 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
 
     return! 
         if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error |> Task.FromResult
-        elif request.Token |> checkUserExists |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
+        elif request.Token |> checkAuthTokenValid config |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
         else task {
             let! customerPreferenceRes = getCustomerPreferences config
             let customerPreference = customerPreferenceRes |> unwrapResult

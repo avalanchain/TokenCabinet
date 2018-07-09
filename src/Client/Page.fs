@@ -65,6 +65,5 @@ let pageParser : Parser<MenuPage -> MenuPage, MenuPage> =
     oneOf ([ map MenuPage.Home (s "home") ]
             @ loginFlowPageParsers
             @ cabinetPageParsers
-            // @ tradingPageParsers 
             )
     

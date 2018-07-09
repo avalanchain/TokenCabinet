@@ -67,7 +67,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         | Ok authToken -> { model with TryingToReset = false }, Cmd.none, UserPasswordReset authToken
         | Error e -> match e with 
                         | ValidationErrors (emailErrors, pwdErrors) -> { model with ResettingErrors = emailErrors @ pwdErrors; TryingToReset = false }, Cmd.none, NoOp
-                        | LoginServerError e -> { model with ResettingErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
+                        | PasswordResetServerError e -> { model with ResettingErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
                         PasswordConfValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword }, Cmd.none, NoOp
