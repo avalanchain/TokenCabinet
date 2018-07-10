@@ -29,7 +29,7 @@
         "remotedev": "0.2.7",
         "toastr": "^2.1.4",
         "url-loader": "^1.0.1",
-        "web3": "0.20.5"
+        "web3": "^1.0.0-beta.34"
     },
     "devDependencies": {
         "babel-core": "6.26.3",

@@ -4,6 +4,7 @@ open System
 open Fable.Core
 open Fable.Import.JS
 
+let [<Import("*","./jsonrpc.ts")>] jsonrpc: IExports = jsNative
 
 type [<AllowNullLiteral>] IExports =
     abstract JsonRPCRequest: JsonRPCRequestStatic

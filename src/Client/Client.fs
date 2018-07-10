@@ -18,7 +18,6 @@ open Fable.Import.Browser
 open Fable.Import
 open JsInterop
 
-open web3Impl
 open Fable.Core.JsInterop
 
 open Client
@@ -49,10 +48,23 @@ let ethHost = match Utils.load<string> "EthereumHost" with
                     Utils.save "EthereumHost" defaultHost
                     defaultHost
 
-let web3: Web3Impl = !!createNew web3 (createNew httpProvider ethHost)
-Browser.console.log web3
+// let web3: Web3Impl = !!createNew web3 (createNew httpProvider ethHost)
+// Browser.console.log web3
 
-// open W3
+open Web3
+
+console.log (sprintf "web3: '%A'" web3)
+
+// let www3: obj = importAll "../Client/W3.ts"
+// Browser.console.log (sprintf "www3: '%A'" www3)
+
+// let w = w3.W3
+// Browser.console.log w3
+
+// Browser.console.log w
+
+
+
 // let w3 = !!createNew W3 ()
 // Browser.console.log "W3"
 // Browser.console.log w3
