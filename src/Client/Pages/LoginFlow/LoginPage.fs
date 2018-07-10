@@ -75,11 +75,10 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
 
 
 let view (model: Model) (dispatch: Msg -> unit) = 
-    let buttonActive =  if not model.LoginErrors.IsEmpty 
-                            && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
-                            && hasErrors model.PasswordStartedTyping model.PasswordValidationErrors |> not
-                            && (model.EmailStartedTyping || model.PasswordStartedTyping)
-                        then "btn-disabled" else "btn-info"        
+    let buttonDisabled = not model.LoginErrors.IsEmpty 
+                            || hasErrors model.EmailStartedTyping model.EmailValidationErrors 
+                            || hasErrors model.PasswordStartedTyping model.PasswordValidationErrors 
+                        
 
     div [ Class "login"
         // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
@@ -112,10 +111,11 @@ let view (model: Model) (dispatch: Msg -> unit) =
                             hasErrorsSpan model.PasswordStartedTyping model.PasswordValidationErrors 
                         ]
                       a [ Type "submit"
-                          Class ("btn block full-width m-b " + buttonActive)
+                          Class ("btn btn-info block full-width m-b")
                           OnClick (fun _ -> dispatch LogInClicked)
                           onEnter LogInClicked dispatch 
-                          ]
+                          Disabled buttonDisabled
+                        ]
                         [  (if model.TryingToLogin then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                             else str "Login") ] 
                       a [   Href (LoginFlowPage.ForgotPassword |> MenuPage.LoginFlow |> toHash) 

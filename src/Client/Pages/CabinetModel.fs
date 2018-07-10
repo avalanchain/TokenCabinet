@@ -22,6 +22,7 @@ and PurchaseTokenMsg =
     | ActiveSymbolChanged of symbol: CryptoCurrencySymbol
     | CCAmountChanges     of decimal
     | TAmountChanges      of decimal
+    | AddressCopied       of string
 
 type Model = {
     Auth                   : AuthModel

@@ -91,6 +91,12 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
     let changeCurrentAddress symbol (fc:ViewModels.FullCustomer) = 
         (fc.Wallet.ForSymbol symbol).Address.Value
 
+    let toastrSuccess text =   
+                    Toastr.message text
+                    |> Toastr.withProgressBar
+                    |> Toastr.position BottomRight
+                    |> Toastr.timeout 2000
+                    |> Toastr.success
     match msg with
     | VerificationMsg    -> model, Cmd.none
     | PurchaseTokenMsg msg_  -> 
@@ -108,7 +114,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
                                                         { model.PurchaseTokenModel with BuyTokens = tokens 
                                                                                         CCTokens = ccPrice model.ActiveSymbol tokens model.CurrenciesCurentPrices
                                                                                         TotalPrice = tokenTotalPrice model.TokenSale model.ActiveSymbol tokens model.CurrenciesCurentPrices } }, Cmd.none 
-        
+        | AddressCopied text -> model, toastrSuccess (sprintf "Address Copied") 
     | MyInvestmentsMsg   -> model, Cmd.none
     | ReferralProgramMsg -> model, Cmd.none
     | ContactsMsg        -> model, Cmd.none

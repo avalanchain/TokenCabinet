@@ -2451,7 +2451,7 @@ label.error {
   border-right: none;
 }
 /* Toastr custom style */
-#toast-container > .toast {
+/* #toast-container > .toast {
   background-image: none !important;
 }
 #toast-container > .toast:before {
@@ -2492,7 +2492,7 @@ label.error {
   -ms-filter: alpha(opacity=100);
   filter: alpha(opacity=100);
   cursor: pointer;
-}
+} */
 .toast {
   background-color: #1ab394;
 }

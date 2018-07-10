@@ -122,6 +122,12 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
         let cmd = Cmd.batch [ deleteAuthModelCmd; Cmd.map LoginFlowMsg cmd ]
         { model with    Page = MenuPage.LoginFlow LoginFlowPage.Default
                         PageModel = loginFlowModel |> PageModel.LoginFlowModel } , cmd
+    let toastrSuccess text =   
+                    Toastr.message text
+                    |> Toastr.withProgressBar
+                    |> Toastr.position BottomRight
+                    |> Toastr.timeout 1000
+                    |> Toastr.success
 
     let (model', cmd') : AppModel * Cmd<AppMsg> =  
         match msg with
@@ -145,14 +151,10 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
                 model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"
             | BrowserStorageUpdated -> model, Cmd.none            
             | MenuSelected page -> 
-                let cmd =   Toastr.message (sprintf "Menu selected: '%A'" page)
-                            |> Toastr.withProgressBar
-                            |> Toastr.position BottomRight
-                            |> Toastr.timeout 1000
-                            |> Toastr.success
-                { model with Page = MenuPage.Cabinet page } , cmd  
+                { model with Page = MenuPage.Cabinet page } , toastrSuccess (sprintf "Menu selected: '%A'" page) 
             | Login -> enforceLogin model
             | Logout -> enforceLogin model
+                        
 
         | UnexpectedMsg msg_ ->
             match msg_ with

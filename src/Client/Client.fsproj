@@ -31,8 +31,10 @@
     <Compile Include="lib/Fable.Recharts.fs" />
     <Compile Include="lib/ChartJs.fs" />
     <Compile Include="lib/react-chartjs-2.fs" />
+
     <Compile Include="Utils.fs" />
     <Compile Include="Components/Helpers.fs" />
+    <Compile Include="lib/ReactCopyToClipboard.fs" />
 
 <!--
     <Compile Include="Components/HeroTile.fs" />

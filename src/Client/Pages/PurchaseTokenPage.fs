@@ -19,9 +19,18 @@ open Helpers
 open ReactBootstrap
 open FormHelpers
 open Shared.WalletPublic
+open Client
+open ReactCopyToClipboard
 
+
+importAll "../../../node_modules/react-rangeslider/lib/index.css"
+importAll "../../Client/lib/css/inspinia/flatUIRange.css"
 // let buttonToolbar = ReactBootstrap.buttonToolbar
 importAll "../../../node_modules/qrcode.react/lib/index.js"
+importAll "../../../node_modules/react-moment/dist/index.js"
+importAll "../../../node_modules/react-rangeslider/lib/Rangeslider.js"
+importAll "../../../node_modules/react-rangeslider/lib/index.js"
+
 let calcPrice activeSymbol (tick: ViewModels.CurrencyPriceTick) f =
     tick.Prices 
     |> List.tryFind(fun p -> p.Symbol = activeSymbol)
@@ -30,24 +39,6 @@ let calcPrice activeSymbol (tick: ViewModels.CurrencyPriceTick) f =
 
 let roundFour (v:decimal) = Math.Round(v, 4)
 
-let bodyTL m = 
-      ul [ Class "timeline"
-           Id "timeline" ]
-           [
-             for stage in m.TokenSaleStages ->
-               li [ Class ("li" + (match stage.Status with 
-                                    | TokenSaleStageStatus.Active       -> " active" 
-                                    | TokenSaleStageStatus.Completed    -> " complete"
-                                    | TokenSaleStageStatus.Cancelled    -> " cancelled"
-                                    | TokenSaleStageStatus.Paused       
-                                    | TokenSaleStageStatus.Expectation       -> " " )) ]
-                  [ div [ Class "timestamp" ]
-                      [ span [ Class "author" ]
-                          [ str (stage.CapUsd.ToString() + " $") ] ]
-                    div [ Class "status" ]
-                      [ h4 [ ]
-                          [ str (stage.CapEth.ToString() + " %") ] ] ]
-           ]
 let bodyRowSomeNone (model: Model) body =
     match model.TokenSale with
     | Some m -> Ibox.btCol "Timeline" "9" ([ body m ])
@@ -65,7 +56,7 @@ let bodySomeNoneTwoModels (model: Model) body dispatch =
 
 let cur symbol image price isActive dispatch =
                     span [ ]//Class "col-md-1"
-                        [ comF button (fun o -> o.bsClass <- "crypto btn btn-default dim btn-large-dim btn-outline " + (if isActive then "active" else "") |> Some 
+                        [ comF button (fun o -> o.bsClass <- "crypto btn btn-default dim btn-large-dim btn-outline " + (if isActive then "active btn-green" else "") |> Some 
                                                 o.onClick <- React.MouseEventHandler(fun _ -> symbol |> ActiveSymbolChanged |> PurchaseTokenMsg |> dispatch) |> Some)
                                       [ div [ Class "name" ]
                                             [str (symbol.ToString())]
@@ -74,11 +65,26 @@ let cur symbol image price isActive dispatch =
                                         div [ Class "price" ]
                                             [str (price.ToString() + " $")] ] ]
  
-            
+let rMoment (date:DateTime)  = ofImport "default" "react-moment" (createObj [  "date" ==> date
+                                                                               "fromNow" ==> true  ]) []
 
-let bodyC (model: Model) dispatch = 
+let bodyCurrenciesTime (m: Model) dispatch = 
+            div [ Class "m-b-sm" ] 
+                [ 
+                  small [ Class "label label-primary"  ]
+                        [
+                          i [ Class "fa fa-clock-o" ] [ ]
+                          str " Updated: a few seconds ago"
+                          //(rMoment m.CurrenciesCurentPrices.Prices.Head.PriceAt) //str (" Updated: " + m.CurrenciesCurentPrices.Prices.Head.PriceAt.ToShortTimeString()
+                         ] 
+                    
+
+                   
+                ]         
+
+let bodyCurrencies (model: Model) dispatch = 
             [   for curr in model.CurrenciesCurentPrices.Prices ->
-                       cur curr.Symbol curr.Symbol curr.PriceUsd (model.ActiveSymbol= curr.Symbol) dispatch
+                       cur curr.Symbol "" curr.PriceUsd (model.ActiveSymbol = curr.Symbol) dispatch
             ]
 
 
@@ -94,24 +100,25 @@ let bodyP model  =
              [ str ("Discount 20%" )] ]
 
  
-let discAr = [10, 100; 20, 200; 30, 300; 40, 400; 50, 500; 60, 600; 70, 700; 80, 800; 90, 900; 100, 1000]
+let discAr = [10, 1000; 20, 2000; 30, 3000; 40, 4000; 50, 5000; 60, 6000; 70, 7000; 80, 8000; 90, 9000; 100, 10000]
 
-let bonus (m: PurchaseTokenModel) dispatch= 
-      ul [ Class "timeline shift"
-           Id "timeline" ]
-           [
-             for (per, tokens) in discAr ->
-               let ttt per (tokens: decimal) = if (decimal per) > tokens then " "
-                                               else "complete"
-               
-               li [ Class ("li " + (ttt per m.BuyTokens))]
-                  [ div [ Class "timestamp" ]
-                      [ span [ Class "author" ]
-                          [ str (tokens.ToString()) ] ]
-                    div [ Class "status" ]
-                      [ h4 [ ]
-                          [ str (per.ToString() + " %") ] ] ]
-           ]
+let bonus (m: PurchaseTokenModel) = 
+      div [ Class "col-sm-11" ]
+          [ ul [ Class "timeline shift"
+                 Id "timeline" ]
+               [
+                 for (per, tokens) in discAr ->
+                   let isComplete per (tokens: decimal) = if (decimal (per*100)) > tokens then " "
+                                                          else "complete"
+                   
+                   li [ Class ("li " + (isComplete per m.BuyTokens))]
+                      [ div [ Class "timestamp" ]
+                          [ span [ Class "author" ]
+                              [ str (tokens.ToString()) ] ]
+                        div [ Class "status" ]
+                          [ h4 [ ]
+                              [ str (per.ToString() + " %") ] ] ]
+               ]]
 // [<Pojo>]
 // type QrCodeProps =
 //   { 
@@ -133,16 +140,34 @@ let selectedCurrency (model: Model) dispatch =
             [
                h2 []
                   [ str ("Current " + model.ActiveSymbol.ToString() + " Address:") ] 
-               p []
+               pre [ Class "text-center" ]
                   [ str ( model.PurchaseTokenModel.CCAddress) ]
             ]
-            // bodyUserSomeNone
+
+
+let copiedAddress (address:string) (dispatch: PurchaseTokenMsg -> unit) = 
+    comF copyToClipboard (fun o ->  o.text <- address
+                                    o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
+        [ 
+            comF button (fun o -> o.bsClass <- "btn btn-success btn-outline pull-right"  |> Some )
+                  [ str "Copy Address" ]
+        ]        // bodyUserSomeNone
 let currenciesGroup (model: Model) dispatch = 
         Ibox.emptyRow [ div [ Class "col-md-8" ] 
-                            (bodyC model dispatch)
+                            [ 
+                                bodyCurrenciesTime model dispatch
+                                div [ ] 
+                                    (bodyCurrencies model dispatch) 
+                            ]
                         div [ Class "col-md-4" ] 
                            [ selectedCurrency model dispatch
-                             qrCode model.PurchaseTokenModel.CCAddress]  
+                             Ibox.emptyRow 
+                                [
+                                    Ibox.btColEmpty "6" [ qrCode model.PurchaseTokenModel.CCAddress ]
+                                    Ibox.btColEmpty "6" [ copiedAddress model.PurchaseTokenModel.CCAddress (PurchaseTokenMsg >> dispatch) ]
+                                ]
+                            
+                            ]  
                             ]
 
 let bodyCounter m (model:PurchaseTokenModel) dispatch = 
@@ -208,114 +233,109 @@ let bodyCounter m (model:PurchaseTokenModel) dispatch =
 let counter (m: Model) dispatch = div [ Class ("col-md-6") ]
                                       [ bodySomeNoneTwoModels m bodyCounter dispatch ]
 
-
+let range volume = ofImport "default" "react-rangeslider" 
+                            (createObj [  "value" ==> volume 
+                                          "min" ==> 0
+                                          "max" ==> 1000
+                                          "from" ==> 200
+                                          "to" ==> 800
+                                          "type" ==> "double" 
+                                          "prefix" ==> "$" 
+                                          ]) []
 let tokenSale (m:ViewModels.TokenSale) = 
-    div [Class "col-md-4 col-md-offset-1"]
+    div [Class "col-md-5 col-md-offset-1"]
         [
          ul [ Class "stat-list" ]
-            [ li [ ]
-                [ h2 [ Class "no-margins " ]
-                    [ str (m.SoftCapEth.ToString() + " ETH" ) ]
-                  small [ ]
-                    [ str "SoftCap" ]
-                  div [ Class "stat-percent" ]
-                    [ str "52%"
-                      i [ Class "fa fa-bolt text-navy" ]
-                        [ ] ]
-                  div [ Class "progress progress-mini" ]
-                    [ div [ 
-                        // HTMLAttr.Custom ("style", "width: 52%;")
-                            Class "progress-bar-success" ]
-                        [ ] ] ]
-              li [ ]
+            [  li [ Class "row" ]
+                [ 
+                  div [ Class "col-md-6" ] 
+                    [ 
+                        h2 [ Class "no-margins " ]
+                           [ str (m.SoftCapEth.ToString() + " ETH" ) ]
+                        small [ ]
+                            [ str "SoftCap" ]
+                        div [ Class "stat-percent" ]
+                            [ str "52%"
+                              i [ Class "fa fa-bolt text-navy" ]
+                                [ ] ]
+                        div [ Class "progress progress-mini" ]
+                            [ div [ 
+                                // HTMLAttr.Custom ("style", "width: 52%;")
+                                    Class "progress-bar-success" ]
+                                [ ] ] 
+                    ]
+                  div [ Class "col-md-6" ] 
+                    [ 
+                        h2 [ Class "no-margins" ]
+                            [ str (m.HardCapEth.ToString() + " ETH" ) ]
+                        small [ ]
+                            [ str "HardCap" ]
+                        div [ Class "progress progress-mini" ]
+                            [ div [ 
+                                // HTMLAttr.Custom ("style", "width: 48%;")
+                                    Class "progress-bar" ]
+                                [ ] ]
+                    ]
+                 
+                        
+                        
+                        ]
+            //    li [ ] 
+            //     [
+                    
+            //      ]       
+               li [ ]
                 [ h2 [ Class "no-margins" ]
-                    [ str (m.HardCapEth.ToString() + " ETH" ) ]
+                    [ str " 1232434 ETH"  ]
                   small [ ]
-                    [ str "HardCap" ]
-                  div [ Class "progress progress-mini" ]
-                    [ div [ 
-                        // HTMLAttr.Custom ("style", "width: 48%;")
-                            Class "progress-bar" ]
-                        [ ] ] ]
-              li [ ]
-                [ h2 [ Class "no-margins " ]
-                    [ str (m.Expectations.ToString() + " ETH" ) ]
-                  small [ ]
-                    [ str "Expectations" ]
-                  div [ Class "progress progress-mini" ]
-                    [ div [ 
-                        // HTMLAttr.Custom ("style", "width: 60%;")
-                            Class "progress-bar-success" ]
-                        [ ] ] ] ]
+                    [ str "Counted" ]
+                  div []
+                        [
+                            range 600
+                        ] ]
+            //   li [ ]
+            //     [ h2 [ Class "no-margins " ]
+            //         [ str (m.Expectations.ToString() + " ETH" ) ]
+            //       small [ ]
+            //         [ str "Expectations" ]
+            //       div [ Class "progress progress-mini" ]
+            //         [ div [ 
+            //             // HTMLAttr.Custom ("style", "width: 60%;")
+            //                 Class "progress-bar-success" ]
+            //             [ ] ] ] 
+                        
+                        ]
 
         ]
 // let volumes m = div [ Class ("col-md-9") ]
 //                                  [ div [] [ str "sds" ] ]
 
-let bounusCommon ptm dispatch = bonus ptm dispatch
-    // div [ Class "row" ]
-    //     [ 
-    //         bonus ptm dispatch
-    //     ]
+let bounusLeft (tokenSale:TokenSale) = 
+    
+    div [ Class "col-sm-1" ]
+        [ 
+            h3 [ ]
+                [ str (string tokenSale.SaleToken.Symbol)]
+            hr []
+            h3 [ ]
+               [ str "Bonus" ]
+        ]
+
 
 let counterRow (m: Model) dispatch = Ibox.emptyRow [ counter m dispatch 
                                                      bodySomeNone m tokenSale]   
 
-let invest m dispatch = Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
-                                                   div [ Class "hr-line-dashed" ] [ ]
-                                                   counterRow m (PurchaseTokenMsg >> dispatch)
-                                                   div [ Class "hr-line-dashed" ] [ ]
-                                                   bounusCommon m.PurchaseTokenModel dispatch])
-//compares not used 
-let compares = Ibox.btCol "AIM" "3" [
-                    comE table [
-                        thead [][
-                            tr[][
-                                th [ Class "text-center" ][str "Symbol" ]
-                                th [ Class "text-center" ][str "Name" ]
-                                th [ Class "text-center" ][str "Account" ]
-                            ]
-                        ]
-                        tbody [][
-                                 tr [ ]
-                                    [ td [ Class "text-center" ]
-                                        [ img [ Class "w25"
-                                                Src "../lib/img/coins/eth_logo.png" ] ]
-                                      td [ Class "text-center" ]
-                                        [ str "ETH" ]
-                                      td [ Class "text-right" ]
-                                        [ span [ Class "text-info font-bold" ]
-                                            [ str "185.00 " ]
-                                          img [ Alt "image"
-                                                Class "w25"
-                                                Src "../lib/img/logo.png" ] ] ]
-                                 tr [ ]
-                                    [ td [ Class "text-center" ]
-                                        [ i [ Class "fa fa-btc fa-2x" ]
-                                            [ ] ]
-                                      td [ Class "text-center" ]
-                                        [ str "BTC" ]
-                                      td [ Class "text-right" ]
-                                        [ span [ Class "text-info font-bold" ]
-                                            [ str "1532.00 " ]
-                                          img [ Alt "image"
-                                                Class "w25"
-                                                Src "../lib/img/logo.png" ] ] ]
-                                 tr [ ]
-                                    [ td [ Class "text-center" ]
-                                        [ i [ Class "fa fa-usd fa-2x" ]
-                                            [ ] ]
-                                      td [ Class "text-center" ]
-                                        [ str "USD" ]
-                                      td [ Class "text-right" ]
-                                        [ span [ Class "text-info font-bold" ]
-                                            [ str "5.20 " ]
-                                          img [ Alt "image"
-                                                Class "w25"
-                                                Src "../lib/img/logo.png" ] ] ]
-                        ]
-                    ]
-                ]                                                
+let invest m dispatch = 
+    Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
+                               div [ Class "hr-line-dashed" ] [ ]
+                               counterRow m (PurchaseTokenMsg >> dispatch)
+                               div [ Class "hr-line-dashed" ] [ ]
+                               Ibox.emptyRow 
+                                [
+                                   bodySomeNone m bounusLeft
+                                   bonus m.PurchaseTokenModel
+                                ]
+                                ])                                               
 
 
 let timelineItem (stage:TokenSaleStage) =
@@ -412,11 +432,9 @@ let columnFirstRow m = div []
                            bodySomeNone m stages
                            ]
 let firstRow m dispatch = Ibox.emptyRow [ invest m dispatch 
-//bodyRowSomeNone m bodyTL
                                           columnFirstRow m ]
-// let secondRow m dispatch = Ibox.emptyRow [ 
-//                                            compares ]
-let view (model: Model) dispatch =
+
+let view (model: Model) (dispatch: Msg -> unit) =
     div [  ]
         [ firstRow model dispatch ]
 
