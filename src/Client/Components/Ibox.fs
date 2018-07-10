@@ -31,7 +31,9 @@ let btCol title col body =
 let btColEmpty col body =
     div [ Class ("col-md-"+ col) ]
                  body 
-
+let btColEmptyLg col body =
+    div [ Class ("col-lg-"+ col) ]
+                 body
 let btColContentOnly col body =
     div [ Class ("col-md-"+ col) ]
                 [ iboxContentOnly body "" ]

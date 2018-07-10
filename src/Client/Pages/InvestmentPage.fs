@@ -21,9 +21,11 @@ open FormHelpers
 open Fable
 open CabinetModel
 
-let bodySomeNoneCustomer model (fullCustomer: FullCustomer option)  body =
+open ReactCopyToClipboard
+
+let bodySomeNoneCustomer model (fullCustomer: FullCustomer option) body dispatch=
     match fullCustomer with
-            | Some fc ->  body model fc 
+            | Some fc ->  body model fc dispatch
             | None    ->  str "No model loaded" 
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
@@ -68,6 +70,13 @@ let transactions =
                 ]
 ]
 
+let copiedAddress (address:string) (dispatch: PurchaseTokenMsg -> unit) = 
+    comF copyToClipboard (fun o ->  o.text <- address
+                                    o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
+        [ 
+            comF button (fun o -> o.bsClass <- "btn btn-success btn-outline pull-right"  |> Some )
+                  [ str "Copy Address" ]
+        ]        // bodyUserSomeNone
 let symbolAddress m = function
                     | ETH  -> m.Wallet.Accounts.Eth.Address.Value
                     | ETC  -> m.Wallet.Accounts.Etc.Address.Value
@@ -76,14 +85,15 @@ let symbolAddress m = function
                     | BCH  -> m.Wallet.Accounts.Bch.Address.Value
                     | BTG  -> m.Wallet.Accounts.Btg.Address.Value
                     | DASH -> m.Wallet.Accounts.Dash.Address.Value    
-let compares (model: Model) (m: FullCustomer)  = 
+let compares (model: Model) (m: FullCustomer) dispatch = 
     Ibox.btCol "Crypto Addresses" "12" [
             comE table [
                 thead [][
-                    tr[][
-                        th [ Class "text-center" ][str "Symbol" ]
-                        th [ Class "text-center" ][str "Name" ]
-                        th [ Class "text-center" ][str "Address" ]
+                    tr [ ][
+                        th [ Class "col-md-1 text-center" ][str "Symbol" ]
+                        th [ Class "col-md-1 text-center" ][str "Name" ]
+                        th [ Class "col-md-9 text-center" ][str "Address" ]
+                        th [ Class "col-md-11 text-center" ][str "Action" ]
                     ]
                 ]
                 tbody [][
@@ -98,8 +108,12 @@ let compares (model: Model) (m: FullCustomer)  =
                                      [ str ( string price.Symbol) ]
                                   td [ Class "" ]
                                     [ 
-                                      span [ Class "font-bold" ]
+                                      pre [ ]
                                            [ str (symbolAddress  m price.Symbol ) ]//model
+                                    ]
+                                  td [ Class "" ]
+                                    [ 
+                                      copiedAddress (symbolAddress  m price.Symbol) dispatch
                                     ] ]
                                
                         ]
@@ -109,16 +123,16 @@ let compares (model: Model) (m: FullCustomer)  =
 
 // helper
 //                                       transactions
-let ccAdresses model m = bodySomeNoneCustomer model m compares
+let ccAdresses model m dispatch= bodySomeNoneCustomer model m compares dispatch
 
 let grouped m dispatch = Ibox.emptyRow [ helper
                                          transactions]
 
 let view (model: Model) dispatch = 
     Ibox.emptyRow [ 
-        Ibox.btColEmpty "8" [ helper
-                              transactions ]
-        Ibox.btColEmpty "4" [ 
+        Ibox.btColEmptyLg "7" [ helper
+                                transactions ]
+        Ibox.btColEmptyLg "5" [ 
             Ibox.emptyRow [
-                (ccAdresses model model.FullCustomer)] ]
+                (ccAdresses model model.FullCustomer (PurchaseTokenMsg >> dispatch))] ]
     ]

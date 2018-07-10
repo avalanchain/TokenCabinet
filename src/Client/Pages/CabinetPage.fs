@@ -46,6 +46,9 @@ let init authToken =
                                     TotalPrice = 0m
                                     CCAddress = "" 
                                     }
+        VerificationModel       = {
+                                    CurrentTab = 1
+                                    }
     }
 
    
@@ -98,7 +101,11 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
                     |> Toastr.timeout 2000
                     |> Toastr.success
     match msg with
-    | VerificationMsg    -> model, Cmd.none
+    | VerificationMsg  msg_  -> 
+        match msg_ with
+        | TabChanged activeKey -> 
+            let verifiacationModel = { model.VerificationModel with CurrentTab = activeKey }
+            { model with VerificationModel = verifiacationModel } , Cmd.none
     | PurchaseTokenMsg msg_  -> 
         match msg_ with 
         | ActiveSymbolChanged symbol    -> 
@@ -146,10 +153,10 @@ open Page
 
 let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) = 
     match page with
-        | Verification      -> [ VerificationPage.view ]
-        | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch]
-        | Investments       -> [ InvestmentPage.view model dispatch]
-        | ReferralProgram   -> [ ReferralProgramPage.view ]
+        | Verification      -> [ VerificationPage.view model dispatch ]
+        | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch ]
+        | Investments       -> [ InvestmentPage.view model dispatch ]
+        | ReferralProgram   -> [ ReferralProgramPage.view model dispatch ]
         | Contacts          -> [ ContactsPage.view ]
         // | Dashboard          -> [ DashboardView.view ]
         // | Book ed, BookListModel m -> viewPageStatic<Book> ed m dispatch

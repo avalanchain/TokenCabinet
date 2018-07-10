@@ -23,7 +23,7 @@ let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
                       [ i [ Class "fa fa-envelope text-info mid-icon" ] [ ] ]    
                   h2 [ ] [
                      str "Please, contact us" ]
-                  a [ Href "info@avalanchain.com" ] [ str "info@avalanchain.com" ]
+                  a [ Href "mailto:info@avalanchain.com" ] [ str "info@avalanchain.com" ]
                                      ]]
   
 let view = Ibox.emptyRow [ helper ]

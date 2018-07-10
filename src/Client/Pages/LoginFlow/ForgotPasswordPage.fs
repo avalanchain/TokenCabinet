@@ -26,7 +26,7 @@ type Msg =
     | ChangeEmail                 of string
     | ForgotPasswordAttemptResult of Result<string, ForgotPasswordError>
     | UpdateValidationErrors 
-    | PasswordResetClicked
+    | PasswordResetClicked        of FormValidation
 
 type ExternalMsg =
     | NoOp
@@ -61,16 +61,18 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
                         | ForgotPasswordError.ForgotPasswordServerError e -> { model with ForgotPasswordErrors = handleLoginFlowServerError e; TryingToSendReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with EmailValidationErrors = InputValidators.emailValidation model.InputEmail }, Cmd.none, NoOp
-    | PasswordResetClicked ->
-        { model with TryingToSendReset = true }, Cmd.none, ForgotPassword { UserName = model.InputEmail } // TODO: hash password
-
+    | PasswordResetClicked validation ->
+        match validation with  
+        | Valid when model.EmailStartedTyping -> { model with TryingToSendReset = true }, Cmd.none, ForgotPassword { UserName = model.InputEmail } // TODO: hash password
+        | Valid
+        | InValid -> model, Cmd.none, NoOp
 
 
 let view model (dispatch: Msg -> unit) =
-    let buttonActive =  if not model.ForgotPasswordErrors.IsEmpty 
-                            && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
-                            && (model.EmailStartedTyping)
-                        then "btn-disabled" else "btn-info" 
+    let formValid =  if not model.ForgotPasswordErrors.IsEmpty 
+                            || hasErrors model.EmailStartedTyping model.EmailValidationErrors
+                            // || (model.EmailStartedTyping)
+                        then FormValidation.InValid else FormValidation.Valid 
     let errors = model.ForgotPasswordErrors @ model.EmailValidationErrors 
 
     if model.ShowSuccessPage then div [] [ str "Email sent Successfully"] // TODO: Add propoer content
@@ -104,8 +106,9 @@ let view model (dispatch: Msg -> unit) =
                                                         ]
                                                       button [  Type "submit"
                                                                 Class "btn btn-info block full-width m-b"
-                                                                OnClick (fun _ -> dispatch PasswordResetClicked)
-                                                                onEnter PasswordResetClicked dispatch ]
+                                                                OnClick (fun _ -> dispatch (PasswordResetClicked formValid ))
+                                                                onEnter (PasswordResetClicked formValid) dispatch 
+                                                                Disabled (formValid <> FormValidation.Valid || not model.EmailStartedTyping)]
                                                         [  (if model.TryingToSendReset then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                                                             else str "Reset password") ]
                                                       p [ Class "text-muted text-center" ]

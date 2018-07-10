@@ -16,6 +16,7 @@ open Shared
 open ViewModels
 open Client.FormHelpers
 
+open CabinetModel
 open ReactBootstrap
 open Helpers
 
@@ -23,8 +24,16 @@ open Helpers
 //     match model.TokenSale with
 //     | Some m -> Ibox.btRow "Timeline" ([ body m ])
 //     | None   -> Ibox.btRow "Timeline" ([ str "No model loaded" ]) 
-
-let personalData =
+let buttonTab (sideClass:string) (name:string) (key:int) (dispatch) = 
+    // comF copyToClipboard (fun o ->  o.text <- address
+    //                                 o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
+    //     [ 
+            comF button (fun o -> o.bsClass <- "btn btn-sm btn-info m-t-n-xs " + sideClass  |> Some
+                                  o.onClick <- React.MouseEventHandler(fun _ -> key |> TabChanged |> VerificationMsg |> dispatch) |> Some) 
+                  [  strong [ ]
+                            [ str name ] ]
+        //] 
+let personalData model dispatch =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-6 b-r" ]
             [ formHorizontal
@@ -56,10 +65,14 @@ let personalData =
                   fGroupO (FormElement.Input InputType.Date ) (None) "Registration Date" "Enter a Registration Date"
                
                   div [ ]
-                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-right m-t-n-xs")
-                        [ strong [ ]
-                            [ str "Next" ] ] ] ] ]]
-let address =
+                    [ 
+                       buttonTab "pull-right" "Next" 2 dispatch
+                    //    comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-right m-t-n-xs")
+                    //         [ strong [ ]
+                    //         [ str "Next" ] ] 
+                            
+                            ] ] ]]
+let address model dispatch =
     div [ Class "panel-body" ]
         [ div [ Class "col-lg-12 b-r" ]
             [ formHorizontal
@@ -75,17 +88,13 @@ let address =
                   fGroupO (FormElement.Input InputType.Text) (None) "Zipcode" "Enter a Zipcode"
 
                   div [ ]
-                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-left m-t-n-xs")
-                        [ strong [ ]
-                            [ str "Prev" ] ] ]
+                    [ buttonTab "pull-left" "Prev" 1 dispatch ]
                   
                   div [ ]
-                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-right m-t-n-xs")
-                        [ strong [ ]
-                            [ str "Next" ] ] ] ] ]
+                    [ buttonTab "pull-right" "Next" 3 dispatch ] ] ]
          ]
 
-let documentation =
+let documentation model dispatch =
     div [ Class "panel-body" ]
         [ 
           div [  ]
@@ -99,33 +108,37 @@ let documentation =
                         [ ] ] ] ]
                         
           div [ ]
-                    [ comF button (fun o -> o.bsClass <- Some "btn btn-sm btn-info pull-left m-t-n-xs")
-                        [ strong [ ]
-                            [ str "Prev" ] ] ]
+                    [ buttonTab "pull-left" "Prev" 2 dispatch ]
                                 
                         ]
 
 
 
-let tabs = comF tabs (fun o -> 
-                           o.defaultActiveKey <- Some (1 :> obj)
+let tabs (model:VerifiacationModel) dispatch = 
+                comF tabs (fun o -> 
+                           o.activeKey <- Some (model.CurrentTab :> obj)
                            o.id <- Some "verification"
+                           o.onSelect <- SelectCallback(fun k -> k.Value :?> int |> TabChanged |> VerificationMsg |> dispatch ) |> Some
                            o.animation <- Some false ) 
                            [
                               comF tab (fun o -> o.eventKey <- Some (1 :> obj) 
                                                  o.title <- Some "Personal data" ) 
-                                        [ personalData ]
+                                        [ personalData model dispatch]
 
                               comF tab (fun o -> o.eventKey <- Some (2 :> obj) 
                                                  o.title <- Some "Registration address" ) 
-                                        [ address ]
+                                        [ address model dispatch ]
 
                               comF tab (fun o -> o.eventKey <- Some (3 :> obj) 
                                                  o.title <- Some "Documentation" ) 
-                                        [ documentation ]
+                                        [ documentation model dispatch ]
                             ]
-
-let view = div [ Class "tabs-container"] [tabs]
+                
+let view model dispatch = 
+     div [ ]
+         [ div [ Class "tabs-container"] [ tabs model.VerificationModel dispatch ]
+        //    str (model.VerifiacationModel.CurrentTab.ToString())
+         ]
 
 
 // let view = Ibox.btRow "Verification" ([ Ibox.emptyRow [body]

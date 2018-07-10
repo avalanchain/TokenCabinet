@@ -660,3 +660,7 @@ pre {
     margin: 0 0 10px;
     background-color: #ffffff;
 }
+
+.nav-tabs>li>a {
+    margin-right: 0px;
+}

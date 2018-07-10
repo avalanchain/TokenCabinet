@@ -10,6 +10,10 @@ type AuthModel = {
     Token: AuthToken
 }
 
+type FormValidation =
+    | Valid
+    | InValid     
+
 type LoginState =
     | LoggedOut
     | LoggedIn  of AuthModel
@@ -21,8 +25,8 @@ let hasErrorsClass startedTyping (errors: List<_>) =
     if hasErrors startedTyping errors then "has-error" else ""
 let hasErrorsSpan startedTyping (errors: List<_>) =
     if hasErrors startedTyping errors 
-    then span [ Class "help-block" ] 
-            [ ul [ ]  [ for error in errors -> li [ ] [ str error ] ] ]
+    then span [ Class "text-danger" ] 
+            [ div [ Class "m-t-xs" ]  [ for error in errors -> div [ ] [ str error ] ] ]
     else emptyElement        
 
 let [<Literal>] ENTER_KEY = 13.

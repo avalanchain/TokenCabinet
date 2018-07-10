@@ -6,7 +6,7 @@ open Shared.WalletPublic
 
 
 type Msg =
-    | VerificationMsg
+    | VerificationMsg of VerificationMsg
     | PurchaseTokenMsg of PurchaseTokenMsg
     | MyInvestmentsMsg
     | ReferralProgramMsg
@@ -23,6 +23,8 @@ and PurchaseTokenMsg =
     | CCAmountChanges     of decimal
     | TAmountChanges      of decimal
     | AddressCopied       of string
+and VerificationMsg = 
+    | TabChanged          of int
 
 type Model = {
     Auth                   : AuthModel
@@ -35,6 +37,7 @@ type Model = {
     FullCustomer           : ViewModels.FullCustomer option
 
     PurchaseTokenModel     : PurchaseTokenModel
+    VerificationModel     : VerifiacationModel
 }
 and PurchaseTokenModel = {
     CCTokens               : decimal
@@ -43,3 +46,6 @@ and PurchaseTokenModel = {
     TotalPrice             : decimal
 } 
 
+and VerifiacationModel = {
+    CurrentTab             : int
+} 

@@ -15,6 +15,8 @@ open Elmish.React
 open ReactBootstrap
 open Helpers
 open FormHelpers
+open CabinetModel
+open ReactCopyToClipboard
 
 
 // let helper2 = div [ Class "col-md-12" ] [
@@ -34,7 +36,7 @@ open FormHelpers
 // ]
 
 let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
-                p [ Class "p-xs" ] 
+                div [ Class "p-xs" ] 
                   [
                     div [ Class "pull-left m-r-md" ]
                         [ i [ Class "fa fa-globe text-info mid-icon" ] [ ] ]    
@@ -45,25 +47,42 @@ let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
                    ]]]
         
         // div[ Class "col-sm-10 input-group"]
-let spanBtn = span [ Class "input-group-btn" ] 
-                   [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
-                        [ strong [ ]
-                            [ str "Copy" ] ] ]    
+let spanBtn (address:string) (dispatch: PurchaseTokenMsg -> unit) =
+              comF copyToClipboard (fun o ->  o.text <- address
+                                              o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
+                [ span [ Class "input-group-btn" ] 
+                           [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
+                                [ strong [ ]
+                                    [ str "Copy" ] ] ] ]   
 
+let copiedAddress (address:string) (dispatch: PurchaseTokenMsg -> unit) = 
+    comF copyToClipboard (fun o ->  o.text <- address
+                                    o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
+        [ 
+            comF button (fun o -> o.bsClass <- "btn btn-success btn-outline pull-right"  |> Some )
+                  [ str "Copy Address" ]
+        ]
 
+let fullInput (address:string)  = //((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
+                input [ 
+                        Type "text" 
+                        ClassName "form-control" 
+                        Value address
+                         ]
 
-let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
-let bodyLink = formHorizontal 
+let bodyLink address dispatch = 
+                    formHorizontal 
                         ([fGroupEmpty ([labelG "Link"
                                         div [ Class "col-sm-10"] 
                                             [div [ Class "input-group"] 
-                                                 fullInput
+                                                 [ fullInput address
+                                                   spanBtn address dispatch]
                                             ]
                                             ])] 
                                             )
                         // @ [spanBtn])
 
-let referalLink = Ibox.btRow "Referal Link" [bodyLink]
+let referalLink address dispatch = Ibox.btRow "Referal Link" [bodyLink address dispatch]
 
 
 let referals = Ibox.btRow "Referals" [
@@ -79,7 +98,7 @@ let referals = Ibox.btRow "Referals" [
                         tbody [][]
                     ]
                 ]
-
-let view = Ibox.emptyRow [ helper
-                           referalLink
-                           referals]
+let address:string = "https://demo.avalanchain.com/mycihYk4HRuYjA1msutjyVGNfaAeyMfc3a"
+let view model dispatch = Ibox.emptyRow [ helper
+                                          referalLink address (PurchaseTokenMsg >> dispatch)
+                                          referals ]

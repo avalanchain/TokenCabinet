@@ -26,7 +26,8 @@ type Msg =
     | ChangePassword        of string
     | LoginAttemptResult    of Result<AuthToken, LoginError>
     | UpdateValidationErrors 
-    | LogInClicked
+    | LogInClicked          of FormValidation
+
 
 type ExternalMsg =
     | NoOp
@@ -70,19 +71,20 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
     | UpdateValidationErrors -> 
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
                         PasswordValidationErrors = InputValidators.passwordValidation model.InputPassword }, Cmd.none, NoOp
-    | LogInClicked ->
-        { model with TryingToLogin = true }, Cmd.none, LoginUser { Email = model.InputEmail; Password = model.InputPassword } // TODO: hash password
+    | LogInClicked validation ->
+        match validation with 
+        | Valid when model.EmailStartedTyping -> { model with TryingToLogin = true }, Cmd.none, LoginUser { Email = model.InputEmail; Password = model.InputPassword } // TODO: hash password
+        | Valid
+        | InValid -> model, Cmd.none, NoOp
 
 
 let view (model: Model) (dispatch: Msg -> unit) = 
-    let buttonDisabled = not model.LoginErrors.IsEmpty 
-                            || hasErrors model.EmailStartedTyping model.EmailValidationErrors 
-                            || hasErrors model.PasswordStartedTyping model.PasswordValidationErrors 
-                        
+    let formValid =  if not model.LoginErrors.IsEmpty 
+                             || hasErrors model.EmailStartedTyping model.EmailValidationErrors 
+                             || hasErrors model.PasswordStartedTyping model.PasswordValidationErrors 
+                     then FormValidation.InValid else FormValidation.Valid
 
-    div [ Class "login"
-        // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
-        ]
+    div [ Class "login" ]
         [ div [ Class "middle-box text-center loginscreen  animated fadeInDown" ]
               [   div [ ]
                     [ img [ Alt "image"
@@ -112,9 +114,9 @@ let view (model: Model) (dispatch: Msg -> unit) =
                         ]
                       a [ Type "submit"
                           Class ("btn btn-info block full-width m-b")
-                          OnClick (fun _ -> dispatch LogInClicked)
-                          onEnter LogInClicked dispatch 
-                          Disabled buttonDisabled
+                          OnClick (fun _ -> dispatch (LogInClicked formValid) )
+                          onEnter (LogInClicked formValid) dispatch 
+                          Disabled (formValid <> FormValidation.Valid || not model.EmailStartedTyping)
                         ]
                         [  (if model.TryingToLogin then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                             else str "Login") ] 

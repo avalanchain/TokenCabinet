@@ -25,7 +25,7 @@ type Msg =
     | ChangeConfPassword        of string
     | RegisteringAttemptResult  of Result<AuthToken, RegisteringError>
     | UpdateValidationErrors 
-    | RegisterClicked
+    | RegisterClicked           of FormValidation
 
 type ExternalMsg =
     | NoOp
@@ -78,17 +78,18 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         { model with    EmailValidationErrors = InputValidators.emailValidation model.InputEmail
                         PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
                         PasswordConfValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword }, Cmd.none, NoOp
-    | RegisterClicked ->
-        { model with TryingToRegister = true }, Cmd.none, RegisterUser { Email = model.InputEmail; Password = model.InputPassword } // TODO: hash password
-
+    | RegisterClicked validation ->
+        match validation with 
+        | Valid -> { model with TryingToRegister = true }, Cmd.none, RegisterUser { Email = model.InputEmail; Password = model.InputPassword } // TODO: hash password
+        | InValid -> model, Cmd.none, NoOp
 
 let view model (dispatch: Msg -> unit) =
-    let buttonActive =  if not model.RegisteringErrors.IsEmpty 
-                            && hasErrors model.EmailStartedTyping model.EmailValidationErrors |> not
-                            && hasErrors model.PasswordStartedTyping model.PasswordValidationErrors |> not
-                            && hasErrors model.PasswordConfStartedTyping model.PasswordConfValidationErrors |> not
-                            && (model.EmailStartedTyping || model.PasswordStartedTyping || model.PasswordConfStartedTyping)
-                        then "btn-disabled" else "btn-info"        
+    let formValid =  if not model.RegisteringErrors.IsEmpty 
+                              || hasErrors model.EmailStartedTyping model.EmailValidationErrors
+                              || hasErrors model.PasswordStartedTyping model.PasswordValidationErrors 
+                              || hasErrors model.PasswordConfStartedTyping model.PasswordConfValidationErrors 
+                            //   && (model.EmailStartedTyping || model.PasswordStartedTyping || model.PasswordConfStartedTyping)
+                     then FormValidation.InValid else FormValidation.Valid    
     div [ Class "login"
             // HTMLAttr.Custom ("style", "background: white; padding: 10% 0px; height: 100vh") 
             ]
@@ -130,8 +131,9 @@ let view model (dispatch: Msg -> unit) =
                           a [ 
                               Type "submit"
                               Class "btn btn-info block full-width m-b"
-                              OnClick (fun _ -> dispatch RegisterClicked)
-                              onEnter RegisterClicked dispatch 
+                              OnClick (fun _ -> dispatch (RegisterClicked formValid))
+                              onEnter (RegisterClicked formValid) dispatch 
+                              Disabled (formValid <> FormValidation.Valid || not model.EmailStartedTyping)
                               ]
                             [  (if model.TryingToRegister then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                                 else str "Register") ] 

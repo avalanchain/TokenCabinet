@@ -24,7 +24,7 @@ type FormElement =
     | Textarea
     | Static
 and InputType =
-    | Email
+    | Email 
     | Text
     | Date
     | Submit
@@ -87,4 +87,4 @@ let fGroupO (element:FormElement) v labelText helpText =
 
 
 let fGroupEmpty body = 
-    comE formGroup [Ibox.emptyRow body]
+    comE formGroup body
