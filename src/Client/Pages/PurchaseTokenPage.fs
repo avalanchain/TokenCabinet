@@ -100,24 +100,24 @@ let bodyP model  =
              [ str ("Discount 20%" )] ]
 
  
-let discAr = [10, 1000; 20, 2000; 30, 3000; 40, 4000; 50, 5000; 60, 6000; 70, 7000; 80, 8000; 90, 9000; 100, 10000]
+let discountArray = [|1000m, 10m; 2000m, 20m; 3000m, 30m; 4000m, 40m; 5000m, 50m; 6000m, 60m; 7000m, 70m; 8000m, 80m; 9000m, 90m; 10000m, 100m|]
 
 let bonus (m: PurchaseTokenModel) = 
       div [ Class "col-sm-11" ]
           [ ul [ Class "timeline shift"
                  Id "timeline" ]
                [
-                 for (per, tokens) in discAr ->
-                   let isComplete per (tokens: decimal) = if (decimal (per*100)) > tokens then " "
-                                                          else "complete"
+                 for (boundary, percent) in discountArray ->
+                   let isComplete = if boundary > m.BuyTokens then " "
+                                    else "complete"
                    
-                   li [ Class ("li " + (isComplete per m.BuyTokens))]
+                   li [ Class ("li " + isComplete )]
                       [ div [ Class "timestamp" ]
                           [ span [ Class "author" ]
-                              [ str (tokens.ToString()) ] ]
+                              [ str (boundary.ToString()) ] ]
                         div [ Class "status" ]
                           [ h4 [ ]
-                              [ str (per.ToString() + " %") ] ] ]
+                              [ str (percent.ToString() + " %") ] ] ]
                ]]
 // [<Pojo>]
 // type QrCodeProps =
@@ -236,14 +236,14 @@ let counter (m: Model) dispatch = div [ Class ("col-md-6") ]
 let range volume = ofImport "default" "react-rangeslider" 
                             (createObj [  "value" ==> volume 
                                           "min" ==> 0
-                                          "max" ==> 1000
+                                          "max" ==> 1500000
                                           "from" ==> 200
-                                          "to" ==> 800
+                                          "to" ==> 1232434
                                           "type" ==> "double" 
                                           "prefix" ==> "$" 
                                           ]) []
 let tokenSale (m:ViewModels.TokenSale) = 
-    div [Class "col-md-5 col-md-offset-1"]
+    div [ Class "col-md-5 col-md-offset-1" ]
         [
          ul [ Class "stat-list" ]
             [  li [ Class "row" ]
@@ -291,7 +291,7 @@ let tokenSale (m:ViewModels.TokenSale) =
                     [ str "Counted" ]
                   div []
                         [
-                            range 600
+                            range 1232434
                         ] ]
             //   li [ ]
             //     [ h2 [ Class "no-margins " ]
@@ -321,9 +321,45 @@ let bounusLeft (tokenSale:TokenSale) =
                [ str "Bonus" ]
         ]
 
+let countBonus (buyTokens:decimal) = 
+        discountArray
+        |> Array.tryFindBack (fun (boundary, value) -> buyTokens >= boundary)
+        |> Option.defaultValue (0m, 0m)
+        |> fun (_, percent) -> buyTokens * percent / 100m 
+        // |> Array.find (fun (bound, value) -> buyTokens <= bound)
+        // |> fst  
+            //|> Map.filter (fun percents _ -> (decimal (percents * 100)) > buyTokens  )
+
+                // for (percents, tokens) in discountArray ->
+                //    let isComplete percents (tokens: decimal) = if (decimal (percents * 100)) > tokens then " "
+                //                                                else percents * 100
+                // isComplete percents buyTokens                                         
+                   
+                   
+let totalCoins (m: Model) = 
+    div [ Class "col-md-5 col-md-offset-1" ]
+        [
+            h2 [ ]
+               [
+                    str ( "Tokens: " + string (roundFour m.PurchaseTokenModel.BuyTokens))
+                    span [ Class "text-navy pull-right" ]
+                       [
+                            str ( " Bonus: " + string (roundFour (countBonus m.PurchaseTokenModel.BuyTokens)))
+                        ]  
+               ]
+            h1 [ ]
+               [
+                   span [ Class "pull-right font-bold" ]
+                       [
+                    str ( " Total: " + string (roundFour ( m.PurchaseTokenModel.BuyTokens + (countBonus m.PurchaseTokenModel.BuyTokens))))
+                    
+                    ]
+               ] 
+        ]
 
 let counterRow (m: Model) dispatch = Ibox.emptyRow [ counter m dispatch 
-                                                     bodySomeNone m tokenSale]   
+                                                     bodySomeNone m tokenSale
+                                                     totalCoins m ]   
 
 let invest m dispatch = 
     Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
