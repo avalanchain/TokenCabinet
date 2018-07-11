@@ -362,5 +362,5 @@ module Moment =
         abstract relativeTimeThreshold: threshold: string * limit: float -> bool
         abstract now: unit -> float
 
-    let [<Import("*","moment")>] Global: MomentStatic = failwith "JS only"
+    let [<Import("*","moment")>] moment: MomentStatic = failwith "JS only"
 
