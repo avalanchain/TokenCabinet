@@ -2,10 +2,13 @@
 module rec Web3Types
 open System
 open Fable.Core
+open Fable.Import
 open Fable.Import.JS
 
-module Us = Underscore
-type BigNumber = Bn_js.BigNumber
+open BigNumber // TODO: bindings may be outdated 
+
+// module Us = Underscore
+// type BigNumber = Bn_js.BigNumber
 
 type [<AllowNullLiteral>] IExports =
     abstract Eth: EthStatic
@@ -318,7 +321,7 @@ type [<AllowNullLiteral>] Utils =
     abstract isBigNumber: any: obj option -> bool
     abstract isAddress: any: obj option -> bool
     abstract isHex: any: obj option -> bool
-    abstract ``_``: Us.UnderscoreStatic with get, set
+    // abstract ``_``: Us.UnderscoreStatic with get, set
     abstract asciiToHex: ``val``: string -> string
     abstract hexToAscii: ``val``: string -> string
     abstract bytesToHex: ``val``: ResizeArray<float> -> string
