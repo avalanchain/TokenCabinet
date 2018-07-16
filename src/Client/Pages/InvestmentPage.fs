@@ -23,6 +23,8 @@ open CabinetModel
 
 open ReactCopyToClipboard
 
+
+// let coinbaseAccount = 
 let bodySomeNoneCustomer model (fullCustomer: FullCustomer option) body dispatch=
     match fullCustomer with
             | Some fc ->  body model fc dispatch

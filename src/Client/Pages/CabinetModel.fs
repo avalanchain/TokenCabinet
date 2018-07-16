@@ -3,6 +3,7 @@ module Client.CabinetModel
 open Shared
 open LoginCommon
 open Shared.WalletPublic
+open Elmish.Toastr
 
 
 type Msg =
@@ -23,6 +24,7 @@ and PurchaseTokenMsg =
     | CCAmountChanges     of decimal
     | TAmountChanges      of decimal
     | AddressCopied       of string
+    | BuyTokens           //of decimal
 and VerificationMsg = 
     | TabChanged          of int
 
@@ -44,8 +46,25 @@ and PurchaseTokenModel = {
     BuyTokens              : decimal
     CCAddress              : string
     TotalPrice             : decimal
+    IsConnecting           : bool
 } 
 
 and VerifiacationModel = {
     CurrentTab             : int
 } 
+
+
+let toastrCommon (status:TostrStatus) text =   
+                    Toastr.message text
+                    |> Toastr.withProgressBar
+                    |> Toastr.position BottomRight
+                    |> Toastr.timeout 2000
+                    |> match status with
+                        | TostrStatus.Success -> Toastr.success
+                        | TostrStatus.Err -> Toastr.error
+                        | TostrStatus.Warning -> Toastr.warning
+                        | TostrStatus.Info -> Toastr.info
+let toastrSuccess text = toastrCommon TostrStatus.Success text
+let toastrError text = toastrCommon TostrStatus.Err text
+let toastrWarning text = toastrCommon TostrStatus.Warning text
+let toastrInfo text = toastrCommon TostrStatus.Info text

@@ -2,10 +2,11 @@
 module rec Web3Types
 open System
 open Fable.Core
+open Fable.Import
 open Fable.Import.JS
 
-module Us = Underscore
-type BigNumber = Bn_js.BigNumber
+// module Us = Underscore
+open BigNumber 
 
 type [<AllowNullLiteral>] IExports =
     abstract Eth: EthStatic
@@ -206,18 +207,18 @@ type [<AllowNullLiteral>] Signature =
     abstract s: string with get, set
     abstract v: string with get, set
 
-type [<AllowNullLiteral>] Tx =
+type [<AllowNullLiteral>] Tx = 
     abstract nonce: U2<string, float> option with get, set
     abstract chainId: U2<string, float> option with get, set
     abstract from: string option with get, set
     abstract ``to``: string option with get, set
     abstract data: string option with get, set
-    abstract value: U2<string, float> option with get, set
+    abstract value: U2<string, BigNumber> option with get, set
     abstract gas: U2<string, float> option with get, set
     abstract gasPrice: U2<string, float> option with get, set
 
 type [<AllowNullLiteral>] IProvider =
-    abstract send: payload: JsonRPCRequest * callback: (Error -> JsonRPCResponse -> unit) -> obj option
+    abstract send: payload: JsonRPCRequest * callback: (Error -> JsonRPCResponse -> unit) -> Promise<obj option>
 
 type [<AllowNullLiteral>] WebsocketProvider =
     inherit IProvider
@@ -318,7 +319,7 @@ type [<AllowNullLiteral>] Utils =
     abstract isBigNumber: any: obj option -> bool
     abstract isAddress: any: obj option -> bool
     abstract isHex: any: obj option -> bool
-    abstract ``_``: Us.UnderscoreStatic with get, set
+    // abstract ``_``: Us.UnderscoreStatic with get, set
     abstract asciiToHex: ``val``: string -> string
     abstract hexToAscii: ``val``: string -> string
     abstract bytesToHex: ``val``: ResizeArray<float> -> string

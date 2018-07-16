@@ -7,7 +7,7 @@ open Fable.Import.JS
 module T = Web3Types
 
 let [<Import("*","web3")>] web3Factory: Web3Static = jsNative
-let web3 = web3Factory.Create()
+// let web3 = web3Factory.Create()
 
 type [<AllowNullLiteral>] IExports =
     abstract Web3: Web3Static

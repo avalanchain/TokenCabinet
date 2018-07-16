@@ -31,6 +31,10 @@ importAll "../../../node_modules/react-moment/dist/index.js"
 importAll "../../../node_modules/react-rangeslider/lib/Rangeslider.js"
 importAll "../../../node_modules/react-rangeslider/lib/index.js"
 
+
+// importAll "../../../node_modules/ion-rangeslider/css/ion.rangeSlider.skinFlat.css"
+// importAll "../../../node_modules/ion-rangeslider/js/ion.rangeSlider.min.js"
+
 let calcPrice activeSymbol (tick: ViewModels.CurrencyPriceTick) f =
     tick.Prices 
     |> List.tryFind(fun p -> p.Symbol = activeSymbol)
@@ -226,13 +230,26 @@ let bodyCounter m (model:PurchaseTokenModel) dispatch =
                           ] 
                      ] 
                 div [ Class "col-lg-6 " ]
-                    [ a [ Class "btn btn-primary btn-sm" ]
-                        [ str "BUY TOKENS" ] ] 
+                    [   
+                        comF button (fun o -> o.bsClass <- "btn btn-primary btn-sm"  |> Some
+                                              o.onClick <- React.MouseEventHandler(fun _ -> BuyTokens |> dispatch) |> Some  )
+                                    [ 
+                                        (if false then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                                         else str "BUY TOKENS") ]
+                        
+                           
+                           ] 
                   ]]
 
 let counter (m: Model) dispatch = div [ Class ("col-md-6") ]
-                                      [ bodySomeNoneTwoModels m bodyCounter dispatch ]
+                                      [ bodySomeNoneTwoModels m bodyCounter (dispatch) ]
 
+
+///TODO: add jquery slider range with flat ui
+// let jq = importDefault<obj> "jquery"
+// let go = jq $ ("#go")
+
+// let rangeTest volume =
 let range volume = ofImport "default" "react-rangeslider" 
                             (createObj [  "value" ==> volume 
                                           "min" ==> 0
@@ -285,14 +302,33 @@ let tokenSale (m:ViewModels.TokenSale) =
                     
             //      ]       
                li [ ]
-                [ h2 [ Class "no-margins" ]
-                    [ str " 1232434 ETH"  ]
-                  small [ ]
-                    [ str "Counted" ]
-                  div []
-                        [
-                            range 1232434
-                        ] ]
+                [ 
+                  div [ ]
+                      [
+                          h2 [ Class "no-margins" ]
+                             [ str " 1232434 ETH"  ]
+                          small [ ]
+                            [ str "Counted" ]
+                          div []
+                                [
+                                    range 1232434
+                                ] 
+                      ]    
+                    
+                  ]
+
+                //   div [ Class "col-lg-offset-6 col-lg-6" ]
+                //       [
+                //           h2 [ Class "no-margins" ]
+                //              [ str " 1232434 ETH"  ]
+                //           small [ ]
+                //             [ str "Counted" ]
+                         
+                //       ]    
+                //   div [ Class " col-lg-12" ]
+                //       [
+                //           range 1232434
+                //       ] 
             //   li [ ]
             //     [ h2 [ Class "no-margins " ]
             //         [ str (m.Expectations.ToString() + " ETH" ) ]

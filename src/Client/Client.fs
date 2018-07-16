@@ -51,10 +51,61 @@ let ethHost = match Utils.load<string> "EthereumHost" with
 // let web3: Web3Impl = !!createNew web3 (createNew httpProvider ethHost)
 // Browser.console.log web3
 
-open Web3
+// open Web3
+// open Web3Types
+// open Fable.Import.BigNumber
 
-console.log (sprintf "web3: '%A'" web3)
+// [<Emit("window.web3")>]
+// let web3: Web3 = jsNative
+// console.log (sprintf "web3: '%A'" web3)
+// console.log (sprintf "web3cp: '%A'" web3.currentProvider)
 
+// // let w3 = web3Factory.Create("http://127.0.0.1:8545" |> U2.Case2 )
+// let w3 = web3Factory.Create(web3.currentProvider |> U2.Case1 )
+
+// console.log (sprintf "w3: '%A'" w3)
+
+// // console.log (sprintf "accounts1: '%A'" w3.eth.accounts  ) 
+// promise {
+//     let! accs = w3.eth.getAccounts()
+//     console.log "accs"
+//     console.log accs
+//     let! bal = w3.eth.getBalance(accs.[0])
+//     console.log "bal"
+//     console.log (bal / 1000000000000000000.)
+
+//     let! coinbase = w3.eth.getCoinbase()
+//     console.log "coinbase"
+//     console.log (coinbase)
+//     let amount = w3.utils.toWei("1" |> U3.Case1, Web3Types.Unit.Ether)
+    
+//     // let provider = web3.currentProvider :> obj :?> IProvider
+//     // let! _ = provider.send(jsOptions<JsonRPCRequest>(fun r ->  r.method <- "personal_sign" |> Some 
+//     //                                                            r.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )) 
+
+//     let tr = jsOptions<Tx>(fun  tx -> tx.value <- amount |> Some 
+//                                       tx.from <- Some coinbase
+//                                       tx.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )
+ 
+//     //coinbase,"0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE"
+
+//     let! tx = w3.eth.sendTransaction tr
+
+//     console.log tx
+
+//     let! balance = w3.eth.getBalance("0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE")
+//     // let! sendSignedTransaction = w3.eth.sendSignedTransaction(coinbase,"0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )
+//     // let! newAccount = w3.eth.personal.newAccount("123")
+//     // console.log "newAccount"
+//     // console.log (newAccount)
+//     console.log "getBalanse"
+//     console.log (balance)
+//     let! accs = w3.eth.getAccounts()
+//     console.log accs
+// }
+// |> Promise.start
+
+// 0x22eB149b6885c07B4BB2dC5F374c1DA904e062cE aac
 // let www3: obj = importAll "../Client/W3.ts"
 // Browser.console.log (sprintf "www3: '%A'" www3)
 

@@ -31,16 +31,18 @@ let navBar (fullCustomer: FullCustomer option) (dispatch: UIMsg -> unit)  =
                           Href "#" ]
                         [ i [ Class "fa fa-bars" ]
                             [ ] ]
-                      form [ Role "search"
-                             Class "navbar-form-custom"
-                             Method "post"
-                             Action "#" ]
-                        [ div [ Class "form-group" ]
-                            [ input [ Type "text"
-                                      Placeholder "Search for something..."
-                                      Class "form-control"
-                                      Name "top-search"
-                                      Id "top-search" ] ] ] ]
+                    //   form [ Role "search"
+                    //          Class "navbar-form-custom"
+                    //          Method "post"
+                    //          Action "#" ]
+                    //     [ div [ Class "form-group" ]
+                    //         [ input [ Type "text"
+                    //                   Placeholder "Search for something..."
+                    //                   Class "form-control"
+                    //                   Name "top-search"
+                    //                   Id "top-search" ] ] ] 
+                                      
+                                      ]
                   ul [ Class "nav navbar-top-links navbar-right" ]
                     [ li [ ]
                          [ a [ Href "#" 

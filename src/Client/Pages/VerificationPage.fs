@@ -20,15 +20,23 @@ open CabinetModel
 open ReactBootstrap
 open Helpers
 
-// let bodyRowSomeNone (model: Model) body =
-//     match model.TokenSale with
-//     | Some m -> Ibox.btRow "Timeline" ([ body m ])
-//     | None   -> Ibox.btRow "Timeline" ([ str "No model loaded" ]) 
+
+let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
+                div [ Class "p-xs" ] 
+                  [
+                    div [ Class "pull-left m-r-md" ]
+                        [ i [ Class "fa fa-address-card text-info mid-icon" ] [ ] ]    
+                    h2 [ ] [
+                       str "AML/KYC Verification" ]
+                    span [ ] [
+                            str "Please, fill out the form. It will take several minutes. "
+                   ]]]
+
 let buttonTab (sideClass:string) (name:string) (key:int) (dispatch) = 
     // comF copyToClipboard (fun o ->  o.text <- address
     //                                 o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
     //     [ 
-            comF button (fun o -> o.bsClass <- "btn btn-sm btn-info m-t-n-xs " + sideClass  |> Some
+            comF button (fun o -> o.bsClass <- "btn btn-sm btn-info btn-outline btn-w-sm m-t-n-xs " + sideClass  |> Some
                                   o.onClick <- React.MouseEventHandler(fun _ -> key |> TabChanged |> VerificationMsg |> dispatch) |> Some) 
                   [  strong [ ]
                             [ str name ] ]
@@ -74,7 +82,7 @@ let personalData model dispatch =
                             ] ] ]]
 let address model dispatch =
     div [ Class "panel-body" ]
-        [ div [ Class "col-lg-12 b-r" ]
+        [ div [ Class "col-lg-12" ]
             [ formHorizontal
                 [ fGroupO (FormElement.Input InputType.Date) (None) "Country" "Enter a Country"
                   div [ Class "hr-line-dashed" ] [ ]
@@ -136,7 +144,8 @@ let tabs (model:VerifiacationModel) dispatch =
                 
 let view model dispatch = 
      div [ ]
-         [ div [ Class "tabs-container"] [ tabs model.VerificationModel dispatch ]
+         [ helper
+           div [ Class "tabs-container"] [ tabs model.VerificationModel dispatch ]
         //    str (model.VerifiacationModel.CurrentTab.ToString())
          ]
 

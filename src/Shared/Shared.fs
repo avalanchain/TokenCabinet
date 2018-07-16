@@ -4,6 +4,8 @@ open System
 open Auth
 
 type Counter = int
+
+type TostrStatus = Success | Warning | Err | Info
  
 type CryptoCurrencySymbol = ETH | ETC | BTC | LTC | BCH | BTG | DASH
 

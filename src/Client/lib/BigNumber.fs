@@ -46,7 +46,7 @@ module BigNumber =
         (** The remainder is always positive. Euclidian division: `q = sign(n) * floor(a / abs(n))` *)
         | EUCLID = 9
 
-    and [<AllowNullLiteral>] [<Import("*","bignumber.js")>] BigNumber(value: U3<float, string, BigNumber>, ?``base``: float) =
+    and [<AllowNullLiteral>] [<Import("*","bn.js")>] BigNumber(value: U3<float, string, BigNumber>, ?``base``: float) =
         member __.ROUND_UP with get(): RoundingMode = jsNative and set(v: RoundingMode): unit = jsNative
         member __.ROUND_DOWN with get(): RoundingMode = jsNative and set(v: RoundingMode): unit = jsNative
         member __.ROUND_CEIL with get(): RoundingMode = jsNative and set(v: RoundingMode): unit = jsNative

@@ -664,3 +664,7 @@ pre {
 .nav-tabs>li>a {
     margin-right: 0px;
 }
+
+.btn-w-sm {
+    min-width: 60px;
+}

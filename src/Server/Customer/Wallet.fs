@@ -80,3 +80,23 @@ let createCustomerWallet id =
     {   CustomerId  = id
         Main = mainEnv
         Test = testEnv }
+
+
+type MType = 
+    | A of int
+
+
+let f (t: MType) = 
+    let mtype = A 2
+    let (A inner) = mtype
+    inner
+
+
+// let addAccountToNet eAccount = 
+//     //  Nethereum.Web3.Web3(account)
+//     let (CCPrivKey privateKey) = eAccount.EPrivKey
+//     let acc = new Nethereum.Web3.Accounts.Account(privateKey)
+    
+    // let web3 = new Nethereum.Web3.Web3(acc, "http://localhost:8545")
+    // web3.Eth.
+    // web3.Personal.NewAccount.
