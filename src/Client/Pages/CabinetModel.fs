@@ -4,6 +4,7 @@ open Shared
 open LoginCommon
 open Shared.WalletPublic
 open Elmish.Toastr
+open Fable.PowerPack
 
 
 type Msg =
@@ -25,6 +26,7 @@ and PurchaseTokenMsg =
     | TAmountChanges      of decimal
     | AddressCopied       of string
     | BuyTokens           //of decimal
+    | SignResult          of Result<string, string>
 and VerificationMsg = 
     | TabChanged          of int
 
@@ -39,20 +41,24 @@ type Model = {
     FullCustomer           : ViewModels.FullCustomer option
 
     PurchaseTokenModel     : PurchaseTokenModel
-    VerificationModel     : VerifiacationModel
+    VerificationModel      : VerifiacationModel
+
+    IsWeb3                 : bool
 }
 and PurchaseTokenModel = {
     CCTokens               : decimal
     BuyTokens              : decimal
     CCAddress              : string
     TotalPrice             : decimal
-    IsConnecting           : bool
+    IsLoading              : bool
 } 
 
 and VerifiacationModel = {
     CurrentTab             : int
 } 
 
+
+type TostrStatus = Success | Warning | Err | Info
 
 let toastrCommon (status:TostrStatus) text =   
                     Toastr.message text
