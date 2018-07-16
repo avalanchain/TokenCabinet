@@ -26,6 +26,8 @@ open Dapper
 
 open TypeShape.Tools
 
+open Elmish
+open Elmish.Bridge
 
 let publicPath = Path.GetFullPath "../Client/public"
 
@@ -565,6 +567,8 @@ let errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) =
         // ignore error
         Ignore
 
+
+
 let webApp config =
     // Setting up remoting
     let loginProtocol =
@@ -583,6 +587,10 @@ let webApp config =
         {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
             initDb          = initDb            >> Async.AwaitTask }
         
+    let bridgeProtocol =
+        bridge init update {
+            at Shared.endpoint
+        }        
         
     choose [
         remoting loginProtocol {
@@ -597,6 +605,7 @@ let webApp config =
             use_route_builder Route.builder
             use_error_handler errorHandler
         }
+        bridgeProtocol
         Router.router
     ]
 

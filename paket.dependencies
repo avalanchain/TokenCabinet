@@ -5,6 +5,7 @@ group Server
     nuget FSharp.Core
     nuget Saturn
     nuget Fable.Remoting.Giraffe ~> 2.6
+    nuget Elmish.Bridge.Giraffe
     
     nuget Dapper
     nuget Simple.Migrations
@@ -37,6 +38,8 @@ group Client
     nuget Fable.React
     nuget Fable.DateFunctions
     nuget Elmish.Toastr
+    nuget Elmish.Bridge.HMR
+    nuget Elmish.Bridge.Client
 
     clitool dotnet-fable
 
