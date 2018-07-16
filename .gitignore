@@ -12,3 +12,4 @@ release.sh
 *.DotSettings.user
 bundle.js*
 public/
+src/Server/database.sqlite
