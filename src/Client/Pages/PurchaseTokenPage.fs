@@ -55,7 +55,7 @@ let bodySomeNone (model: Model) body =
 
 let bodySomeNoneTwoModels (model: Model) body dispatch =
     match model.TokenSale with
-    | Some m ->  body m model.PurchaseTokenModel dispatch
+    | Some m ->  body model.ActiveSymbol model.IsWeb3 m model.PurchaseTokenModel dispatch
     | None   ->  str "No model loaded" 
 
 let cur symbol image price isActive dispatch =
@@ -174,7 +174,8 @@ let currenciesGroup (model: Model) dispatch =
                             ]  
                             ]
 
-let bodyCounter m (model:PurchaseTokenModel) dispatch = 
+let bodyCounter activeSymbol isWeb3 m (model:PurchaseTokenModel) dispatch = 
+    let isHide = if (activeSymbol = CryptoCurrencySymbol.ETH && (not isWeb3) && model.CCTokens <> 0m && model.BuyTokens <> 0m) then "" else "hidden" 
     dl [ Class "dl-horizontal" ]
         [ dt [ ]
             [ h4 [ ]
@@ -231,10 +232,10 @@ let bodyCounter m (model:PurchaseTokenModel) dispatch =
                      ] 
                 div [ Class "col-lg-6 " ]
                     [   
-                        comF button (fun o -> o.bsClass <- "btn btn-primary btn-sm"  |> Some
+                        comF button (fun o -> o.bsClass <- "btn btn-primary full-width btn-sm " + isHide |> Some
                                               o.onClick <- React.MouseEventHandler(fun _ -> BuyTokens |> dispatch) |> Some  )
                                     [ 
-                                        (if false then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                                        (if model.IsLoading then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                                          else str "BUY TOKENS") ]
                         
                            

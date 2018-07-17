@@ -38,52 +38,15 @@ open Fable.Import.BigNumber
 
 [<Emit("window.web3")>]
 let web3: Web3 = jsNative
-console.log (sprintf "web3: '%A'" web3)
-console.log (sprintf "web3cp: '%A'" web3.currentProvider)
+// console.log (sprintf "web3: '%A'" web3)
+// console.log (sprintf "web3cp: '%A'" web3.currentProvider)
+let IsWeb3 = isNull web3
 
+console.log (sprintf "IsW3: '%A'" IsWeb3)
 // let w3 = web3Factory.Create("http://127.0.0.1:8545" |> U2.Case2 )
 let w3 = web3Factory.Create(web3.currentProvider |> U2.Case1 )
 
-console.log (sprintf "w3: '%A'" w3)
 
-// console.log (sprintf "accounts1: '%A'" w3.eth.accounts  ) 
-// promise {
-//     let! accs = w3.eth.getAccounts()
-//     console.log "accs"
-//     console.log accs
-//     let! bal = w3.eth.getBalance(accs.[0])
-//     console.log "bal"
-//     console.log (bal / 1000000000000000000.)
-
-//     let! coinbase = w3.eth.getCoinbase()
-//     console.log "coinbase"
-//     console.log (coinbase)
-//     let amount = w3.utils.toWei("1" |> U3.Case1, Web3Types.Unit.Ether)
-    
-//     // let provider = web3.currentProvider :> obj :?> IProvider
-//     // let! _ = provider.send(jsOptions<JsonRPCRequest>(fun r ->  r.method <- "personal_sign" |> Some 
-//     //                                                            r.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )) 
-
-//     let tr = jsOptions<Tx>(fun  tx -> tx.value <- amount |> Some 
-//                                       tx.from <- Some coinbase
-//                                       tx.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )
- 
-//     //coinbase,"0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE"
-
-//     // let! tx = w3.eth.sendTransaction tr
-
-//     // console.log tx
-
-//     // let! balance = w3.eth.getBalance("0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE")
-
-//     // console.log "newAccount"
-//     // console.log (newAccount)
-//     // console.log "getBalanse"
-//     // console.log (balance)
-//     let! accs = w3.eth.getAccounts()
-//     console.log accs
-// }
-// |> PowerPack.Promise.start
 
 let init authToken = 
     {   Auth                    = { Token = authToken }
@@ -96,11 +59,12 @@ let init authToken =
                                     BuyTokens = 0m
                                     TotalPrice = 0m
                                     CCAddress = "" 
-                                    IsConnecting = false
+                                    IsLoading = false
                                     }
         VerificationModel       = {
                                     CurrentTab = 1
                                     }
+        IsWeb3                  = IsWeb3
     }
 
    
@@ -151,36 +115,40 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
                 match fc with 
                 | Some ac -> ac.Wallet.Accounts.Etc.Address.Value.ToString()
                 | None -> ""
-        //(fc.Wallet.ForSymbol symbol).Address.Value
-        promise {
-            let! coinbase = w3.eth.getCoinbase()
-            console.log "coinbase"
-            console.log (coinbase)
-            let amount = w3.utils.toWei( amount |> U3.Case1, Web3Types.Unit.Ether )
-            let toAccount = account fc
+        let toAccount = account fc
 
-            if toAccount.Length > 0 
-            then
+        let sendToChain () =
+            promise {
+                let! coinbase = w3.eth.getCoinbase()
+                console.log "coinbase"
+                console.log (coinbase)
+                let amount = w3.utils.toWei( amount |> U3.Case1, Web3Types.Unit.Ether )
+                
                 let tr = jsOptions<Tx>(fun  tx -> tx.value <- amount |> Some 
                                                   tx.from <- Some coinbase
                                                   tx.``to`` <- Some toAccount )
-             
+                 
                 let! tx = w3.eth.sendTransaction tr
-                console.log tx
-            else
-                toastrError "Account not found" |> ignore
+                let! balance = w3.eth.getBalance(toAccount)
 
-            let! balance = w3.eth.getBalance(toAccount)
+                console.log "getBalanse"
+                console.log (balance)
 
-            console.log "getBalanse"
-            console.log (balance)
+                let! accs = w3.eth.getAccounts()
+                console.log accs
+                return tx
+            }
+        if toAccount.Length > 0 
+        then    
+            Cmd.ofPromise sendToChain () 
+                                (fun (tx) -> 
+                                     SignResult (Ok (tx.transactionHash)) |> PurchaseTokenMsg) 
+                                (fun e ->      //console.error "Failed sent"
+                                     (SignResult (Result.Error e.Message)) |> PurchaseTokenMsg ) 
+        else
+            toastrError "Account not found" 
 
-            let! accs = w3.eth.getAccounts()
-            console.log accs
-        }
-        |> PowerPack.Promise.start
-
-    let isConnecting model (status:bool )= { model.PurchaseTokenModel with IsConnecting =  status  } 
+    let isConnecting model (status:bool )= { model.PurchaseTokenModel with IsLoading =  status  } 
     
     match msg with
     | VerificationMsg  msg_  -> 
@@ -205,9 +173,14 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
                                                                                         TotalPrice = tokenTotalPrice model.TokenSale model.ActiveSymbol tokens model.CurrenciesCurentPrices } }, Cmd.none 
         | AddressCopied text -> model, toastrSuccess (sprintf "Address Copied") 
         | BuyTokens -> 
-            buyTokens (model.PurchaseTokenModel.CCTokens.ToString()) model.FullCustomer
-            // { model with PurchaseTokenModel (isConnecting model true) } 
-            model, Cmd.none 
+            let cmd = buyTokens (model.PurchaseTokenModel.CCTokens.ToString()) model.FullCustomer 
+            { model with PurchaseTokenModel = (isConnecting model true) }, cmd 
+        | SignResult signResult -> 
+            { model with PurchaseTokenModel = (isConnecting model false) },  
+            match signResult with 
+            | Ok transaction -> toastrSuccess ("Signed succesfully! Transaction index: " + transaction)
+            | Error message -> toastrError ("Exception during Metamask call: " + message)
+
     | MyInvestmentsMsg   -> model, Cmd.none
     | ReferralProgramMsg -> model, Cmd.none
     | ContactsMsg        -> model, Cmd.none
