@@ -213,5 +213,5 @@ module WsBridge =
         | ConnectionLost
         | ServerConnected
         | UserConnected             of AuthToken
-        | ServerPriceTick
+        | ServerPriceTick           of ViewModels.CurrencyPriceTick
     

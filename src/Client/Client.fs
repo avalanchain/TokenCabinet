@@ -374,7 +374,7 @@ let wsBridgeUrlUpdate result model: AppModel * Cmd<BridgeClientMsg> =
 module wsBridge =
     let init initialState : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> =
         Disconnected [], Cmd.none
-    let update (msg: WsBridge.ClientMsg) (model: WsBridgeModel) : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> = 
+    let update (appCommands: Cmd<AppMsg> -> unit) (msg: WsBridge.ClientMsg) (model: WsBridgeModel) : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> = 
         console.log ("p.update: " + msg.ToString()) 
         match msg with 
         | ConnectUserOnServer authToken ->
@@ -395,10 +395,19 @@ module wsBridge =
             | Connected              -> model, Cmd.none
         | UserConnected _               -> Connected, Cmd.none
 
-        | ServerPriceTick               -> failwith "Not Implemented"        
+        | ServerPriceTick prices     -> 
+            prices |> PriceTick |> ServerMsg |> CabinetMsg |> Cmd.ofMsg |> appCommands
+            model, Cmd.none         
 
     let view (model: WsBridgeModel) (dispatch: Msg<WsBridge.ServerMsg, WsBridge.ClientMsg> -> unit) =
         div [] []
+
+let appMsgQueue = // A queue
+    let mutable buffer = []
+    (fun (msg: Cmd<AppMsg>) -> buffer <- msg :: buffer), (fun () -> 
+                                                            let ret = buffer |> List.rev
+                                                            buffer <- []
+                                                            ret)  
 
 let mapProgram (p: Program<_,WsBridgeModel,WsBridge.ClientMsg,_>): Program<_,AppModel,BridgeClientMsg,_> = 
     {   init = fun args -> 
@@ -410,7 +419,8 @@ let mapProgram (p: Program<_,WsBridgeModel,WsBridge.ClientMsg,_>): Program<_,App
                     match msg with
                     | ClientMsg m -> 
                         let model', cmd = p.update m model.WsBridgeModel
-                        { model with WsBridgeModel = model' }, cmd |> Cmd.map ClientMsg
+                        let allCmds = (snd appMsgQueue)() |> List.map (Cmd.map AppMsg) |> List.append [ cmd |> Cmd.map ClientMsg ] |> Cmd.batch
+                        { model with WsBridgeModel = model' }, allCmds
                     | AppMsg m -> 
                         let model', cmd = update m model
                         model', cmd
@@ -423,7 +433,7 @@ let mapProgram (p: Program<_,WsBridgeModel,WsBridge.ClientMsg,_>): Program<_,App
     } 
 
 //bridge wsBridgeInit wsBridgeUpdate wsBridgeView {
-bridge wsBridge.init wsBridge.update wsBridge.view {
+bridge wsBridge.init (wsBridge.update (fst appMsgQueue))  wsBridge.view {
     mapped ClientMsg mapProgram
     mapped Bridge.NavigableMapping (Program.toNavigable (parseHash pageParser) wsBridgeUrlUpdate)
 #if DEBUG

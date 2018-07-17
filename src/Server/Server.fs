@@ -332,6 +332,14 @@ let unwrapResultOpt res =
     | Ok None -> failwithf "Incorrect Database setup"
     | Error exn -> raise exn
 
+type BridgeConnectionState =
+    | Connected of AuthToken
+    | Disconnected
+
+let bridgeConnections =
+    ServerHub<BridgeConnectionState, WsBridge.ServerMsg, WsBridge.ClientMsg>.New()    
+
+
 let getTokenSaleStages config = task {  
     let processStage (stage: TokenSaleStages.TokenSaleStage) = task {
         printfn "Stage Id: %A" stage.Id
@@ -530,6 +538,10 @@ module PriceUpdater =
             | LoadPrices ->
                 let! newPrices = getPriceTick()
                 printfn "Prices loaded"
+                match newPrices with
+                | Some prices ->
+                    bridgeConnections.SendIf(function | Connected _ -> true | Disconnected -> false) (prices |> WsBridge.ServerPriceTick |> C)
+                | None -> ()
                 return! messageLoop (newPrices |> Option.defaultValue prices)
             | GetPrices replyChannel -> 
                 replyChannel.Reply prices
@@ -567,9 +579,7 @@ let errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) =
         // ignore error
         Ignore
 
-type BridgeConnectionState =
-    | Connected of AuthToken
-    | Disconnected
+
 
 open Shared.WsBridge
 
@@ -590,10 +600,6 @@ let webApp config =
     let adminProtocol =
         {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
             initDb          = initDb            >> Async.AwaitTask }
-        
-
-    let bridgeConnections =
-        ServerHub<BridgeConnectionState, WsBridge.ServerMsg, WsBridge.ClientMsg>.New()    
 
    
     let bridgeInit () =
