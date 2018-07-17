@@ -25,6 +25,8 @@ open ClientMsgs
 open LoginPage
 open CabinetModel
 open Client.LoginCommon
+open Shared.WsBridge
+open Elmish
 
 // type LoginState =
 // | LoggedOut
@@ -40,7 +42,7 @@ type PageModel =
 
 type WsBridgeModel = 
     | Connected
-    | Disconnected
+    | Disconnected of Pending: Bridge.Msg<ServerMsg, ClientMsg> list
 
 type AppModel = {
     Page            : MenuPage

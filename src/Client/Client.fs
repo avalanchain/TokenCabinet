@@ -373,15 +373,26 @@ let wsBridgeUrlUpdate result model: AppModel * Cmd<BridgeClientMsg> =
 
 module wsBridge =
     let init initialState : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> =
-        Disconnected, Cmd.none
+        Disconnected [], Cmd.none
     let update (msg: WsBridge.ClientMsg) (model: WsBridgeModel) : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> = 
         console.log ("p.update: " + msg.ToString()) 
         match msg with 
-        | ConnectUserOnServer authToken -> model, ConnectUser authToken |> S |> Cmd.ofMsg
-        | DisconnectUserOnServer        -> model, DisconnectUser |> S |> Cmd.ofMsg
+        | ConnectUserOnServer authToken ->
+            let msg' = ConnectUser authToken |> S
+            match model with
+            | Disconnected pending   -> (msg' :: pending) |> Disconnected, Cmd.none
+            | Connected              -> model, msg' |> Cmd.ofMsg  
+        | DisconnectUserOnServer        -> 
+            let msg' = DisconnectUser |> S
+            match model with
+            | Disconnected pending   -> (msg' :: pending) |> Disconnected, Cmd.none
+            | Connected              -> model, msg' |> Cmd.ofMsg  
         
-        | ConnectionLost                -> Disconnected, Cmd.none 
-        | ServerConnected               -> model, Cmd.none
+        | ConnectionLost                -> Disconnected [], Cmd.none 
+        | ServerConnected               -> 
+            match model with
+            | Disconnected pending   -> Disconnected [], pending |> List.rev |> List.map Cmd.ofMsg |> Cmd.batch
+            | Connected              -> model, Cmd.none
         | UserConnected _               -> Connected, Cmd.none
 
         | ServerPriceTick               -> failwith "Not Implemented"        
@@ -405,7 +416,9 @@ let mapProgram (p: Program<_,WsBridgeModel,WsBridge.ClientMsg,_>): Program<_,App
                         model', cmd
         subscribe = fun model -> model.WsBridgeModel |> p.subscribe |> Cmd.map ClientMsg 
         view = view
-        setState = fun model dispatch -> view model dispatch |> ignore 
+        setState = fun model dispatch ->
+                        p.setState model.WsBridgeModel (ClientMsg >> dispatch) 
+                        view model dispatch |> ignore 
         onError = p.onError
     } 
 

@@ -44,6 +44,9 @@
     <Compile Include="Pages/CabinetPage.fs" />
     <Compile Include="Pages/HomePage.fs" />
 
+    <Compile Include="WsClientSharedLibrary.fs" /> 
+    <Compile Include="WsClientLibrary.fs" /> <!-- Remove this when Elmish.Bridge library is fixed -->
+
     <Compile Include="ClientMsgs.fs" />
     <Compile Include="ClientModels.fs" />
     
@@ -52,8 +55,6 @@
     <Compile Include="Pages/Menu.fs" />
 
     <Compile Include="PageRouter.fs" />
-    <Compile Include="WsClientSharedLibrary.fs" /> 
-    <Compile Include="WsClientLibrary.fs" /> <!-- Remove this when Elmish.Bridge library is fixed -->
     <Compile Include="Client.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
