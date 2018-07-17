@@ -38,11 +38,16 @@ type PageModel =
     | CabinetModel   of CabinetModel.Model
 //   | StaticModel of Statics.Model
 
-type AppModel = {
-    Page        : MenuPage
-    PageModel   : PageModel
+type WsBridgeModel = WsBridgeModel
 
-    Loading     : bool  
+type AppModel = {
+    Page            : MenuPage
+    PageModel       : PageModel
+
+    Loading         : bool
+
+    WsBridgeModel   : WsBridgeModel
+  
     // State       : LoginState
 
     // Counter     : Counter option

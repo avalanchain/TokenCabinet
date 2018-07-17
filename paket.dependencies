@@ -40,6 +40,7 @@ group Client
     nuget Elmish.Toastr
     nuget Elmish.Bridge.HMR
     nuget Elmish.Bridge.Client
+    nuget Elmish.Bridge.Browser
 
     clitool dotnet-fable
 

@@ -40,6 +40,10 @@ module.exports = {
             '/api/*': {
                 target: 'http://localhost:' + port,
                 changeOrigin: true
+            },
+            '/wsbridge': {
+                target: 'http://localhost:' + port,
+                ws: true
             }
         },
         hot: true,

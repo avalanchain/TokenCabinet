@@ -5,6 +5,8 @@ open Elmish.Browser.Navigation
 open Elmish.Browser.UrlParser
 open Elmish.React
 open Elmish.Toastr
+open Elmish.Bridge
+open Elmish.Bridge.Browser
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
@@ -167,11 +169,12 @@ let cmdServerCall (apiFunc: 'T -> Async<ServerResult<'R>>) (args: 'T) (completeM
         (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
                     exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg)
 
-let init urlParsingResult : AppModel * Cmd<AppMsg> =
+let init wsBridgeModel urlParsingResult : AppModel * Cmd<AppMsg> =
     Browser.console.log (sprintf "Passed Url: '%A'" urlParsingResult)
     let model = {   Loading                 = false
                     Page                    = MenuPage.Default
                     PageModel               = NoPageModel
+                    WsBridgeModel           = wsBridgeModel
                 }
     let cmd = match LocalStorage.loadUser() with 
                 | Some authModel -> authModel.Token |> AuthMsg.LoggedIn |> AuthMsg |> Cmd.ofMsg
@@ -266,23 +269,8 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<AppMsg> =
 
 /// Constructs the view for a page given the model and dispatcher.
 [<PassGenerics>]
-let innerPageView model (dispatch: AppMsg -> unit) =
-    match model.Page with
-    | MenuPage.Home -> HomePage.view() 
-
-    | MenuPage.LoginFlow page -> 
-        match model.PageModel with
-        | LoginFlowModel m -> (LoginFlowPage.view m (LoginFlowMsg >> dispatch)) 
-        | _ -> 
-            Browser.console.error(sprintf "Unexpected PageModel for LoginPage:[%A]" model.PageModel)
-            div [ ] [ str "Incorrect login model/page" ]
-
-    | MenuPage.Cabinet p ->
-        match model.PageModel with
-        | CabinetModel sm -> (CabinetPage.view p sm (CabinetMsg >> dispatch))        
-        | _ -> 
-            Browser.console.error(sprintf "Unexpected PageModel for CabinetPage:[%A]" model.PageModel)
-            div [ ] [ str "Incorrect cabinet model/page" ]
+let cabinetPageView p model (dispatch: AppMsg -> unit) =
+    CabinetPage.view p model (CabinetMsg >> dispatch)        
 
 
 let sidebarToggle (e: React.MouseEvent) =
@@ -310,43 +298,37 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 
 /// Constructs the view for the application given the model.
 
-let mainView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView = 
-    let fullCustomer = match model.PageModel with
-                        | CabinetModel m                    -> m.FullCustomer
-                        | LoginFlowModel _ | NoPageModel    -> None
+let mainView page (model: CabinetModel.Model) (dispatch: AppMsg -> unit) cabinetPageView = 
+    let fullCustomer = model.FullCustomer
     div [ Id "wrapper" ]
         [
-            Menu.view model.Page (AppMsg.UIMsg >> dispatch)
+            Menu.view page (AppMsg.UIMsg >> dispatch)
             div [ Id "page-wrapper"
                   Class "gray-bg" ] [
                   TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> dispatch)
                   div [ Class "wrapper wrapper-content animated fadeInRight"]
                       [ 
-                        (innerPageView model dispatch)
+                        (cabinetPageView page model dispatch)
                            ]
 
                   Footer.footer
             ]
         ]
 
-
+/// Constructs the view for the application given the model.
 [<PassGenerics>]
-let pageView (model: AppModel) (dispatch: AppMsg -> unit) innerPageView =
+let view (model: AppModel) (dispatch: AppMsg -> unit) =
     match model.PageModel with 
-    | LoginFlowModel loginModel -> LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> dispatch)
-    | CabinetModel cm -> mainView model dispatch innerPageView
+    | LoginFlowModel loginModel -> 
+        LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> dispatch)
+    | CabinetModel cm -> 
+        mainView (match model.Page with | MenuPage.Cabinet p -> p | _ -> CabinetPagePage.Default) 
+            cm dispatch cabinetPageView
     | NoPageModel ->
         Browser.console.error("Unsupported model/Auth state combination")
         Login |> UIMsg |> dispatch 
-        div [] []
+        HomePage.view()
          
-    
-
-
-/// Constructs the view for the application given the model.
-[<PassGenerics>]
-let view model dispatch = pageView model dispatch innerPageView
-
 
 let timer initial =
     let sub dispatch = 
@@ -356,20 +338,101 @@ let timer initial =
                                     , 2000) |> ignore
     Cmd.ofSub sub
 
+
+
 #if DEBUG
 open Elmish.Debug
 open Elmish.HMR
+open Elmish.Bridge.HMR
+open Shared.WsBridge
 #endif
 
-Program.mkProgram init update view
-|> Program.toNavigable (parseHash pageParser) PageRouter.urlUpdate
-// |> Program.withSubscription timer
+// Program.mkProgram init update view
+// |> Program.toNavigable (parseHash pageParser) PageRouter.urlUpdate
+// // |> Program.withSubscription timer
+// #if DEBUG
+// |> Program.withConsoleTrace
+// |> Program.withHMR
+// #endif
+// |> Program.withReact "ac-app"
+// #if DEBUG
+// |> Program.withDebugger
+// #endif
+// |> Program.run
+
+type BridgeClientMsg = 
+    | ClientMsg of WsBridge.ClientMsg
+    | AppMsg    of AppMsg
+
+type BridgedMsg = Msg<WsBridge.ServerMsg, BridgeClientMsg>
+
+let msgMapC f = function    | C m -> m |> f |> C 
+                            | S m -> S m
+
+// let wsBridgeInit urlParsingResult : AppModel * Cmd<WsBridge.ClientMsg> =
+//     let model, cmd = init urlParsingResult
+//     model, cmd |> Cmd.map msgMap
+
+// let wsBridgeUpdate (msg : BridgeClientMsg) (model : AppModel) : AppModel * Cmd<BridgedMsg> =
+//     match msg with 
+//     | ClientMsg msg -> 
+//         console.log ("ServerMsg: " + msg.ToString()) 
+//         match model, msg with 
+//         | _, _ ->
+//             model, Cmd.none // TODO: fix message handling
+//     | AppMsg msg    ->  
+//         let model, cmd = update msg model
+//         model, cmd |> Cmd.map msgMap
+
+// [<PassGenerics>]
+// let wsBridgeView model (dispatch: BridgedMsg -> unit) = 
+//     view model (msgMap >> dispatch)
+
+let wsBridgeUrlUpdate result model: AppModel * Cmd<BridgeClientMsg> = 
+    let model, cmd = PageRouter.urlUpdate result model
+    model, cmd |> Cmd.map AppMsg
+
+module wsBridge =
+    let init initialState : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> =
+        WsBridgeModel, Cmd.none
+    let update (msg: WsBridge.ClientMsg) (model: WsBridgeModel) = 
+        console.log ("ServerMsg: " + msg.ToString()) 
+        match model, msg with 
+        | _, _ ->
+            model, Cmd.none // TODO: fix message handling
+    let view (model: WsBridgeModel) dispatch =
+        div [] []
+
+let mapProgram (p: Program<_,WsBridgeModel,WsBridge.ClientMsg,_>): Program<_,AppModel,BridgeClientMsg,_> = 
+    {   init = fun args -> 
+                        let wsModel, cmdB = p.init args
+                        let model, cmdA = init wsModel args
+                        model, Cmd.batch [ cmdB |> Cmd.map ClientMsg ; cmdA |> Cmd.map AppMsg ]
+        update = fun (msg: BridgeClientMsg) (model: AppModel) ->
+                    match msg with
+                    | ClientMsg m -> 
+                        let model', cmd = p.update m model.WsBridgeModel
+                        { model with WsBridgeModel = model' }, cmd |> Cmd.map ClientMsg
+                    | AppMsg m -> 
+                        let model', cmd = update m model
+                        model', cmd |> Cmd.map AppMsg
+        subscribe = fun model -> model.WsBridgeModel |> p.subscribe |> Cmd.map ClientMsg 
+        view = fun model dispatch -> view model (AppMsg >> dispatch)
+        setState = fun model dispatch -> view model (AppMsg >> dispatch) |> ignore 
+        onError = p.onError
+    } 
+
+//bridge wsBridgeInit wsBridgeUpdate wsBridgeView {
+bridge wsBridge.init wsBridge.update wsBridge.view {
+    mapped ClientMsg mapProgram
+    mapped Bridge.NavigableMapping (Program.toNavigable (parseHash pageParser) wsBridgeUrlUpdate)
 #if DEBUG
-|> Program.withConsoleTrace
-|> Program.withHMR
+    simple Program.withConsoleTrace
+    simple Program.withDebugger
 #endif
-|> Program.withReact "ac-app"
+    simple (Program.withReactUnoptimized "ac-app")
 #if DEBUG
-|> Program.withDebugger
+    mapped Bridge.HMRMsgMapping Program.withHMR
 #endif
-|> Program.run
+    at Shared.Route.wsBridgeEndpoint
+}

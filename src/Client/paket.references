@@ -11,6 +11,6 @@ group Client
 
     Elmish.Toastr
     Elmish.Bridge.HMR
-    Elmish.Bridge.Client
+    Elmish.Bridge.Browser
 
     dotnet-fable

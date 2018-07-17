@@ -567,7 +567,11 @@ let errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) =
         // ignore error
         Ignore
 
+type BridgeConnectionState =
+    | Connected of AuthToken
+    | Disconnected
 
+open Shared.WsBridge
 
 let webApp config =
     // Setting up remoting
@@ -587,9 +591,23 @@ let webApp config =
         {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
             initDb          = initDb            >> Async.AwaitTask }
         
+
+    let bridgeConnections =
+        ServerHub<BridgeConnectionState, WsBridge.ServerMsg, WsBridge.ClientMsg>.New()    
+
+   
+    let bridgeInit () =
+        printfn "Server init"
+        Disconnected, Cmd.ofMsg (C QueryConnected)
+
+    let bridgeUpdate msg state =
+        match state, msg with
+        | _, _ -> state, Cmd.none 
+        
     let bridgeProtocol =
-        bridge init update {
-            at Shared.endpoint
+        bridge bridgeInit bridgeUpdate {
+            serverHub bridgeConnections
+            at Shared.Route.wsBridgeEndpoint
         }        
         
     choose [
@@ -612,6 +630,7 @@ let webApp config =
 let app config = application {
     url ("http://0.0.0.0:" + port.ToString() + "/")
     router (webApp config)
+    app_config Giraffe.useWebSockets
     memory_cache
     use_static publicPath
     use_gzip

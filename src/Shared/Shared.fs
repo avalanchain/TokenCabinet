@@ -182,6 +182,8 @@ module Route =
     let builder typeName methodName =
         sprintf "/api/%s/%s" typeName methodName
 
+    let wsBridgeEndpoint = "/wsbridge"    
+
 /// A type that specifies the communication protocol for client and server
 /// Every record field must have the type : 'a -> Async<'b> where 'a can also be `unit`
 /// Add more such fields, implement them on the server and they be directly available on client
@@ -198,3 +200,15 @@ type ITokenSaleProtocol = {
 
     getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }
+
+module WsBridge =
+    // Messages processed on the server
+    type ServerMsg =
+        | Closed 
+        | ConnectUser of AuthToken
+    //Messages processed on the client
+    type ClientMsg =
+        | ConnectionLost
+        | QueryConnected
+        | UserConnected of AuthToken
+    

@@ -47,43 +47,43 @@ let w3 = web3Factory.Create(web3.currentProvider |> U2.Case1 )
 console.log (sprintf "w3: '%A'" w3)
 
 // console.log (sprintf "accounts1: '%A'" w3.eth.accounts  ) 
-promise {
-    let! accs = w3.eth.getAccounts()
-    console.log "accs"
-    console.log accs
-    let! bal = w3.eth.getBalance(accs.[0])
-    console.log "bal"
-    console.log (bal / 1000000000000000000.)
+// promise {
+//     let! accs = w3.eth.getAccounts()
+//     console.log "accs"
+//     console.log accs
+//     let! bal = w3.eth.getBalance(accs.[0])
+//     console.log "bal"
+//     console.log (bal / 1000000000000000000.)
 
-    let! coinbase = w3.eth.getCoinbase()
-    console.log "coinbase"
-    console.log (coinbase)
-    let amount = w3.utils.toWei("1" |> U3.Case1, Web3Types.Unit.Ether)
+//     let! coinbase = w3.eth.getCoinbase()
+//     console.log "coinbase"
+//     console.log (coinbase)
+//     let amount = w3.utils.toWei("1" |> U3.Case1, Web3Types.Unit.Ether)
     
-    // let provider = web3.currentProvider :> obj :?> IProvider
-    // let! _ = provider.send(jsOptions<JsonRPCRequest>(fun r ->  r.method <- "personal_sign" |> Some 
-    //                                                            r.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )) 
+//     // let provider = web3.currentProvider :> obj :?> IProvider
+//     // let! _ = provider.send(jsOptions<JsonRPCRequest>(fun r ->  r.method <- "personal_sign" |> Some 
+//     //                                                            r.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )) 
 
-    let tr = jsOptions<Tx>(fun  tx -> tx.value <- amount |> Some 
-                                      tx.from <- Some coinbase
-                                      tx.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )
+//     let tr = jsOptions<Tx>(fun  tx -> tx.value <- amount |> Some 
+//                                       tx.from <- Some coinbase
+//                                       tx.``to`` <- Some "0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE" )
  
-    //coinbase,"0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE"
+//     //coinbase,"0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE"
 
-    // let! tx = w3.eth.sendTransaction tr
+//     // let! tx = w3.eth.sendTransaction tr
 
-    // console.log tx
+//     // console.log tx
 
-    // let! balance = w3.eth.getBalance("0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE")
+//     // let! balance = w3.eth.getBalance("0xC25FdBeaD74a9A1d09F3209d2fcDE652d4D359fE")
 
-    // console.log "newAccount"
-    // console.log (newAccount)
-    // console.log "getBalanse"
-    // console.log (balance)
-    let! accs = w3.eth.getAccounts()
-    console.log accs
-}
-|> PowerPack.Promise.start
+//     // console.log "newAccount"
+//     // console.log (newAccount)
+//     // console.log "getBalanse"
+//     // console.log (balance)
+//     let! accs = w3.eth.getAccounts()
+//     console.log accs
+// }
+// |> PowerPack.Promise.start
 
 let init authToken = 
     {   Auth                    = { Token = authToken }

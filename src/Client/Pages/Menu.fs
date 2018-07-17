@@ -69,7 +69,7 @@ let handleClick (e: React.MouseEvent) =
 
 // let testlink = 
 
-let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
+let view (menuPage: CabinetPagePage) (dispatch: UIMsg -> unit) =
     let icon  (page: CabinetPagePage) = 
                 match page with 
                 | Verification      -> "fa fa-address-card"    
@@ -78,13 +78,6 @@ let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
                 | ReferralProgram   -> "fa fa-refresh"
                 | Contacts          -> "fa fa-phone"            
                 // | Dashboard         -> "fa fa-th-large"         
-    let home = 
-        let page = MenuPage.Home
-        [   navViewLink page "Main view" "fa fa-th-large" ( menuPage = page )]
-
-    let login = 
-        let page = LoginFlowPage.Login |> MenuPage.LoginFlow
-        [   navViewLink page "LOGIN" "fa fa-sign-in" ( menuPage = page )]
 
     let cabinet = 
         let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPagePage
@@ -92,7 +85,7 @@ let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
         [   for page in getUnionCases<CabinetPagePage> ->
                 let pageName = page.Name |> splitOnCapital 
                 let page = page |> toPage
-                navViewLink (MenuPage.Cabinet page) pageName (icon page) (MenuPage.Cabinet page = menuPage)
+                navViewLink (MenuPage.Cabinet page) pageName (icon page) (page = menuPage)
         ]
 
     // let divider = li [ ClassName "divider" ] [ ]
@@ -120,21 +113,3 @@ let view (menuPage: MenuPage) (dispatch: UIMsg -> unit) =
                     
                         (staticPart :: cabinet)
                             ] ] 
-    // div [ ClassName "sidebar" ] [
-    //     nav [ ClassName "sidebar-nav" ] [
-    //         ul [ ClassName "nav" ] (
-    //             match model.Auth with
-    //             | None ->
-    //                     (home 
-    //                         @ (login)
-    //                     )
-    //             | Some _ -> 
-    //                     (home 
-    //                         // @ (divider :: trading)
-    //                         @ (cabinet)
-    //                         @ (logout)
-    //                         //@ (divider :: statics)
-    //                     )
-    //         )
-    //     ]
-    // ]
