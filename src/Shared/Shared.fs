@@ -204,9 +204,14 @@ module WsBridge =
     type ServerMsg =
         | Closed 
         | ConnectUser of AuthToken
+        | DisconnectUser
     //Messages processed on the client
     type ClientMsg =
+        | ConnectUserOnServer       of AuthToken
+        | DisconnectUserOnServer
+        
         | ConnectionLost
-        | QueryConnected
-        | UserConnected of AuthToken
+        | ServerConnected
+        | UserConnected             of AuthToken
+        | ServerPriceTick
     

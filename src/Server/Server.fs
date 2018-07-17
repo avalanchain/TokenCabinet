@@ -598,11 +598,14 @@ let webApp config =
    
     let bridgeInit () =
         printfn "Server init"
-        Disconnected, Cmd.ofMsg (C QueryConnected)
+        Disconnected, Cmd.ofMsg (C ServerConnected)
 
     let bridgeUpdate msg state =
-        match state, msg with
-        | _, _ -> state, Cmd.none 
+        printfn "bridgeUpdate: %A" msg
+        match msg with
+        | Closed                -> Disconnected, Cmd.none
+        | ConnectUser authToken -> Connected authToken, UserConnected authToken |> C |> Cmd.ofMsg
+        | DisconnectUser        -> Disconnected, Cmd.none
         
     let bridgeProtocol =
         bridge bridgeInit bridgeUpdate {

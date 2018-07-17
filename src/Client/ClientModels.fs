@@ -38,7 +38,9 @@ type PageModel =
     | CabinetModel   of CabinetModel.Model
 //   | StaticModel of Statics.Model
 
-type WsBridgeModel = WsBridgeModel
+type WsBridgeModel = 
+    | Connected
+    | Disconnected
 
 type AppModel = {
     Page            : MenuPage
