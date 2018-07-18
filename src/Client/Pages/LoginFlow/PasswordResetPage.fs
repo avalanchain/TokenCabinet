@@ -28,7 +28,7 @@ type Msg =
 
 type ExternalMsg =
     | NoOp
-    | ResetPassword        of PwdResetInfo
+    | ResetPassword        of ResetPasswordInfo
     | UserPasswordReset    of AuthToken
 
 type Model = {

@@ -34,7 +34,7 @@ type ExternalMsg =
     | LoginUser          of LoginInfo
     | RegisterUser       of LoginInfo
     | ForgotPasswordUser of ForgotPasswordInfo
-    | ResetPassword      of PwdResetInfo
+    | ResetPassword      of ResetPasswordInfo
     | LoggedIn           of AuthToken
 
 
