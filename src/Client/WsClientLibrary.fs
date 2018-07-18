@@ -182,10 +182,7 @@ module Bridge =
             ws.onmessage <- fun e ->
                 e.data |> string |> JsInterop.ofJson |> program.mapClientMsg |> inbox.Post
 
-        let urlNoHash =
-            let hashIdx = url.href.IndexOf "#" 
-            if hashIdx > 0 then url.href.Substring(0, hashIdx) 
-            else url.href
+        let urlNoHash = (url.href.Split '#').[0] 
         websocket urlNoHash ws
         let serverSub =
             try

@@ -154,16 +154,11 @@ module Server =
             use_route_builder Route.builder
         }        
 
-    let adminApi : IAdminProtocol =
-        Proxy.remoting<IAdminProtocol> {
-            use_route_builder Route.builder
-        }
-
-type BridgeClientMsg = 
-    | ClientMsg of WsBridge.ClientMsg
+type ClientMsg = 
+    | BridgeMsg of WsBridge.BridgeMsg
     | AppMsg    of AppMsg
 
-type BridgedMsg = Msg<WsBridge.ServerMsg, BridgeClientMsg>
+type BridgedMsg = Msg<WsBridge.ServerMsg, ClientMsg>
 
 let msgMapC f = function    | C m -> m |> f |> C 
                             | S m -> S m
@@ -180,7 +175,7 @@ let cmdServerCall (apiFunc: 'T -> Async<ServerResult<'R>>) (args: 'T) (completeM
         (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
                     exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg |> AppMsg)
 
-let init wsBridgeModel urlParsingResult : AppModel * Cmd<BridgeClientMsg> =
+let init wsBridgeModel urlParsingResult : AppModel * Cmd<ClientMsg> =
     Browser.console.log (sprintf "Passed Url: '%A'" urlParsingResult)
     let model = {   Loading                 = false
                     Page                    = MenuPage.Default
@@ -192,12 +187,12 @@ let init wsBridgeModel urlParsingResult : AppModel * Cmd<BridgeClientMsg> =
                 | None -> Cmd.none  
     model, cmd
 
-let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<BridgeClientMsg> =
+let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
     let enforceLogin model =
         let deleteAuthModelCmd = LocalStorage.deleteUserCmd |> Cmd.map AppMsg
         let loginFlowModel, cmd = LoginFlowPage.init ()
         let cmd = Cmd.batch [   deleteAuthModelCmd
-                                DisconnectUserOnServer |> ClientMsg |> Cmd.ofMsg
+                                DisconnectUserOnServer |> BS |> BridgeMsg |> Cmd.ofMsg
                                 Cmd.map (LoginFlowMsg >> AppMsg) cmd ]
         { model with    Page = MenuPage.LoginFlow LoginFlowPage.Default
                         PageModel = loginFlowModel |> PageModel.LoginFlowModel } , cmd
@@ -208,7 +203,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<BridgeClientMsg> =
                     |> Toastr.timeout 1000
                     |> Toastr.success
 
-    let (model', cmd') : AppModel * Cmd<BridgeClientMsg> =  
+    let (model', cmd') : AppModel * Cmd<ClientMsg> =  
         match msg with
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
             let page = CabinetPagePage.Default
@@ -217,7 +212,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<BridgeClientMsg> =
             let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
             let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
             let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg |> AppMsg)
-            let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> ClientMsg)
+            let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> BS |> BridgeMsg)
             let cmd' = Cmd.batch [  cmdLocalStorage 
                                     cmdGetCryptoCurrencies
                                     cmdGetTokenSale
@@ -288,7 +283,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<BridgeClientMsg> =
 
 /// Constructs the view for a page given the model and dispatcher.
 [<PassGenerics>]
-let cabinetPageView p model (dispatch: BridgeClientMsg -> unit) =
+let cabinetPageView p model (dispatch: ClientMsg -> unit) =
     CabinetPage.view p model (CabinetMsg >> AppMsg >> dispatch)        
 
 
@@ -317,7 +312,7 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 
 /// Constructs the view for the application given the model.
 
-let mainView page (model: CabinetModel.Model) (dispatch: BridgeClientMsg -> unit) cabinetPageView = 
+let mainView page (model: CabinetModel.Model) (dispatch: ClientMsg -> unit) cabinetPageView = 
     let fullCustomer = model.FullCustomer
     div [ Id "wrapper" ]
         [
@@ -336,7 +331,7 @@ let mainView page (model: CabinetModel.Model) (dispatch: BridgeClientMsg -> unit
 
 /// Constructs the view for the application given the model.
 [<PassGenerics>]
-let view (model: AppModel) (dispatch: BridgeClientMsg -> unit) =
+let view (model: AppModel) (dispatch: ClientMsg -> unit) =
     match model.PageModel with 
     | LoginFlowModel loginModel -> 
         LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> AppMsg >> dispatch)
@@ -367,39 +362,52 @@ open Shared.WsBridge
 open Elmish
 #endif
 
-let wsBridgeUrlUpdate result model: AppModel * Cmd<BridgeClientMsg> = 
+let wsBridgeUrlUpdate result model: AppModel * Cmd<ClientMsg> = 
     let model, cmd = PageRouter.urlUpdate result model
     model, cmd |> Cmd.map AppMsg
 
 module wsBridge =
-    let init initialState : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> =
+    let init initialState : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.BridgeMsg>> =
         Disconnected [], Cmd.none
-    let update (appCommands: Cmd<AppMsg> -> unit) (msg: WsBridge.ClientMsg) (model: WsBridgeModel) : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.ClientMsg>> = 
+    let update (appCommands: Cmd<AppMsg> -> unit) (msg: WsBridge.BridgeMsg) (model: WsBridgeModel) : WsBridgeModel * Cmd<Msg<WsBridge.ServerMsg, WsBridge.BridgeMsg>> = 
         console.log ("p.update: " + msg.ToString()) 
         match msg with 
-        | ConnectUserOnServer authToken ->
-            let msg' = ConnectUser authToken |> S
-            match model with
-            | Disconnected pending   -> (msg' :: pending) |> Disconnected, Cmd.none
-            | Connected              -> model, msg' |> Cmd.ofMsg  
-        | DisconnectUserOnServer        -> 
-            let msg' = DisconnectUser |> S
-            match model with
-            | Disconnected pending   -> (msg' :: pending) |> Disconnected, Cmd.none
-            | Connected              -> model, msg' |> Cmd.ofMsg  
-        
-        | ConnectionLost                -> Disconnected [], Cmd.none 
-        | ServerConnected               -> 
-            match model with
-            | Disconnected pending   -> Disconnected [], pending |> List.rev |> List.map Cmd.ofMsg |> Cmd.batch
-            | Connected              -> model, Cmd.none
-        | UserConnected _               -> Connected, Cmd.none
+        | BS bsMsg -> 
+            match bsMsg with
+            | ConnectUserOnServer authToken ->
+                let msg' = ConnectUser authToken |> S
+                match model with
+                | Disconnected pending   -> (msg' :: pending) |> Disconnected, Cmd.none
+                | Connected              -> model, msg' |> Cmd.ofMsg  
+            | DisconnectUserOnServer        -> 
+                let msg' = DisconnectUser |> S
+                match model with
+                | Disconnected pending   -> (msg' :: pending) |> Disconnected, Cmd.none
+                | Connected              -> model, msg' |> Cmd.ofMsg  
+        | BC bcMsg -> 
+            match bcMsg with
+            | ErrorResponse(e, request)     -> 
+                match e with
+                | AuthError _               -> 
+                    AuthMsg.LoggedOut |> AuthMsg |> Cmd.ofMsg |> appCommands
+                    model, Cmd.none 
+                | InternalError _           -> 
+                    let msg' = S request
+                    let cmd = Cmd.ofAsync (fun () -> async { do! Async.Sleep 1000; }) () (fun _ -> msg') (fun _ -> msg') // Wait for a sec before retry
+                    model, cmd
+                | NotImplementedError       -> failwith "Not Implemented"            
+            | ConnectionLost                -> Disconnected [], Cmd.none 
+            | ServerConnected               -> 
+                match model with
+                | Disconnected pending   -> Disconnected [], pending |> List.rev |> List.map Cmd.ofMsg |> Cmd.batch
+                | Connected              -> model, Cmd.none
+            | UserConnected _               -> Connected, Cmd.none
 
-        | ServerPriceTick prices     -> 
-            prices |> PriceTick |> ServerMsg |> CabinetMsg |> Cmd.ofMsg |> appCommands
-            model, Cmd.none         
+            | ServerPriceTick prices     -> 
+                prices |> PriceTick |> ServerMsg |> CabinetMsg |> Cmd.ofMsg |> appCommands
+                model, Cmd.none         
 
-    let view (model: WsBridgeModel) (dispatch: Msg<WsBridge.ServerMsg, WsBridge.ClientMsg> -> unit) =
+    let view (model: WsBridgeModel) (dispatch: Msg<WsBridge.ServerMsg, WsBridge.BridgeMsg> -> unit) =
         div [] []
 
 let appMsgQueue = // A queue
@@ -409,32 +417,31 @@ let appMsgQueue = // A queue
                                                             buffer <- []
                                                             ret)  
 
-let mapProgram (p: Program<_,WsBridgeModel,WsBridge.ClientMsg,_>): Program<_,AppModel,BridgeClientMsg,_> = 
+let mapProgram (p: Program<_,WsBridgeModel,WsBridge.BridgeMsg,_>): Program<_,AppModel,ClientMsg,_> = 
     {   init = fun args -> 
                         let wsModel, cmdB = p.init args
                         let model, cmdA = init wsModel args
-                        model, Cmd.batch [ cmdB |> Cmd.map ClientMsg ; cmdA ]
-        update = fun (msg: BridgeClientMsg) (model: AppModel) ->
-                    console.log ("update: " + msg.ToString())
+                        model, Cmd.batch [ cmdB |> Cmd.map BridgeMsg ; cmdA ]
+        update = fun (msg: ClientMsg) (model: AppModel) ->
                     match msg with
-                    | ClientMsg m -> 
+                    | BridgeMsg m -> 
                         let model', cmd = p.update m model.WsBridgeModel
-                        let allCmds = (snd appMsgQueue)() |> List.map (Cmd.map AppMsg) |> List.append [ cmd |> Cmd.map ClientMsg ] |> Cmd.batch
+                        let allCmds = (snd appMsgQueue)() |> List.map (Cmd.map AppMsg) |> List.append [ cmd |> Cmd.map BridgeMsg ] |> Cmd.batch
                         { model with WsBridgeModel = model' }, allCmds
                     | AppMsg m -> 
                         let model', cmd = update m model
                         model', cmd
-        subscribe = fun model -> model.WsBridgeModel |> p.subscribe |> Cmd.map ClientMsg 
+        subscribe = fun model -> model.WsBridgeModel |> p.subscribe |> Cmd.map BridgeMsg 
         view = view
         setState = fun model dispatch ->
-                        p.setState model.WsBridgeModel (ClientMsg >> dispatch) 
+                        p.setState model.WsBridgeModel (BridgeMsg >> dispatch) 
                         view model dispatch |> ignore 
         onError = p.onError
     } 
 
 //bridge wsBridgeInit wsBridgeUpdate wsBridgeView {
 bridge wsBridge.init (wsBridge.update (fst appMsgQueue))  wsBridge.view {
-    mapped ClientMsg mapProgram
+    mapped BridgeMsg mapProgram
     mapped Bridge.NavigableMapping (Program.toNavigable (parseHash pageParser) wsBridgeUrlUpdate)
 #if DEBUG
     simple Program.withConsoleTrace

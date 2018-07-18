@@ -185,11 +185,6 @@ module Route =
 /// A type that specifies the communication protocol for client and server
 /// Every record field must have the type : 'a -> Async<'b> where 'a can also be `unit`
 /// Add more such fields, implement them on the server and they be directly available on client
-type IAdminProtocol = {   
-    getInitCounter      : unit -> Async<ServerResult<Counter>>
-    initDb              : unit -> Async<ServerResult<unit>> 
-}
-
 type ITokenSaleProtocol = {
     getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
@@ -206,10 +201,14 @@ module WsBridge =
         | ConnectUser of AuthToken
         | DisconnectUser
     //Messages processed on the client
-    type ClientMsg =
+    type BridgeMsg =
+        | BS of BridgeServerMsg
+        | BC of BridgeClientMsg
+    and BridgeServerMsg =
         | ConnectUserOnServer       of AuthToken
         | DisconnectUserOnServer
-        
+    and BridgeClientMsg =
+        | ErrorResponse             of ServerError * Request: ServerMsg
         | ConnectionLost
         | ServerConnected
         | UserConnected             of AuthToken

@@ -28,21 +28,14 @@ open Client.LoginCommon
 open Shared.WsBridge
 open Elmish
 
-// type LoginState =
-// | LoggedOut
-// | LoggedIn of JWT
-
-// Model
-
 type PageModel =
     | NoPageModel
     | LoginFlowModel of LoginFlowPage.Model
     | CabinetModel   of CabinetModel.Model
-//   | StaticModel of Statics.Model
 
 type WsBridgeModel = 
     | Connected
-    | Disconnected of Pending: Bridge.Msg<ServerMsg, ClientMsg> list
+    | Disconnected of Pending: Bridge.Msg<ServerMsg, BridgeMsg> list
 
 type AppModel = {
     Page            : MenuPage
@@ -51,12 +44,5 @@ type AppModel = {
     Loading         : bool
 
     WsBridgeModel   : WsBridgeModel
-  
-    // State       : LoginState
-
-    // Counter     : Counter option
-
-    // LoginFlowModel: LoginFlowPage.Model
-    // CabinetModel  : CabinetModel.Model
 }
 

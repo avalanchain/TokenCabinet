@@ -125,14 +125,6 @@ let private resetPassword config resetPasswordInfo = task { // TODO: Change this
 }
 
 module Seed =
-    // let seed config deleteAll lst = task {
-    //     let cryptoCurrencies = getUnionCaseNames<CryptoCurrencySymbol> |> List.map (fun cc -> { CryptoCurrencySymbol.Id = cc; Name = cc; LogoUrl = ""; UpdateUrl = "" })
-    //     let! _ = CryptoCurrencies.Database.deleteAll config
-    //     for cc in cryptoCurrencies do
-    //         let! _ = CryptoCurrencies.Database.insert config cc
-    //         ()
-    // }
-
     let seedT connectionString deleteAll insert lst = task {
         let! _ = deleteAll connectionString
         for l in lst do
@@ -221,8 +213,6 @@ module Seed =
                     CreatedBy           = "Initial"
                     Proof               = "Initial Proof" } ]
         lst |> seedT connectionString TokenSaleStatuses.Database.deleteAll TokenSaleStatuses.Database.insert
-                    // StartDate           = tokenSaleStages.[0].StartDate
-                    // EndDate             = (tokenSaleStages |> Array.last).EndDate 
 
     let tokenSaleSeed connectionString startDate endDate = 
         let lst: TokenSales.TokenSale list = 
@@ -239,8 +229,6 @@ module Seed =
                     CreatedBy   = "Initial"
                     Proof       = "Initial Proof" } ]
         lst |> seedT connectionString TokenSales.Database.deleteAll TokenSales.Database.insert
-                    // StartDate           = tokenSaleStages.[0].StartDate
-                    // EndDate             = (tokenSaleStages |> Array.last).EndDate 
 
     let customerPreferencesSeed connectionString =
         let lst: CustomerPreferences.CustomerPreference list = 
@@ -252,17 +240,6 @@ module Seed =
         let lst: Customers.Customer list = 
             [ createCustomer "trader@cryptoinvestor.com" "!!!ChangeMe111" "0x001002003004005006007008009" ]
         lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert        
-
-    // let fullCustomerSeed connectionString =
-    //     let lst: Customers.Customer list  = 
-    //         [   {   Customer = customer
-    //                 IsVerified = false
-    //                 VerificationEvent = None
-    //                 CustomerPreference = customerPreference
-    //                 CustomerTier = Tier1
-    //                 Wallet = (createCustomerWallet customer.Id).PublicPart TestEnv
-    //             } ]
-    //     lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert    
 
     let walletsSeed connectionString = task {
         let! _ = WalletsKV.Database.deleteAll connectionString
@@ -337,7 +314,7 @@ type BridgeConnectionState =
     | Disconnected
 
 let bridgeConnections =
-    ServerHub<BridgeConnectionState, WsBridge.ServerMsg, WsBridge.ClientMsg>.New()    
+    ServerHub<BridgeConnectionState, WsBridge.ServerMsg, WsBridge.BridgeMsg>.New()    
 
 
 let getTokenSaleStages config = task {  
@@ -597,24 +574,24 @@ let webApp config =
             getFullCustomer     = getFullCustomer       config    >> Async.AwaitTask
             getPriceTick        = getPriceTick          config    >> Async.AwaitTask
         }
-    let adminProtocol =
-        {   getInitCounter  = getInitCounter    >> Async.AwaitTask 
-            initDb          = initDb            >> Async.AwaitTask }
 
    
     let bridgeInit () =
         printfn "Server init"
         Disconnected, Cmd.ofMsg (C ServerConnected)
 
-    let bridgeUpdate msg state =
+    let bridgeUpdate config msg state =
         printfn "bridgeUpdate: %A" msg
         match msg with
         | Closed                -> Disconnected, Cmd.none
-        | ConnectUser authToken -> Connected authToken, UserConnected authToken |> C |> Cmd.ofMsg
+        | ConnectUser authToken ->
+            if checkAuthTokenValid config authToken then 
+                Connected authToken, UserConnected authToken |> C |> Cmd.ofMsg
+            else state, ErrorResponse(TokenInvalid |> AuthError, msg) |> C |> Cmd.ofMsg
         | DisconnectUser        -> Disconnected, Cmd.none
         
     let bridgeProtocol =
-        bridge bridgeInit bridgeUpdate {
+        bridge bridgeInit (bridgeUpdate config) {
             serverHub bridgeConnections
             at Shared.Route.wsBridgeEndpoint
         }        
@@ -625,10 +602,6 @@ let webApp config =
             use_error_handler errorHandler
         }        
         remoting tokenSaleProtocol {
-            use_route_builder Route.builder
-            use_error_handler errorHandler
-        }
-        remoting adminProtocol {
             use_route_builder Route.builder
             use_error_handler errorHandler
         }
