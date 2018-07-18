@@ -36,3 +36,9 @@ let inline comE<'P> (com: React.Component<'P>) (children: ReactElement seq): Rea
     createElement(com, createEmpty<'P>, children)
 
 
+let iboxSpinner = 
+    div [ Class "sk-spinner sk-spinner-double-bounce" ]
+        [ div [ Class "sk-double-bounce1" ]
+            [ ]
+          div [ Class "sk-double-bounce2" ]
+            [ ] ]

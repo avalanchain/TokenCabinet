@@ -45,8 +45,8 @@ let roundFour (v:decimal) = Math.Round(v, 4)
 
 let bodyRowSomeNone (model: Model) body =
     match model.TokenSale with
-    | Some m -> Ibox.btCol "Timeline" "9" ([ body m ])
-    | None   -> Ibox.btCol "Timeline" "9" ([ str "No model loaded" ]) 
+    | Some m -> Ibox.btCol "Timeline" "9" false ([ body m ])
+    | None   -> Ibox.btCol "Timeline" "9" false ([ str "No model loaded" ]) 
 
 let bodySomeNone (model: Model) body =
     match model.TokenSale with
@@ -399,16 +399,17 @@ let counterRow (m: Model) dispatch = Ibox.emptyRow [ counter m dispatch
                                                      totalCoins m ]   
 
 let invest m dispatch = 
-    Ibox.btCol "Invest" "9" ([ currenciesGroup m dispatch
-                               div [ Class "hr-line-dashed" ] [ ]
-                               counterRow m (PurchaseTokenMsg >> dispatch)
-                               div [ Class "hr-line-dashed" ] [ ]
-                               Ibox.emptyRow 
-                                [
-                                   bodySomeNone m bounusLeft
-                                   bonus m.PurchaseTokenModel
-                                ]
-                                ])                                               
+    Ibox.btColLg "Invest" "9" m.PurchaseTokenModel.IsLoading 
+        ([ currenciesGroup m dispatch
+           div [ Class "hr-line-dashed" ] [ ]
+           counterRow m (PurchaseTokenMsg >> dispatch)
+           div [ Class "hr-line-dashed" ] [ ]
+           Ibox.emptyRow 
+              [
+                 bodySomeNone m bounusLeft
+                 bonus m.PurchaseTokenModel
+              ]
+            ])                                               
 
 
 let timelineItem (stage:TokenSaleStage) =
@@ -465,7 +466,7 @@ let timelineItem (stage:TokenSaleStage) =
                          ]
                 ]    
          ]
-let stages m = Ibox.btColEmpty "3" 
+let stages m = Ibox.btColEmptyLg "3" 
                 [
                     Ibox.iboxTitle "Token Sale"
                     // Ibox.iboxContentOnly2 [
@@ -498,7 +499,7 @@ let stages m = Ibox.btColEmpty "3"
                                 for stage in m.TokenSaleStages ->
                                 timelineItem stage ]] ""
                 ]
-let price (model: Model) = Ibox.btColContentOnly "3" ([ bodyP model ])
+let price (model: Model) = Ibox.btColContentOnlyLg "3" ([ bodyP model ])
 let columnFirstRow m = div []
                          [ 
                            price m

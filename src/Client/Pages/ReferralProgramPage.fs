@@ -82,10 +82,10 @@ let bodyLink address dispatch =
                                             )
                         // @ [spanBtn])
 
-let referalLink address dispatch = Ibox.btRow "Referal Link" [bodyLink address dispatch]
+let referalLink address dispatch = Ibox.btRow "Referal Link" false [bodyLink address dispatch]
 
 
-let referals = Ibox.btRow "Referals" [
+let referals = Ibox.btRow "Referals" false [
                     comE table [
                         thead [][
                             tr[][

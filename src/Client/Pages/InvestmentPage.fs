@@ -30,19 +30,44 @@ let bodySomeNoneCustomer model (fullCustomer: FullCustomer option) body dispatch
             | Some fc ->  body model fc dispatch
             | None    ->  str "No model loaded" 
 
-let helper = div [ Class "border-bottom ibox-content m-b-sm" ] [
-                div [ Class "p-xs" ] 
-                  [
-                    div [ Class "pull-left m-r-md" ]
-                        [ img [ Class "w100"
-                                Src "../lib/img/coins/eth_logo.png" ] ]    
-                    h2 [ ] 
-                       [ str "Ethereum address" ]
-                    h4 [ Class "text-muted" ] 
-                       [ str "Balance" ]
-                    h3 [ ] [
-                            str "0.0 AIMS"
-                   ]]]
+let bodySomeNone (model: Model) body dispatch =
+    match model.TokenSale with
+    | Some m ->  body model.InvestmentModel m dispatch
+    | None   ->  str "No model loaded" 
+
+let helper m mts dispatch = 
+        let coinbse m dispatch = 
+            if (m.Coinbase.Length = 0)
+                then    
+                    div []
+                        [   comF button (fun o -> o.bsClass <- "btn btn-success btn-outline btn-sm" |> Some
+                                                  o.onClick <- React.MouseEventHandler(fun _ -> GetCoinbase |> dispatch) |> Some  )
+                                            [ 
+                                                (if m.IsLoading then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                                                 else str "Get Metamask Address") ]
+                            h4 [ Class "text-muted" ] 
+                               [ str "Balance:" ]
+                        ]
+                else
+                div []
+                    [   p [ ]
+                          [ str m.Coinbase ]
+                        h4 [ Class "text-muted" ] 
+                               [ str "Balance:" ]
+                        h3 [ ] 
+                           [ str ("0.0 " + mts.SaleToken.Symbol)  ]
+                        ]
+               
+        div [ Class "border-bottom ibox-content m-b-sm" ] [
+            div [ Class "p-xs" ] 
+              [
+                div [ Class "pull-left m-r-md" ]
+                    [ img [ Class "w100"
+                            Src "../lib/img/coins/eth_logo.png" ] ]    
+                h2 [ ] 
+                   [ str "Ethereum address:" ]
+                coinbse m dispatch
+                ]]
         
         // div[ Class "col-sm-10 input-group"]
 let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass <- Some "btn btn-success ")
@@ -53,8 +78,29 @@ let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass 
 
 let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
 
-let transactions = 
-    Ibox.btRow "TRANSACTIONS" 
+let transactions m dispatch = 
+    let getTransactions m dispatch = 
+            if (m.Coinbase.Length = 0)
+                then    
+                    div []
+                        [   comF button (fun o -> o.bsClass <- "btn btn-success btn-outline btn-sm" |> Some
+                                                  o.onClick <- React.MouseEventHandler(fun _ -> GetCoinbase |> dispatch) |> Some  )
+                                            [ 
+                                                (if m.IsLoading then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
+                                                 else str "Get Metamask Address") ]
+                            h4 [ Class "text-muted" ] 
+                               [ str "Balance:" ]
+                        ]
+                else
+                    tr []
+                        [  
+                          td [ ColSpan 6. ]  
+                             [
+                                 p [ Class "text-center m-t-xl" ] 
+                                    [ str "no transactions" ]
+                             ]
+                        ]
+    Ibox.btRow "TRANSACTIONS" false
         [
             comE table 
                 [
@@ -68,7 +114,10 @@ let transactions =
                             th [][str "Status" ]
                         ]
                     ]
-                    tbody [][]
+                    tbody [ ] 
+                          [
+                              getTransactions m dispatch
+                          ]
                 ]
 ]
 
@@ -88,7 +137,7 @@ let symbolAddress m = function
                     | BTG  -> m.Wallet.Accounts.Btg.Address.Value
                     | DASH -> m.Wallet.Accounts.Dash.Address.Value    
 let compares (model: Model) (m: FullCustomer) dispatch = 
-    Ibox.btCol "Crypto Addresses" "12" [
+    Ibox.btCol "Crypto Addresses" "12" false [
             comE table [
                 thead [][
                     tr [ ][
@@ -127,13 +176,13 @@ let compares (model: Model) (m: FullCustomer) dispatch =
 //                                       transactions
 let ccAdresses model m dispatch= bodySomeNoneCustomer model m compares dispatch
 
-let grouped m dispatch = Ibox.emptyRow [ helper
-                                         transactions]
+// let grouped m mts dispatch = Ibox.emptyRow [ helper m mts dispatch
+//                                          transactions]
 
-let view (model: Model) dispatch = 
+let view (model: Model) (dispatch: Msg -> unit) = 
     Ibox.emptyRow [ 
-        Ibox.btColEmptyLg "7" [ helper
-                                transactions ]
+        Ibox.btColEmptyLg "7" [ bodySomeNone model (helper)  (InvestmentsMsg >> dispatch)
+                                transactions model.InvestmentModel (InvestmentsMsg >> dispatch) ]
         Ibox.btColEmptyLg "5" [ 
             Ibox.emptyRow [
                 (ccAdresses model model.FullCustomer (PurchaseTokenMsg >> dispatch))] ]

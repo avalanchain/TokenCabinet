@@ -5,12 +5,15 @@ open LoginCommon
 open Shared.WalletPublic
 open Elmish.Toastr
 open Fable.PowerPack
+open System.Transactions
+open Web3Types
+open System.Transactions
 
 
 type Msg =
     | VerificationMsg of VerificationMsg
     | PurchaseTokenMsg of PurchaseTokenMsg
-    | MyInvestmentsMsg
+    | InvestmentsMsg of InvestmentsMsg
     | ReferralProgramMsg
     | ContactsMsg
     | DashboardMsg
@@ -29,6 +32,12 @@ and PurchaseTokenMsg =
     | SignResult          of Result<string, string>
 and VerificationMsg = 
     | TabChanged          of int
+and InvestmentsMsg = 
+    | GetCoinbase          //of string
+    | GetTransactions     of string
+    | GetTransactionCount
+    | CoinbaseResult           of Result<string, string>
+    | TransactionsResult       of Result<Web3Types.Transaction list, string>
 
 type Model = {
     Auth                   : AuthModel
@@ -41,7 +50,8 @@ type Model = {
     FullCustomer           : ViewModels.FullCustomer option
 
     PurchaseTokenModel     : PurchaseTokenModel
-    VerificationModel      : VerifiacationModel
+    VerificationModel      : VerificationModel
+    InvestmentModel        : InvestmentModel
 
     IsWeb3                 : bool
 }
@@ -51,12 +61,17 @@ and PurchaseTokenModel = {
     CCAddress              : string
     TotalPrice             : decimal
     IsLoading              : bool
-} 
+}
 
-and VerifiacationModel = {
+and VerificationModel = {
     CurrentTab             : int
 } 
-
+ 
+and InvestmentModel = {
+    Coinbase               : string
+    Transactions           : Web3Types.Transaction list
+    IsLoading              : bool
+} 
 
 type TostrStatus = Success | Warning | Err | Info
 
