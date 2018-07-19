@@ -18,6 +18,9 @@ open Fable.Import.Browser
 open Fable.Import
 open JsInterop
 
+open Elmish.Bridge
+open Elmish.Bridge.Browser
+
 
 open Fable.Core.JsInterop
 open Client.Page
@@ -46,3 +49,12 @@ and UIMsg =
 and UnexpectedMsg =
     | BrowserStorageFailure of Exception
     | ServerErrorMsg        of RemotingError
+
+type ClientMsg = 
+    | BridgeMsg of WsBridge.BridgeMsg
+    | AppMsg    of AppMsg
+
+type BridgedMsg = Msg<WsBridge.ServerMsg, ClientMsg>
+
+let msgMapC f = function    | C m -> m |> f |> C 
+                            | S m -> S m

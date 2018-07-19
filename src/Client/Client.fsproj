@@ -55,6 +55,9 @@
     <Compile Include="Pages/Menu.fs" />
 
     <Compile Include="PageRouter.fs" />
+    
+    <Compile Include="App.fs" />
+    <Compile Include="wsBridge.fs" />
     <Compile Include="Client.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

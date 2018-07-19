@@ -104,6 +104,8 @@
     </Content>
     <Compile Include="AuthJwt.fs" />
     <Compile Include="Seed.fs" />
+    <Compile Include="LoginFlow.fs" />
+    <Compile Include="Cabinet.fs" />
     <Compile Include="Server.fs" />
     <Content Include="*.sqlite">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
