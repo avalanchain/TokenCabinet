@@ -6,9 +6,7 @@
     <Compile Include="../Shared/Utils.fs" />
     <Compile Include="../Shared/Auth.fs" />
     <Compile Include="../Shared/InputValidators.fs" />
-
     <Compile Include="../Shared/Inner/Shared.fs" />
-
     <Compile Include="lib/BigNumber.fs" />
     <Compile Include="lib/jsonrpc.fs" />
     <Compile Include="lib/Web3Types.fs" />
@@ -16,27 +14,23 @@
     <Compile Include="lib/Fable.Recharts.fs" />
     <Compile Include="lib/ChartJs.fs" />
     <Compile Include="lib/react-chartjs-2.fs" />
-
     <Compile Include="Utils.fs" />
     <Compile Include="Components/Helpers.fs" />
     <Compile Include="lib/ReactCopyToClipboard.fs" />
-
+    <Compile Include="lib/ReactBootstrap.fs" />
     <Compile Include="Components/Ibox.fs" />
+    <Compile Include="Components/FormHelpers.fs" />
+    <Compile Include="Components/Footer.fs" />
+    <Compile Include="Components/TopNavbar.fs" />
+    <Compile Include="Inner/CabinetMenuPage.fs" />
     <Compile Include="Page.fs" />
-
     <Compile Include="LoginFlow/LoginCommon.fs" />
     <Compile Include="LoginFlow/LoginPage.fs" />
     <Compile Include="LoginFlow/ForgotPasswordPage.fs" />
     <Compile Include="LoginFlow/RegisterPage.fs" />
     <Compile Include="LoginFlow/PasswordResetPage.fs" />
     <Compile Include="LoginFlow/LoginFlowPage.fs" />
-    
     <Compile Include="Inner/CabinetModel.fs" />
-    <Compile Include="lib/ReactBootstrap.fs" />
-    <Compile Include="Components/FormHelpers.fs" />
-    
-    <Compile Include="Views/DashboardView.fs" />
-
     <Compile Include="Inner/ContactsPage.fs" />
     <Compile Include="Inner/InvestmentPage.fs" />
     <Compile Include="Inner/ReferralProgramPage.fs" />
@@ -44,19 +38,13 @@
     <Compile Include="Inner/PurchaseTokenPage.fs" />
     <Compile Include="Inner/CabinetPage.fs" />
     <Compile Include="Inner/HomePage.fs" />
-
-    <Compile Include="WsClientSharedLibrary.fs" /> 
-    <Compile Include="WsClientLibrary.fs" /> <!-- Remove this when Elmish.Bridge library is fixed -->
-
+    <Compile Include="Inner/Menu.fs" />
+    <Compile Include="Views/DashboardView.fs" />
+    <Compile Include="WsClientSharedLibrary.fs" />
+    <Compile Include="WsClientLibrary.fs" />
     <Compile Include="ClientMsgs.fs" />
     <Compile Include="ClientModels.fs" />
-    
-    <Compile Include="Components/Footer.fs" />
-    <Compile Include="Components/TopNavbar.fs" />
-    <Compile Include="Inner/Menu.fs" />
-
     <Compile Include="PageRouter.fs" />
-    
     <Compile Include="App.fs" />
     <Compile Include="wsBridge.fs" />
     <Compile Include="Client.fs" />

@@ -121,7 +121,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
     let (model', cmd') : AppModel * Cmd<ClientMsg> =  
         match msg with
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
-            let page = CabinetPage.Default
+            let page = Cabinet.MenuPage.Default
             let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken } |> Cmd.map AppMsg
             let cmdGetCryptoCurrencies      = cmdServerCall (Server.cabinetApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
             let cmdGetTokenSale             = cmdServerCall (Server.cabinetApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
@@ -134,7 +134,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
                                     cmdGetFullCustomerCompleted
                                     cmdTick
                                     cmdConnectWsBridge ]
-            Navigation.newUrl (CabinetPage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
+            Navigation.newUrl (Cabinet.MenuPage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
             { model with    Page = MenuPage.Cabinet page
                             PageModel = CabinetPage.init authToken |> PageModel.CabinetModel
                  } , cmd'  // TODO: Add UserName
@@ -221,19 +221,6 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 
 /// Constructs the view for the application given the model.
 
-let mainView page (model: CabinetModel.Model) (dispatch: AppMsg -> unit) cabinetPageView = 
-    let fullCustomer = model.FullCustomer
-    div [ Id "wrapper" ]
-        [   Menu.view page (AppMsg.UIMsg >> dispatch)
-            div [ Id "page-wrapper"
-                  Class "gray-bg" ] [
-                  TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> dispatch)
-                  div [ Class "wrapper wrapper-content animated fadeInRight"]
-                      [ cabinetPageView page model (CabinetMsg >> dispatch) ]
-
-                  Footer.footer
-            ]
-        ]
 
 /// Constructs the view for the application given the model.
 [<PassGenerics>]
@@ -242,7 +229,7 @@ let view (model: AppModel) (dispatch: ClientMsg -> unit) =
     | LoginFlowModel loginModel -> 
         LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> AppMsg >> dispatch)
     | CabinetModel cm -> 
-        mainView (match model.Page with | MenuPage.Cabinet p -> p | _ -> CabinetPage.Default) 
+        mainView (match model.Page with | MenuPage.Cabinet p -> p | _ -> Cabinet.MenuPage.Default) 
             cm (AppMsg >> dispatch) (CabinetPage.view)
     | NoPageModel ->
         Browser.console.error("Unsupported model/Auth state combination")

@@ -15,13 +15,13 @@ open Elmish.Browser.Navigation
 open Elmish.Browser.UrlParser
 
 open Shared.Utils
+open Client
 
 [<RequireQualifiedAccess>]
 type MenuPage = 
     | Home 
     | LoginFlow of LoginFlow
-    | Cabinet of CabinetPage
-//   | Static of Statics.Page
+    | Cabinet of Cabinet.MenuPage
     with static member Default = LoginFlow.Default |> LoginFlow
 and LoginFlow =
     | Login         
@@ -29,14 +29,6 @@ and LoginFlow =
     | ForgotPassword
     | PasswordReset
     with static member Default = Login
-and CabinetPage =
-    | PurchaseToken
-    | Investments
-    | ReferralProgram
-    | Verification
-    | Contacts
-    // | Dashboard
-    with static member Default = PurchaseToken  
 
 let toHash =
   function
@@ -56,7 +48,7 @@ let loginFlowPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list =
 
 
 let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
-    allUnionCases<CabinetPage>
+    allUnionCases<Cabinet.MenuPage>
     |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "cabinet" </> s ((getUnionCaseName ed).ToLowerInvariant())))
 
 

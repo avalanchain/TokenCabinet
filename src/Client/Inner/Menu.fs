@@ -67,20 +67,20 @@ let handleClick (e: React.MouseEvent) =
 
 // let testlink = 
 
-let view (menuPage: CabinetPage) (dispatch: UIMsg -> unit) =
-    let icon  (page: CabinetPage) = 
+let view (menuPage: Cabinet.MenuPage) (dispatch: UIMsg -> unit) =
+    let icon  (page: Cabinet.MenuPage) = 
                 match page with 
-                | Verification      -> "fa fa-address-card"    
-                | PurchaseToken     -> "fa fa-shopping-cart"  
-                | Investments     -> "fa fa-briefcase"  
-                | ReferralProgram   -> "fa fa-refresh"
-                | Contacts          -> "fa fa-phone"            
+                | Cabinet.MenuPage.Verification      -> "fa fa-address-card"    
+                | Cabinet.MenuPage.PurchaseToken     -> "fa fa-shopping-cart"  
+                | Cabinet.MenuPage.Investments     -> "fa fa-briefcase"  
+                | Cabinet.MenuPage.ReferralProgram   -> "fa fa-refresh"
+                | Cabinet.MenuPage.Contacts          -> "fa fa-phone"            
                 // | Dashboard         -> "fa fa-th-large"         
 
     let cabinet = 
-        [   for page in getUnionCases<CabinetPage> ->
+        [   for page in getUnionCases<Cabinet.MenuPage> ->
                 let pageName = page.Name |> splitOnCapital 
-                let page = page |> getUnionCase<CabinetPage>
+                let page = page |> getUnionCase<Cabinet.MenuPage>
                 navViewLink (MenuPage.Cabinet page) pageName (icon page) (page = menuPage)
         ]
 
@@ -109,3 +109,17 @@ let view (menuPage: CabinetPage) (dispatch: UIMsg -> unit) =
                     
                         (staticPart :: cabinet)
                             ] ] 
+
+let mainView page (model: CabinetModel.Model) (dispatch: AppMsg -> unit) cabinetPageView = 
+    let fullCustomer = model.FullCustomer
+    div [ Id "wrapper" ]
+        [   view page (AppMsg.UIMsg >> dispatch)
+            div [ Id "page-wrapper"
+                  Class "gray-bg" ] [
+                  TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> dispatch)
+                  div [ Class "wrapper wrapper-content animated fadeInRight"]
+                      [ cabinetPageView page model (CabinetMsg >> dispatch) ]
+
+                  Footer.footer
+            ]
+        ]

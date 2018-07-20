@@ -161,15 +161,14 @@ let update (msg: Msg) model : Model * Cmd<Msg> =
                                                             PurchaseTokenModel = 
                                                             { model.PurchaseTokenModel with TotalPrice = ccTotalPrice model.ActiveSymbol model.PurchaseTokenModel.CCTokens tick } }, Cmd.none
 
-let view (page: Page.CabinetPage) (model: Model) (dispatch: Msg -> unit) = 
+let view (page: Cabinet.MenuPage) (model: Model) (dispatch: Msg -> unit) = 
     match page with
-        | Page.CabinetPage.Verification      -> [ VerificationPage.view model dispatch ]
-        | Page.CabinetPage.PurchaseToken     -> [ PurchaseTokenPage.view model dispatch ]
-        | Page.CabinetPage.Investments       -> [ InvestmentPage.view model dispatch ]
-        | Page.CabinetPage.ReferralProgram   -> [ ReferralProgramPage.view model dispatch ]
-        | Page.CabinetPage.Contacts          -> [ ContactsPage.view ]
+        | Cabinet.MenuPage.Verification      -> [ VerificationPage.view model dispatch ]
+        | Cabinet.MenuPage.PurchaseToken     -> [ PurchaseTokenPage.view model dispatch ]
+        | Cabinet.MenuPage.Investments       -> [ InvestmentPage.view model dispatch ]
+        | Cabinet.MenuPage.ReferralProgram   -> [ ReferralProgramPage.view model dispatch ]
+        | Cabinet.MenuPage.Contacts          -> [ ContactsPage.view ]
     |> div [] 
         
-
 
 
