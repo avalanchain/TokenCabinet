@@ -72,8 +72,8 @@ module Server =
             use_route_builder Route.builder
         }
 
-    let tokenSaleApi : ITokenSaleProtocol =
-        Proxy.remoting<ITokenSaleProtocol> {
+    let cabinetApi : ICabinetProtocol =
+        Proxy.remoting<ICabinetProtocol> {
             use_route_builder Route.builder
         }        
 
@@ -109,7 +109,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
         let cmd = Cmd.batch [   deleteAuthModelCmd
                                 DisconnectUserOnServer |> BS |> BridgeMsg |> Cmd.ofMsg
                                 Cmd.map (LoginFlowMsg >> AppMsg) cmd ]
-        { model with    Page = MenuPage.LoginFlow LoginFlowPage.Default
+        { model with    Page = MenuPage.LoginFlow LoginFlow.Default
                         PageModel = loginFlowModel |> PageModel.LoginFlowModel } , cmd
     let toastrSuccess text =   
                     Toastr.message text
@@ -121,11 +121,11 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
     let (model', cmd') : AppModel * Cmd<ClientMsg> =  
         match msg with
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
-            let page = CabinetPagePage.Default
+            let page = CabinetPage.Default
             let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken } |> Cmd.map AppMsg
-            let cmdGetCryptoCurrencies      = cmdServerCall (Server.tokenSaleApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
-            let cmdGetTokenSale             = cmdServerCall (Server.tokenSaleApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
-            let cmdGetFullCustomerCompleted = cmdServerCall (Server.tokenSaleApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
+            let cmdGetCryptoCurrencies      = cmdServerCall (Server.cabinetApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
+            let cmdGetTokenSale             = cmdServerCall (Server.cabinetApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
+            let cmdGetFullCustomerCompleted = cmdServerCall (Server.cabinetApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
             let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg |> AppMsg)
             let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> BS |> BridgeMsg)
             let cmd' = Cmd.batch [  cmdLocalStorage 
@@ -134,7 +134,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
                                     cmdGetFullCustomerCompleted
                                     cmdTick
                                     cmdConnectWsBridge ]
-            Navigation.newUrl (CabinetPagePage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
+            Navigation.newUrl (CabinetPage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
             { model with    Page = MenuPage.Cabinet page
                             PageModel = CabinetPage.init authToken |> PageModel.CabinetModel
                  } , cmd'  // TODO: Add UserName
@@ -143,7 +143,7 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
         | UIMsg msg ->
             match msg with 
             | Tick i -> 
-                model, cmdServerCall (Server.tokenSaleApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"
+                model, cmdServerCall (Server.cabinetApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"
             | BrowserStorageUpdated -> model, Cmd.none            
             | MenuSelected page -> 
                 { model with Page = MenuPage.Cabinet page } , toastrSuccess (sprintf "Menu selected: '%A'" page) 
@@ -196,12 +196,6 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
     model', cmd' 
 
 
-/// Constructs the view for a page given the model and dispatcher.
-[<PassGenerics>]
-let cabinetPageView p model (dispatch: ClientMsg -> unit) =
-    CabinetPage.view p model (CabinetMsg >> AppMsg >> dispatch)        
-
-
 let sidebarToggle (e: React.MouseEvent) =
     e.preventDefault()
     document.body.classList.toggle("sidebar-hidden") |> ignore
@@ -227,18 +221,15 @@ let loader: LoaderProps -> React.ReactElement = importDefault("react-loading-ove
 
 /// Constructs the view for the application given the model.
 
-let mainView page (model: CabinetModel.Model) (dispatch: ClientMsg -> unit) cabinetPageView = 
+let mainView page (model: CabinetModel.Model) (dispatch: AppMsg -> unit) cabinetPageView = 
     let fullCustomer = model.FullCustomer
     div [ Id "wrapper" ]
-        [
-            Menu.view page (AppMsg.UIMsg >> AppMsg >> dispatch)
+        [   Menu.view page (AppMsg.UIMsg >> dispatch)
             div [ Id "page-wrapper"
                   Class "gray-bg" ] [
-                  TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> AppMsg >> dispatch)
+                  TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> dispatch)
                   div [ Class "wrapper wrapper-content animated fadeInRight"]
-                      [ 
-                        (cabinetPageView page model dispatch)
-                           ]
+                      [ cabinetPageView page model (CabinetMsg >> dispatch) ]
 
                   Footer.footer
             ]
@@ -251,8 +242,8 @@ let view (model: AppModel) (dispatch: ClientMsg -> unit) =
     | LoginFlowModel loginModel -> 
         LoginFlowPage.view loginModel (AppMsg.LoginFlowMsg >> AppMsg >> dispatch)
     | CabinetModel cm -> 
-        mainView (match model.Page with | MenuPage.Cabinet p -> p | _ -> CabinetPagePage.Default) 
-            cm dispatch cabinetPageView
+        mainView (match model.Page with | MenuPage.Cabinet p -> p | _ -> CabinetPage.Default) 
+            cm (AppMsg >> dispatch) (CabinetPage.view)
     | NoPageModel ->
         Browser.console.error("Unsupported model/Auth state combination")
         Login |> UIMsg |> AppMsg |> dispatch 

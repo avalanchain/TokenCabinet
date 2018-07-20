@@ -11,30 +11,9 @@ module Utils =
 
     let splitOnCapital caption = Regex.Replace(caption, "([a-z])([A-Z])", "$1 $2")
 
-    // let getUnionCase case (t: System.Type) = FSharpValue.GetUnionFields(case, t) |> fst
+    let [<PassGenerics>] getUnionCaseInfo (x:'a) = FSharpValue.GetUnionFields(x, typeof<'a>) |> fst
 
-    // let getUnionCases (t: System.Type) = 
-    //     FSharpType.GetUnionCases t
-    //     |> List.ofSeq
-
-    // let allUnionCases (t: System.Type) =
-    //     FSharpType.GetUnionCases t
-    //     |> Array.map (fun case -> FSharpValue.MakeUnion(case, [||]) :?> 'T)
-    //     |> Array.toList
-
-    // let getUnionCaseName case (t: System.Type) = 
-    //     match FSharpValue.GetUnionFields(case, t) with
-    //     | case, _ -> case.Name  
-
-    // let getUnionCaseNameSplit case (t: System.Type) = getUnionCaseName case t |> splitOnCapital
-
-    // ///Returns the case names of union type 'ty.
-    // let getUnionCaseNames (t: System.Type) = 
-    //     FSharpType.GetUnionCases t |> Array.map (fun info -> info.Name) |> Array.toList
-
-    // let getUnionCaseNamesSplit (t: System.Type) = getUnionCaseNames t |> (List.map splitOnCapital)
-
-    let [<PassGenerics>] getUnionCase (x:'a) = FSharpValue.GetUnionFields(x, typeof<'a>) |> fst
+    let [<PassGenerics>] getUnionCase<'T> (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> 'T
 
     let [<PassGenerics>] getUnionCases<'t> = 
         FSharpType.GetUnionCases typeof<'t>

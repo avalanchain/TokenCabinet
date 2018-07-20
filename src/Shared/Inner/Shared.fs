@@ -185,7 +185,7 @@ module Route =
 /// A type that specifies the communication protocol for client and server
 /// Every record field must have the type : 'a -> Async<'b> where 'a can also be `unit`
 /// Add more such fields, implement them on the server and they be directly available on client
-type ITokenSaleProtocol = {
+type ICabinetProtocol = {
     getCryptoCurrencies : unit -> Async<ServerResult<ViewModels.CryptoCurrency list>> 
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 

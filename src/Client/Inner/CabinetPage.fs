@@ -13,7 +13,6 @@ open Fable.PowerPack
 open Elmish
 open Elmish.React
 open Elmish.React.Common
-open LoginPage
 open Shared
 open Client.CabinetModel
 open Client.LoginCommon
@@ -23,30 +22,17 @@ open Elmish.Browser
 open Elmish.Toastr
 open Helpers
 
-// type Model = 
-//     | VerificationModel     of string
-//     | PurchaseTokenModel    of ViewModels.TokenSale option
-//     | MyInvestmentsModel    of string
-//     | ReferralProgramModel  of string
-//     | ContactsModel         of string
-//     | DashboardModel        of string
-
-
 open Web3
 open Web3Types
 open Fable.Import.BigNumber
 
 [<Emit("window.web3")>]
 let web3: Web3 = jsNative
-// console.log (sprintf "web3: '%A'" web3)
-// console.log (sprintf "web3cp: '%A'" web3.currentProvider)
 let IsWeb3 = isNull web3
 
 console.log (sprintf "IsW3: '%A'" IsWeb3)
 // let w3 = web3Factory.Create("http://127.0.0.1:8545" |> U2.Case2 )
 let w3 = web3Factory.Create(web3.currentProvider |> U2.Case1 )
-
-
 
 let init authToken = 
     {   Auth                    = { Token = authToken }
@@ -67,27 +53,7 @@ let init authToken =
         IsWeb3                  = IsWeb3
     }
 
-   
-
-    // | Book ed -> 
-    //     let m,cmd = EntityDefs.book.Init user
-    //     m |> BookListModel, Cmd.map (BookMsg) cmd  
-    // | Individual ed -> 
-    //     let m,cmd = EntityDefs.individual.Init user
-    //     m |> IndividualListModel, Cmd.map (IndividualMsg) cmd  
-    // | Organization ed -> 
-    //     let m,cmd = EntityDefs.organization.Init user
-    //     m |> OrganizationListModel, Cmd.map (OrganizationMsg) cmd  
-    // | Vessel ed -> 
-    //     let m,cmd = EntityDefs.vessel.Init user
-    //     m |> VesselListModel, Cmd.map (VesselMsg) cmd  
-    // | BillOfLading ed -> 
-    //     let m,cmd = EntityDefs.billOfLading.Init user
-    //     m |> BillOfLadingListModel, Cmd.map (BillOfLadingMsg) cmd  
-
-
-
-let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
+let update (msg: Msg) model : Model * Cmd<Msg> = 
     
     let ccTotalPrice activeSymbol cCTokens (tick: ViewModels.CurrencyPriceTick) = 
         PurchaseTokenPage.calcPrice activeSymbol tick (Option.map(fun p -> p.PriceUsd * cCTokens))
@@ -195,37 +161,13 @@ let update (msg: Msg) model : Model * Cmd<Msg> = //model ,Cmd.none
                                                             PurchaseTokenModel = 
                                                             { model.PurchaseTokenModel with TotalPrice = ccTotalPrice model.ActiveSymbol model.PurchaseTokenModel.CCTokens tick } }, Cmd.none
 
-    // | BookListModel m, BookMsg ms -> 
-    //     let m, cmd = EntityDefs.book.Update ms m
-    //     m |> BookListModel, Cmd.map (BookMsg) cmd
-
-
-    // | (m, msg) -> 
-    //     Browser.console.error(sprintf "Unexpected Model '%A' and Msg '%A' combination" m msg)
-    //     model, Cmd.none
-
-open ReactBootstrap
-open Fable.Import.React
-open Client.Helpers
-open Page
-
-
-let view (page: CabinetPagePage) (model: Model) (dispatch: Msg -> unit) = 
+let view (page: Page.CabinetPage) (model: Model) (dispatch: Msg -> unit) = 
     match page with
-        | Verification      -> [ VerificationPage.view model dispatch ]
-        | PurchaseToken     -> [ PurchaseTokenPage.view model dispatch ]
-        | Investments       -> [ InvestmentPage.view model dispatch ]
-        | ReferralProgram   -> [ ReferralProgramPage.view model dispatch ]
-        | Contacts          -> [ ContactsPage.view ]
-        // | Dashboard          -> [ DashboardView.view ]
-        // | Book ed, BookListModel m -> viewPageStatic<Book> ed m dispatch
-        // | Individual ed, IndividualListModel m -> viewPageStatic<Individual> ed m dispatch
-        // | Organization ed, OrganizationListModel m -> viewPageStatic<Organization> ed m dispatch
-        // | Vessel ed, VesselListModel m -> viewPageStatic<Vessel> ed m dispatch
-        // | BillOfLading ed, BillOfLadingListModel m -> viewPageStatic<BillOfLading> ed m dispatch
-        // | p -> 
-        //     Browser.console.error(sprintf "Impossible Page:[%A] - Model:[%A] combination" p)
-        //     [ ]
+        | Page.CabinetPage.Verification      -> [ VerificationPage.view model dispatch ]
+        | Page.CabinetPage.PurchaseToken     -> [ PurchaseTokenPage.view model dispatch ]
+        | Page.CabinetPage.Investments       -> [ InvestmentPage.view model dispatch ]
+        | Page.CabinetPage.ReferralProgram   -> [ ReferralProgramPage.view model dispatch ]
+        | Page.CabinetPage.Contacts          -> [ ContactsPage.view ]
     |> div [] 
         
 

@@ -8,13 +8,13 @@ open Fable.PowerPack
 
 
 type Msg =
-    | VerificationMsg of VerificationMsg
-    | PurchaseTokenMsg of PurchaseTokenMsg
+    | VerificationMsg   of VerificationMsg
+    | PurchaseTokenMsg  of PurchaseTokenMsg
     | MyInvestmentsMsg
     | ReferralProgramMsg
     | ContactsMsg
     | DashboardMsg
-    | ServerMsg     of ServerMsg
+    | ServerMsg         of ServerMsg
 and ServerMsg =
     | GetCryptoCurrenciesCompleted  of ViewModels.CryptoCurrency list
     | GetTokenSaleCompleted         of ViewModels.TokenSale

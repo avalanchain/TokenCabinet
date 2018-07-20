@@ -19,17 +19,17 @@ open Shared.Utils
 [<RequireQualifiedAccess>]
 type MenuPage = 
     | Home 
-    | LoginFlow of LoginFlowPage
-    | Cabinet of CabinetPagePage
+    | LoginFlow of LoginFlow
+    | Cabinet of CabinetPage
 //   | Static of Statics.Page
-    with static member Default = LoginFlowPage.Default |> LoginFlow
-and LoginFlowPage =
+    with static member Default = LoginFlow.Default |> LoginFlow
+and LoginFlow =
     | Login         
     | Register      
     | ForgotPassword
     | PasswordReset
     with static member Default = Login
-and CabinetPagePage =
+and CabinetPage =
     | PurchaseToken
     | Investments
     | ReferralProgram
@@ -51,12 +51,12 @@ let goToUrl (e: React.MouseEvent) =
     Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
 
 let loginFlowPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
-    allUnionCases<LoginFlowPage>
+    allUnionCases<LoginFlow>
     |> List.map (fun ed -> map (ed |> MenuPage.LoginFlow) (s ((getUnionCaseName ed).ToLowerInvariant())))
 
 
 let cabinetPageParsers: Parser<MenuPage -> MenuPage, MenuPage> list = 
-    allUnionCases<CabinetPagePage>
+    allUnionCases<CabinetPage>
     |> List.map (fun ed -> map (ed |> MenuPage.Cabinet) (s "cabinet" </> s ((getUnionCaseName ed).ToLowerInvariant())))
 
 

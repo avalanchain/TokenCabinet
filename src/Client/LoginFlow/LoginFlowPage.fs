@@ -46,7 +46,7 @@ type Model =
 
 let mapMC f1 f2 (a, b) = f1 a, Cmd.map f2 b 
 
-let switchTo (page: LoginFlowPage) (model: Model) = 
+let switchTo (page: LoginFlow) (model: Model) = 
     match model, page with 
     | RegisterPageModel m       , Login -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
     | ForgotPasswordPageModel m , Login -> LoginPage.init m.InputEmail |> mapMC LoginPageModel LoginPageMsg
@@ -103,10 +103,10 @@ let rec update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         console.error(sprintf "Impossible Msg '%A' Model '%A' combination" msg model)
         let model', cmd' =
             match msg with
-            | LoginPageMsg _          -> switchTo LoginFlowPage.Login model
-            | RegisterPageMsg _       -> switchTo LoginFlowPage.Register model
-            | ForgotPasswordPageMsg _ -> switchTo LoginFlowPage.ForgotPassword model
-            | PasswordResetPageMsg _  -> switchTo LoginFlowPage.PasswordReset model
+            | LoginPageMsg _          -> switchTo LoginFlow.Login model
+            | RegisterPageMsg _       -> switchTo LoginFlow.Register model
+            | ForgotPasswordPageMsg _ -> switchTo LoginFlow.ForgotPassword model
+            | PasswordResetPageMsg _  -> switchTo LoginFlow.PasswordReset model
         let model'', cmd'', emsg'' = update msg model'
         model'', Cmd.batch [cmd'; cmd''], emsg''
 let [<Literal>] ENTER_KEY = 13.

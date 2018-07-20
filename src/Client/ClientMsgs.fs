@@ -42,7 +42,7 @@ and AuthMsg =
     | LoggedOut
 and UIMsg =
     | Tick                  of uint64
-    | MenuSelected          of CabinetPagePage
+    | MenuSelected          of CabinetPage
     | BrowserStorageUpdated
     | Login
     | Logout  

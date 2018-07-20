@@ -115,7 +115,7 @@ let view model (dispatch: Msg -> unit) =
                                                         [ small [ ]
                                                             [ str "Go back to Login" ] ]
                                                       a [ Class "btn btn-sm btn-white btn-block"
-                                                          Href (LoginFlowPage.Login |> MenuPage.LoginFlow |> toHash) 
+                                                          Href (LoginFlow.Login |> MenuPage.LoginFlow |> toHash) 
                                                           OnClick goToUrl ]
                                                         [ str "Login" ] ] ] ] ] ]  
                               p [ Class "m-t project-title" ]

@@ -1,8 +1,8 @@
 module Client.Menu
 
 open System
-open FSharp.Reflection
 
+open Elmish
 open Elmish.Browser.Navigation
 open Elmish.Browser.UrlParser
 
@@ -14,17 +14,15 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.Core.JsInterop
 
-open Elmish
-
-
+open Shared.Auth
 open Shared.Utils
 
 open ClientMsgs
-open Shared.Auth
-open LoginPage
 open ClientModels
-open LoginCommon
 open Client.Page
+
+open LoginPage
+open LoginCommon
 
 module O = FSharp.Core.Option
 
@@ -69,8 +67,8 @@ let handleClick (e: React.MouseEvent) =
 
 // let testlink = 
 
-let view (menuPage: CabinetPagePage) (dispatch: UIMsg -> unit) =
-    let icon  (page: CabinetPagePage) = 
+let view (menuPage: CabinetPage) (dispatch: UIMsg -> unit) =
+    let icon  (page: CabinetPage) = 
                 match page with 
                 | Verification      -> "fa fa-address-card"    
                 | PurchaseToken     -> "fa fa-shopping-cart"  
@@ -80,11 +78,9 @@ let view (menuPage: CabinetPagePage) (dispatch: UIMsg -> unit) =
                 // | Dashboard         -> "fa fa-th-large"         
 
     let cabinet = 
-        let toPage (case: UnionCaseInfo) = FSharpValue.MakeUnion(case, [||]) :?> CabinetPagePage
-        
-        [   for page in getUnionCases<CabinetPagePage> ->
+        [   for page in getUnionCases<CabinetPage> ->
                 let pageName = page.Name |> splitOnCapital 
-                let page = page |> toPage
+                let page = page |> getUnionCase<CabinetPage>
                 navViewLink (MenuPage.Cabinet page) pageName (icon page) (page = menuPage)
         ]
 

@@ -7,7 +7,7 @@
     <Compile Include="../Shared/Auth.fs" />
     <Compile Include="../Shared/InputValidators.fs" />
 
-    <Compile Include="../Shared/Shared.fs" />
+    <Compile Include="../Shared/Inner/Shared.fs" />
 
     <Compile Include="lib/BigNumber.fs" />
     <Compile Include="lib/jsonrpc.fs" />
@@ -24,25 +24,26 @@
     <Compile Include="Components/Ibox.fs" />
     <Compile Include="Page.fs" />
 
-    <Compile Include="Pages/LoginFlow/LoginCommon.fs" />
-    <Compile Include="Pages/LoginFlow/LoginPage.fs" />
-    <Compile Include="Pages/LoginFlow/ForgotPasswordPage.fs" />
-    <Compile Include="Pages/LoginFlow/RegisterPage.fs" />
-    <Compile Include="Pages/LoginFlow/PasswordResetPage.fs" />
-    <Compile Include="Pages/LoginFlow/LoginFlowPage.fs" />
+    <Compile Include="LoginFlow/LoginCommon.fs" />
+    <Compile Include="LoginFlow/LoginPage.fs" />
+    <Compile Include="LoginFlow/ForgotPasswordPage.fs" />
+    <Compile Include="LoginFlow/RegisterPage.fs" />
+    <Compile Include="LoginFlow/PasswordResetPage.fs" />
+    <Compile Include="LoginFlow/LoginFlowPage.fs" />
     
-    <Compile Include="Pages/CabinetModel.fs" />
+    <Compile Include="Inner/CabinetModel.fs" />
     <Compile Include="lib/ReactBootstrap.fs" />
     <Compile Include="Components/FormHelpers.fs" />
     
     <Compile Include="Views/DashboardView.fs" />
-    <Compile Include="Pages/ContactsPage.fs" />
-    <Compile Include="Pages/InvestmentPage.fs" />
-    <Compile Include="Pages/ReferralProgramPage.fs" />
-    <Compile Include="Pages/VerificationPage.fs" />
-    <Compile Include="Pages/PurchaseTokenPage.fs" />
-    <Compile Include="Pages/CabinetPage.fs" />
-    <Compile Include="Pages/HomePage.fs" />
+
+    <Compile Include="Inner/ContactsPage.fs" />
+    <Compile Include="Inner/InvestmentPage.fs" />
+    <Compile Include="Inner/ReferralProgramPage.fs" />
+    <Compile Include="Inner/VerificationPage.fs" />
+    <Compile Include="Inner/PurchaseTokenPage.fs" />
+    <Compile Include="Inner/CabinetPage.fs" />
+    <Compile Include="Inner/HomePage.fs" />
 
     <Compile Include="WsClientSharedLibrary.fs" /> 
     <Compile Include="WsClientLibrary.fs" /> <!-- Remove this when Elmish.Bridge library is fixed -->
@@ -52,7 +53,7 @@
     
     <Compile Include="Components/Footer.fs" />
     <Compile Include="Components/TopNavbar.fs" />
-    <Compile Include="Pages/Menu.fs" />
+    <Compile Include="Inner/Menu.fs" />
 
     <Compile Include="PageRouter.fs" />
     

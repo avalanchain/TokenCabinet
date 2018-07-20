@@ -120,7 +120,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
                         ]
                         [  (if model.TryingToLogin then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
                             else str "Login") ] 
-                      a [   Href (LoginFlowPage.ForgotPassword |> MenuPage.LoginFlow |> toHash) 
+                      a [   Href (LoginFlow.ForgotPassword |> MenuPage.LoginFlow |> toHash) 
                             OnClick goToUrl ]
                         [ small [ ]
                             [ str "Forgot password?" ] ]
@@ -128,7 +128,7 @@ let view (model: Model) (dispatch: Msg -> unit) =
                         [ small [ ]
                             [ str "Do not have an account?" ] ]
                       a [   Class "btn btn-sm btn-white btn-block"
-                            Href (LoginFlowPage.Register |> MenuPage.LoginFlow |> toHash) 
+                            Href (LoginFlow.Register |> MenuPage.LoginFlow |> toHash) 
                             OnClick goToUrl ]
                        [ str "Create an account" ]]
                   p [ Class "m-t project-title" ]

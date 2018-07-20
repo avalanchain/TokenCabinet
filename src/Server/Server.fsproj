@@ -19,7 +19,7 @@
     <Compile Include="Templates/InternalError.fs" />
     <Compile Include="../Shared/Auth.fs" />
     <Compile Include="../Shared/Utils.fs" />
-    <Compile Include="../Shared/Shared.fs" />
+    <Compile Include="../Shared/Inner/Shared.fs" />
     <Compile Include="Entities/Verifications/VerificationsModel.fs" />
     <Compile Include="Entities/Verifications/VerificationsViews.fs" />
     <Compile Include="Entities/Verifications/VerificationsRepository.fs" />
