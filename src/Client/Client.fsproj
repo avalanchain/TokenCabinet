@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -21,7 +22,6 @@
     <Compile Include="Components/Ibox.fs" />
     <Compile Include="Components/FormHelpers.fs" />
     <Compile Include="Components/Footer.fs" />
-    <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Inner/CabinetMenuPage.fs" />
     <Compile Include="Page.fs" />
     <Compile Include="LoginFlow/LoginCommon.fs" />
@@ -38,11 +38,12 @@
     <Compile Include="Inner/PurchaseTokenPage.fs" />
     <Compile Include="Inner/CabinetPage.fs" />
     <Compile Include="Inner/HomePage.fs" />
-    <Compile Include="Inner/Menu.fs" />
     <Compile Include="Views/DashboardView.fs" />
     <Compile Include="WsClientSharedLibrary.fs" />
-    <Compile Include="WsClientLibrary.fs" />
     <Compile Include="ClientMsgs.fs" />
+    <Compile Include="Components/TopNavbar.fs" />
+    <Compile Include="Inner/Menu.fs" />
+    <Compile Include="WsClientLibrary.fs" />
     <Compile Include="ClientModels.fs" />
     <Compile Include="PageRouter.fs" />
     <Compile Include="App.fs" />

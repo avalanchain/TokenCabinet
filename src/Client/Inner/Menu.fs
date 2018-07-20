@@ -18,7 +18,6 @@ open Shared.Auth
 open Shared.Utils
 
 open ClientMsgs
-open ClientModels
 open Client.Page
 
 open LoginPage

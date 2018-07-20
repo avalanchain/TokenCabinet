@@ -4,16 +4,8 @@ open Fable.Core
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 
-
-
-open Client
 open ClientMsgs
-open ClientModels
-open JsInterop
-open Shared.Auth
-open CabinetModel
 open Shared.ViewModels
-
 
 let customer (fullCustomer: FullCustomer option) =
     match fullCustomer with
