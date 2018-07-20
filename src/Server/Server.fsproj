@@ -99,6 +99,7 @@
     <Compile Include="Inner/Router.fs" />
 
     <Compile Include="Inner/Customer/Wallet.fs" />
+    <Compile Include="Inner/Customer/Transactions.fs" />
     <Content Include="static/*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

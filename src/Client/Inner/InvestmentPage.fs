@@ -35,6 +35,11 @@ let bodySomeNone (model: Model) body dispatch =
     | Some m ->  body model.InvestmentModel m dispatch
     | None   ->  str "No model loaded" 
 
+let trans (ts: ETransaction list) =  div [] [ str ( ts.Length.ToString()) ]
+let bodyts (model: Model) body =
+    match model.Transactions with 
+    | Some ts ->  body trans ts 
+    | None    ->  trans []
 let helper m mts dispatch = 
         let coinbse m dispatch = 
             if (m.Coinbase.Length = 0)
@@ -78,46 +83,58 @@ let spanBtn = span [ Class "input-group-btn" ] [comF button (fun o -> o.bsClass 
 
 let fullInput = ((inputG (FormElement.Input InputType.Text) (None) "") @ [spanBtn])
 
-let transactions m dispatch = 
-    let getTransactions m dispatch = 
-            if (m.Coinbase.Length = 0)
-                then    
-                    div []
-                        [   comF button (fun o -> o.bsClass <- "btn btn-success btn-outline btn-sm" |> Some
-                                                  o.onClick <- React.MouseEventHandler(fun _ -> GetCoinbase |> dispatch) |> Some  )
-                                            [ 
-                                                (if m.IsLoading then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] 
-                                                 else str "Get Metamask Address") ]
-                            h4 [ Class "text-muted" ] 
-                               [ str "Balance:" ]
-                        ]
-                else
-                    tr []
-                        [  
-                          td [ ColSpan 6. ]  
-                             [
-                                 p [ Class "text-center m-t-xl" ] 
-                                    [ str "no transactions" ]
-                             ]
-                        ]
+let transactions m (ts: ETransaction list) = 
+// tr []
+//                         [  
+//                           td [ ColSpan 6. ]  
+//                              [
+//                                  p [ Class "text-center m-t-xl" ] 
+//                                     [ str "no transactions" ]
+//                              ]
+//                         ]
+    // let getTransactions ts = 
+        // for t in ts do
+        //     tr []
+        //        [  
+        //           td [ ColSpan 6. ]  
+        //              [
+        //                  p [ Class "text-center m-t-xl" ] 
+        //                     [ str "no transactions" ]
+        //              ]
+        //         ]
+                
     Ibox.btRow "TRANSACTIONS" false
         [
             comE table 
                 [
                     thead [][
                         tr[][
-                            th [][str "#" ]
-                            th [][str "Date" ]
-                            th [][str "Sum" ]
-                            th [][str "Rate" ]
-                            th [][str "Tokens" ]
-                            th [][str "Status" ]
+                            th [][str "FROM" ]
+                            th [][str "TO" ]
+                            // th [][str "GAS USED" ]
+                            th [][str "TOKENS" ]
                         ]
                     ]
                     tbody [ ] 
                           [
-                              getTransactions m dispatch
-                          ]
+                            for t in ts ->
+                                tr []
+                                   [  td [ ]
+                                         [ str t.From]
+                                      td [ ]  
+                                         [
+                                           str t.To
+                                         ]
+                                    //   td [ ]  
+                                    //      [
+                                    //        str t.Gas
+                                    //      ]
+                                      td [ ]  
+                                         [
+                                           str t.Value
+                                         ]      
+                                    ]]
+                          
                 ]
 ]
 
@@ -172,18 +189,16 @@ let compares (model: Model) (m: FullCustomer) dispatch =
             ]
                                                        
 
-// helper
-//                                       transactions
 let ccAdresses model m dispatch= bodySomeNoneCustomer model m compares dispatch
-
-// let grouped m mts dispatch = Ibox.emptyRow [ helper m mts dispatch
-//                                          transactions]
 
 let view (model: Model) (dispatch: Msg -> unit) = 
     Ibox.emptyRow [ 
         Ibox.btColEmptyLg "7" [ bodySomeNone model (helper)  (InvestmentsMsg >> dispatch)
-                                transactions model.InvestmentModel (InvestmentsMsg >> dispatch) ]
+                                bodyts model transactions ]
         Ibox.btColEmptyLg "5" [ 
             Ibox.emptyRow [
                 (ccAdresses model model.FullCustomer (PurchaseTokenMsg >> dispatch))] ]
+        // Ibox.btColEmptyLg "12" [ 
+        //     Ibox.emptyRow [
+        //             (bodyts model) ] ]
     ]

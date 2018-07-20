@@ -88,6 +88,7 @@ let init authToken =
         ActiveSymbol            = ETH
         TokenSale               = None
         FullCustomer            = None 
+        Transactions            = None
         PurchaseTokenModel      = { CCTokens = 0m
                                     BuyTokens = 0m
                                     TotalPrice = 0m
@@ -253,12 +254,12 @@ let update (msg: Msg) model : Model * Cmd<Msg> =
     | InvestmentsMsg msg_  ->
         match msg_ with  
         | GetCoinbase  -> model, getCoinbase
-        | GetTransactions c -> model, getTransactions c
+        | GetTransactions c -> model, Cmd.none //getTransactions c
         | GetTransactionCount  -> model, Cmd.none
         | CoinbaseResult res -> 
             match res with 
             | Ok c -> { model with InvestmentModel = { model.InvestmentModel with Coinbase =  c
-                                                                                  IsLoading = false  } }, GetTransactions c |> InvestmentsMsg |> Cmd.ofMsg  //getTransactions c
+                                                                                  IsLoading = false  } }, Cmd.none //GetTransactions c |> InvestmentsMsg |> Cmd.ofMsg  //getTransactions c
             | Error message -> { model with InvestmentModel = { model.InvestmentModel with IsLoading = false  } }, 
                                                                 metemaskError message
         | TransactionsResult res -> 
@@ -282,7 +283,8 @@ let update (msg: Msg) model : Model * Cmd<Msg> =
         | PriceTick tick                    -> { model with CurrenciesCurentPrices = tick
                                                             PurchaseTokenModel = 
                                                             { model.PurchaseTokenModel with TotalPrice = ccTotalPrice model.ActiveSymbol model.PurchaseTokenModel.CCTokens tick } }, Cmd.none
-
+        | GetTransactionsCompleted ts       -> { model with Transactions = Some (ts) }, Cmd.none
+        
 let view (page: Cabinet.MenuPage) (model: Model) (dispatch: Msg -> unit) = 
     match page with
         | Cabinet.MenuPage.Verification      -> [ VerificationPage.view model dispatch ]

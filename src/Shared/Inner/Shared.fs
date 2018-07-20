@@ -42,7 +42,6 @@ module WalletPublic =
                                         | DASH -> __.Accounts.Dash
 
 
-
 module ViewModels = 
     type TokenSale = {
         SaleToken   : SaleToken
@@ -175,6 +174,22 @@ module ViewModels =
 
     type CurrencyPriceTick = { Prices: CryptoCurrencyPrice list } 
 
+        
+    type ETransaction = {
+        TransactionHash : string
+        TransactionIndex: string
+        BlockHash       : string
+        BlockNumber     : string
+        From            : string
+        To              : string
+        Gas             : string
+        GasPrice        : string
+        Value           : string
+    }
+
+    type ETransactions = {
+        Transactions: ETransaction list
+    }
 module Route =
     /// Defines how routes are generated on server and mapped from client
     let builder typeName methodName =
@@ -190,6 +205,7 @@ type ICabinetProtocol = {
 
     getTokenSale        : unit -> Async<ServerResult<ViewModels.TokenSale>> 
     getFullCustomer     : SecureVoidRequest -> Async<ServerResult<ViewModels.FullCustomer>> 
+    getTransactions     : SecureVoidRequest -> Async<ServerResult<ViewModels.ETransaction list>>
 
     getPriceTick        : uint64 -> Async<ServerResult<ViewModels.CurrencyPriceTick>>
 }

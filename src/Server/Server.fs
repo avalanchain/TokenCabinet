@@ -76,9 +76,9 @@ let config = { connectionString = "DataSource=database.sqlite" }
 // Seeding
 try
     printfn "Seeding 1..."
-    Seed.seedAll config.connectionString
-    |> Async.AwaitTask 
-    |> Async.RunSynchronously
+    // Seed.seedAll config.connectionString
+    // |> Async.AwaitTask 
+    // |> Async.RunSynchronously
 
     run (app config)
 with 

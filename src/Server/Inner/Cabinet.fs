@@ -20,6 +20,8 @@ open Elmish.Bridge
 open AuthJwt
 open Config
 open Customer.Wallet
+open Customer.Transactions
+open Customer
 open LoginFlow
 
 let getCryptoCurrencies config () = task { 
@@ -207,6 +209,22 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
         }
 }   
 
+let  getTransactions config (request: SecureVoidRequest) = task { 
+    printfn "getTransactions() called"
+
+    return! 
+        if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error |> Task.FromResult
+        elif request.Token |> checkAuthTokenValid config |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
+        else task {
+            let! customerRes = getCustomer config
+            let customer, customerDTO = customerRes |> unwrapResult
+            let! wallet = getWallet config customer.Id
+            let! transactions = getTransactions wallet.Main.Eth
+
+            return transactions |> Ok
+        }
+}   
+
 module PriceUpdater = 
     let [<Literal>] private CCUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BTG,LTC,BCH,DASH,ETC&tsyms=USD,EUR,ETH,BTC"
     type private PriceSource = JsonProvider<CCUrl>
@@ -267,7 +285,7 @@ module PriceUpdater =
             match msg with
             | LoadPrices ->
                 let! newPrices = getPriceTick()
-                printfn "Prices loaded"
+                // printfn "Prices loaded"
                 match newPrices with
                 | Some prices ->
                     bridgeConnections.SendIf(function | Connected _ -> true | Disconnected -> false) 
@@ -314,6 +332,7 @@ let cabinetProtocol config =
     {   getCryptoCurrencies = getCryptoCurrencies   config    >> Async.AwaitTask
         getTokenSale        = getTokenSale          config    >> Async.AwaitTask
         getFullCustomer     = getFullCustomer       config    >> Async.AwaitTask
+        getTransactions     = getTransactions       config    >> Async.AwaitTask
         getPriceTick        = getPriceTick          config    >> Async.AwaitTask
     }
     
