@@ -122,7 +122,7 @@ let documentation model dispatch =
 
 
 
-let tabs (model:VerifiacationModel) dispatch = 
+let tabs (model:VerificationModel) dispatch = 
                 comF tabs (fun o -> 
                            o.activeKey <- Some (model.CurrentTab :> obj)
                            o.id <- Some "verification"

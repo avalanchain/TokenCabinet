@@ -91,6 +91,7 @@ let f (t: MType) =
     let (A inner) = mtype
     inner
 
+// let getTransactions eAccount =
 
 // let addAccountToNet eAccount = 
 //     //  Nethereum.Web3.Web3(account)
