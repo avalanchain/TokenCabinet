@@ -30,6 +30,7 @@
     <Compile Include="LoginFlow/RegisterPage.fs" />
     <Compile Include="LoginFlow/PasswordResetPage.fs" />
     <Compile Include="LoginFlow/LoginFlowPage.fs" />
+    <Compile Include="LocalStorage.fs" />
     <Compile Include="Inner/CabinetModel.fs" />
     <Compile Include="Inner/ContactsPage.fs" />
     <Compile Include="Inner/InvestmentPage.fs" />

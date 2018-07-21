@@ -47,3 +47,13 @@ type AppModel = {
     WsBridgeModel   : WsBridgeModel
 }
 
+let cmdServerCall (apiFunc: 'T -> Async<ServerResult<'R>>) (args: 'T) (completeMsg: 'R -> AppMsg) serverMethodName =
+    Cmd.ofAsync
+        apiFunc
+        args
+        (fun res -> match res with
+                    | Ok cc             -> cc |> completeMsg |> AppMsg
+                    | Error serverError -> serverError |> ServerError |> ServerErrorMsg |> UnexpectedMsg |> AppMsg
+                    )
+        (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
+                    exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg |> AppMsg)

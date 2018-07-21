@@ -24,6 +24,7 @@ open Elmish.Bridge.Browser
 
 open Fable.Core.JsInterop
 open Client.Page
+open LocalStorage
 
 type RemotingError =
     | CommunicationError of exn
@@ -32,6 +33,7 @@ type RemotingError =
 type AppMsg =
     | AuthMsg           of AuthMsg
     | UIMsg             of UIMsg
+    | BrowserStorageMsg of BrowserStorageMsg 
     | UnexpectedMsg     of UnexpectedMsg
     | ErrorMsg          of string * AppMsg * string
     | LoginFlowMsg      of LoginFlowPage.Msg
@@ -43,11 +45,9 @@ and AuthMsg =
 and UIMsg =
     | Tick                  of uint64
     | MenuSelected          of Cabinet.MenuPage
-    | BrowserStorageUpdated
     | Login
-    | Logout  
+    | Logout 
 and UnexpectedMsg =
-    | BrowserStorageFailure of Exception
     | ServerErrorMsg        of RemotingError
 
 type ClientMsg = 

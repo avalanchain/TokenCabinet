@@ -38,6 +38,7 @@ open RegisterPage
 open ForgotPasswordPage
 open PasswordResetPage
 open LoginFlowPage
+open LocalStorage
 open Shared.Auth
 open Shared.WsBridge
 
@@ -51,15 +52,6 @@ let ethHost = match Utils.load<string> "EthereumHost" with
                     Utils.save "EthereumHost" defaultHost
                     defaultHost
 
-module LocalStorage = 
-    let loadUser () : AuthModel option =
-        BrowserLocalStorage.load "user"
-
-    let saveUserCmd (authModel: AuthModel) =
-        Cmd.ofFunc (BrowserLocalStorage.save "user") authModel (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
-
-    let deleteUserCmd =
-        Cmd.ofFunc BrowserLocalStorage.delete "user" (fun _ -> BrowserStorageUpdated |> UIMsg) (BrowserStorageFailure >> UnexpectedMsg)
 
 module Server =
 
@@ -78,18 +70,6 @@ module Server =
         }        
 
 
-
-let cmdServerCall (apiFunc: 'T -> Async<ServerResult<'R>>) (args: 'T) (completeMsg: 'R -> AppMsg) serverMethodName =
-    Cmd.ofAsync
-        apiFunc
-        args
-        (fun res -> match res with
-                    | Ok cc             -> cc |> completeMsg |> AppMsg
-                    | Error serverError -> serverError |> ServerError |> ServerErrorMsg |> UnexpectedMsg |> AppMsg
-                    )
-        (fun exn -> console.error(sprintf "Exception during %s call: '%A'" serverMethodName exn)
-                    exn |> CommunicationError |> ServerErrorMsg |> UnexpectedMsg |> AppMsg)
-
 let init wsBridgeModel urlParsingResult : AppModel * Cmd<ClientMsg> =
     Browser.console.log (sprintf "Passed Url: '%A'" urlParsingResult)
     let model = {   Loading                 = false
@@ -104,7 +84,7 @@ let init wsBridgeModel urlParsingResult : AppModel * Cmd<ClientMsg> =
 
 let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
     let enforceLogin model =
-        let deleteAuthModelCmd = LocalStorage.deleteUserCmd |> Cmd.map AppMsg
+        let deleteAuthModelCmd = LocalStorage.deleteUserCmd |> Cmd.map (BrowserStorageMsg >> AppMsg)
         let loginFlowModel, cmd = LoginFlowPage.init ()
         let cmd = Cmd.batch [   deleteAuthModelCmd
                                 DisconnectUserOnServer |> BS |> BridgeMsg |> Cmd.ofMsg
@@ -122,41 +102,30 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
         match msg with
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
             let page = Cabinet.MenuPage.Default
-            let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken } |> Cmd.map AppMsg
-            let cmdGetCryptoCurrencies      = cmdServerCall (Server.cabinetApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
-            let cmdGetTokenSale             = cmdServerCall (Server.cabinetApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
-            let cmdGetFullCustomerCompleted = cmdServerCall (Server.cabinetApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
+            let pageModel, cmd = CabinetPage.init authToken
+            { model with    Page        = page      |> MenuPage.Cabinet 
+                            PageModel   = pageModel |> PageModel.CabinetModel } , cmd 
             let cmdGetTransactionsCompleted = cmdServerCall (Server.cabinetApi.getTransactions) (Auth.secureVoidRequest authToken) (CabinetModel.GetTransactionsCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTransactions()"
-            let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg |> AppMsg)
-            let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> BS |> BridgeMsg)
-            let cmd' = Cmd.batch [  cmdLocalStorage 
-                                    cmdGetCryptoCurrencies
-                                    cmdGetTokenSale
-                                    cmdGetFullCustomerCompleted
                                     cmdGetTransactionsCompleted
-                                    cmdTick
-                                    cmdConnectWsBridge ]
-            Navigation.newUrl (Cabinet.MenuPage.Default |> MenuPage.Cabinet |> toHash) |> List.map (fun f -> f ignore) |> ignore 
-            { model with    Page = MenuPage.Cabinet page
-                            PageModel = CabinetPage.init authToken |> PageModel.CabinetModel
-                 } , cmd'  // TODO: Add UserName
         | AuthMsg(AuthMsg.LoggedOut) -> enforceLogin model
 
         | UIMsg msg ->
             match msg with 
             | Tick i -> 
-                model, cmdServerCall (Server.cabinetApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"
-            | BrowserStorageUpdated -> model, Cmd.none            
+                model, cmdServerCall (Server.cabinetApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"            
             | MenuSelected page -> 
                 { model with Page = MenuPage.Cabinet page } , toastrSuccess (sprintf "Menu selected: '%A'" page) 
             | Login -> enforceLogin model
             | Logout -> enforceLogin model
                         
+        | BrowserStorageMsg msg -> 
+            match msg with 
+            | BrowserStorageUpdated     -> model, Cmd.none
+            | BrowserStorageFailure _   -> 
+                model, ("Browser storage access failed with", BrowserStorageMsg msg, string model) |> ErrorMsg |> AppMsg |> Cmd.ofMsg
 
         | UnexpectedMsg msg_ ->
             match msg_ with
-            | BrowserStorageFailure _ -> 
-                model, ("Browser storage access failed with", msg, string model) |> ErrorMsg |> AppMsg |> Cmd.ofMsg
             | ServerErrorMsg _ -> 
                 model, ("Server error ", msg, string model) |> ErrorMsg |> AppMsg |> Cmd.ofMsg
         | ErrorMsg(text, msg, m) -> 

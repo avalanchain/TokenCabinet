@@ -82,29 +82,43 @@ promise {
 }
 |> PowerPack.Promise.start
 let init authToken = 
-    {   Auth                    = { Token = authToken }
-        CryptoCurrencies        = []
-        CurrenciesCurentPrices  = { Prices = [] }
-        ActiveSymbol            = ETH
-        TokenSale               = None
-        FullCustomer            = None 
+    let model = {   Auth                    = { Token = authToken }
+                    CryptoCurrencies        = []
+                    CurrenciesCurentPrices  = { Prices = [] }
+                    ActiveSymbol            = ETH
+                    TokenSale               = None
+                    FullCustomer            = None 
         Transactions            = None
-        PurchaseTokenModel      = { CCTokens = 0m
-                                    BuyTokens = 0m
-                                    TotalPrice = 0m
-                                    CCAddress = "" 
-                                    IsLoading = false
-                                    }
-        VerificationModel       = {
-                                    CurrentTab = 1
-                                    }
-        InvestmentModel         = { Coinbase = ""
-                                    Transactions = []
-                                    IsLoading = false
-                                    }
-        IsWeb3                  = IsWeb3
-        // Coinbase                = w3.eth.getCoinbase()
+                    PurchaseTokenModel      = { CCTokens = 0m
+                                                BuyTokens = 0m
+                                                TotalPrice = 0m
+                                                CCAddress = "" 
+                                                IsLoading = false
+                                                }
+                    VerificationModel       = { CurrentTab = 1
+                                                }
+                    InvestmentModel         = { Coinbase = ""
+                                                Transactions = []
+                                                IsLoading = false
+                                                }
+                    IsWeb3                  = IsWeb3
+                    // Coinbase                = w3.eth.getCoinbase()
     }
+    let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken } |> Cmd.map AppMsg
+    let cmdGetCryptoCurrencies      = cmdServerCall (Server.cabinetApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
+    let cmdGetTokenSale             = cmdServerCall (Server.cabinetApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
+    let cmdGetFullCustomerCompleted = cmdServerCall (Server.cabinetApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
+    let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg |> AppMsg)
+    let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> BS |> BridgeMsg)
+    let cmdNavigation               = Navigation.newUrl (Cabinet.MenuPage.Default |> MenuPage.Cabinet |> toHash) 
+    let cmd = Cmd.batch [   cmdLocalStorage 
+                            cmdGetCryptoCurrencies
+                            cmdGetTokenSale
+                            cmdGetFullCustomerCompleted
+                            cmdTick
+                            cmdConnectWsBridge
+                            cmdNavigation ]
+    model, cmd
 
 let update (msg: Msg) model : Model * Cmd<Msg> = 
     
