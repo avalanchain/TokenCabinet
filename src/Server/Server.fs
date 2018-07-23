@@ -24,7 +24,19 @@ open Seed
 open LoginFlow
 open Cabinet
 
-let publicPath = Path.GetFullPath "../Client/public"
+let clientPath =
+    // did we start from server folder?
+    let devPath = Path.Combine("..","Client")
+    if Directory.Exists devPath then devPath
+    else
+        // maybe we are in root of project?
+        let devPath = Path.Combine("src","Client")
+        if Directory.Exists devPath then devPath
+        else @"./Client"
+    |> Path.GetFullPath        
+
+
+let publicPath = Path.Combine (clientPath, "public")
 
 let port = 8085us
 
