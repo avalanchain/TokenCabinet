@@ -49,7 +49,6 @@
     <Compile Include="Inner/PurchaseTokenPage.fs" />
     <Compile Include="Inner/CabinetPage.fs" />
     <Compile Include="Inner/HomePage.fs" />
-    <Compile Include="Views/DashboardView.fs" />
     <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Inner/Menu.fs" />
     <Compile Include="WsClientLibrary.fs" />

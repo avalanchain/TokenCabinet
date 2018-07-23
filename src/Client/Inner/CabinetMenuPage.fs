@@ -15,7 +15,7 @@ type MenuPage =
 type Msg =
     | VerificationMsg   of VerificationMsg
     | PurchaseTokenMsg  of PurchaseTokenMsg
-    | InvestmentsMsg of InvestmentsMsg
+    | InvestmentsMsg    of InvestmentsMsg
     | ReferralProgramMsg
     | ContactsMsg
     | DashboardMsg
