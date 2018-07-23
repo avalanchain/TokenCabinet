@@ -1,8 +1,12 @@
 module Router
 
+open System.IO
 open Saturn
 open Giraffe.Core
 open Giraffe.ResponseWriters
+open Microsoft.AspNetCore.Http
+open FSharp.Control.Tasks.V2.ContextInsensitive
+open Giraffe.Common
 
 
 let browser = pipeline {
@@ -19,11 +23,35 @@ let defaultView = scope {
     get "/default.html" (redirectTo false "/")
 }
 
-let browserRouter = scope {
-    not_found_handler (htmlView NotFound.layout) //Use the default 404 webpage
-    pipe_through browser //Use the default browser pipeline
+type HttpContext with
+    member this.WriteJavascriptFileAsync (filePath : string) =
+        task {
+            let filePath =
+                match Path.IsPathRooted filePath with
+                | true  -> filePath
+                | false ->
+                    let env = this.GetHostingEnvironment()
+                    Path.Combine(env.ContentRootPath, filePath)
+            this.SetContentType "text/javascript"
+            let! html = readFileAsStringAsync filePath
+            return! this.WriteStringAsync html
+        }
 
-    forward "" defaultView //Use the default view
+let jsFile (filePath : string) : HttpHandler =
+    fun (next : HttpFunc) (ctx : HttpContext) ->
+        printfn "BOOOOMMM"
+        ctx.WriteJavascriptFileAsync filePath
+
+let bundle publicPath = scope {
+    get "/public/bundle.js" (jsFile (Path.Combine (publicPath, "bundle.js")))
+}
+
+let browserRouter publicPath = scope {
+    not_found_handler (htmlView NotFound.layout) //Use the default 404 webpage
+    pipe_through browser // Use the default browser pipeline
+
+    forward "" (bundle publicPath) //public/bundle.js 
+    forward "" defaultView // Use the default view
 
     forward "/verifications" Verifications.Controller.resource
     forward "/cryptocurrencies" CryptoCurrencies.Controller.resource
@@ -61,7 +89,7 @@ let browserRouter = scope {
 //     forward "/someApi" someScopeOrController
 // }
 
-let router = scope {
+let router publicPath = scope {
     // forward "/api" apiRouter
-    forward "" browserRouter
+    forward "" (browserRouter publicPath)
 }

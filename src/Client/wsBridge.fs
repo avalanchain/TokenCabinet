@@ -25,6 +25,7 @@ open Fable.Core.JsInterop
 open Client
 open Client.Page
 open ClientMsgs
+open Cabinet
 open ClientModels
 open CabinetModel
 open System.ComponentModel

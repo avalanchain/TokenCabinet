@@ -16,6 +16,7 @@ open Shared
 open ViewModels
 open Client.FormHelpers
 
+open Cabinet
 open CabinetModel
 open ReactBootstrap
 open Helpers

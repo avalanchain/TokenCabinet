@@ -53,7 +53,7 @@ let ethHost = match Utils.load<string> "EthereumHost" with
                     defaultHost
 
 
-module Server =
+module ServerProxy =
 
     open Shared
     open Fable.Remoting.Client
@@ -102,17 +102,27 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
         match msg with
         | AuthMsg(AuthMsg.LoggedIn authToken) -> 
             let page = Cabinet.MenuPage.Default
-            let pageModel, cmd = CabinetPage.init authToken
+            let pageModel, cabinetCmd = CabinetPage.init authToken
+ 
+            let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken } |> Cmd.map (BrowserStorageMsg >> AppMsg)
+            let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg |> AppMsg)
+            let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> BS |> BridgeMsg)
+            let cmdNavigation               = Navigation.newUrl (Cabinet.MenuPage.Default |> MenuPage.Cabinet |> toHash)
+         
+            let cmd = Cmd.batch [   cabinetCmd
+                                    cmdLocalStorage 
+                                    cmdTick
+                                    cmdConnectWsBridge
+                                    cmdNavigation ]
+
             { model with    Page        = page      |> MenuPage.Cabinet 
                             PageModel   = pageModel |> PageModel.CabinetModel } , cmd 
-            let cmdGetTransactionsCompleted = cmdServerCall (Server.cabinetApi.getTransactions) (Auth.secureVoidRequest authToken) (CabinetModel.GetTransactionsCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTransactions()"
-                                    cmdGetTransactionsCompleted
         | AuthMsg(AuthMsg.LoggedOut) -> enforceLogin model
 
         | UIMsg msg ->
             match msg with 
             | Tick i -> 
-                model, cmdServerCall (Server.cabinetApi.getPriceTick) i (CabinetModel.PriceTick >> CabinetModel.ServerMsg >> CabinetMsg) "getPriceTick()"            
+                model, cmdServerCabinetCall (ServerProxy.cabinetApi.getPriceTick) i (Cabinet.PriceTick) "getPriceTick()"            
             | MenuSelected page -> 
                 { model with Page = MenuPage.Cabinet page } , toastrSuccess (sprintf "Menu selected: '%A'" page) 
             | Login -> enforceLogin model
@@ -145,13 +155,13 @@ let update (msg : AppMsg) (model : AppModel) : AppModel * Cmd<ClientMsg> =
                     match externalMsg' with
                     | LoginFlowPage.ExternalMsg.NoOp -> Cmd.none
                     | LoginFlowPage.ExternalMsg.LoginUser info -> 
-                        cmdServerCall (Server.loginFlowApi.login) info (LoginAttemptResult >> LoginPageMsg >> LoginFlowMsg) "login()" 
+                        cmdServerCall (ServerProxy.loginFlowApi.login) info (LoginAttemptResult >> LoginPageMsg >> LoginFlowMsg) "login()" 
                     | LoginFlowPage.ExternalMsg.RegisterUser info -> 
-                        cmdServerCall (Server.loginFlowApi.register) info (RegisteringAttemptResult >> RegisterPageMsg >> LoginFlowMsg) "register()" 
+                        cmdServerCall (ServerProxy.loginFlowApi.register) info (RegisteringAttemptResult >> RegisterPageMsg >> LoginFlowMsg) "register()" 
                     | LoginFlowPage.ExternalMsg.ForgotPasswordUser info -> 
-                        cmdServerCall (Server.loginFlowApi.forgotPassword) info (ForgotPasswordAttemptResult >> ForgotPasswordPageMsg >> LoginFlowMsg) "resetPassword()" 
+                        cmdServerCall (ServerProxy.loginFlowApi.forgotPassword) info (ForgotPasswordAttemptResult >> ForgotPasswordPageMsg >> LoginFlowMsg) "resetPassword()" 
                     | LoginFlowPage.ExternalMsg.ResetPassword info -> 
-                        cmdServerCall (Server.loginFlowApi.resetPassword) info (ResetAttemptResult >> PasswordResetPageMsg >> LoginFlowMsg) "resetPassword()" 
+                        cmdServerCall (ServerProxy.loginFlowApi.resetPassword) info (ResetAttemptResult >> PasswordResetPageMsg >> LoginFlowMsg) "resetPassword()" 
                     | LoginFlowPage.ExternalMsg.LoggedIn authToken -> authToken |> AuthMsg.LoggedIn |> AuthMsg |> AppMsg |> Cmd.ofMsg
 
                 { model with PageModel = LoginFlowModel model' }, Cmd.batch [ Cmd.map (LoginFlowMsg >> AppMsg) cmd'; cmd2 ]

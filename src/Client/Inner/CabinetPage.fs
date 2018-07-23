@@ -2,9 +2,12 @@ module Client.CabinetPage
 
 open System
 
+open Fable
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import
+open Fable.Import.JS
+open Fable.Import.BigNumber
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fable.PowerPack
@@ -13,19 +16,20 @@ open Fable.PowerPack
 open Elmish
 open Elmish.React
 open Elmish.React.Common
+open Elmish.Browser
+open Elmish.Browser.Navigation
+open Elmish.Toastr
+
 open Shared
+open Helpers
+open ClientMsgs
+open ClientModels
 open Client.CabinetModel
 open Client.LoginCommon
-open Fable.Import.JS
-open Fable
-open Elmish.Browser
-open Elmish.Toastr
-open Helpers
-open System.Collections.Generic
+open Client.Cabinet
 
 open Web3
 open Web3Types
-open Fable.Import.BigNumber
 
 [<Emit("window.web3")>]
 let web3: Web3 = jsNative
@@ -81,6 +85,7 @@ promise {
     console.log accs
 }
 |> PowerPack.Promise.start
+
 let init authToken = 
     let model = {   Auth                    = { Token = authToken }
                     CryptoCurrencies        = []
@@ -88,7 +93,7 @@ let init authToken =
                     ActiveSymbol            = ETH
                     TokenSale               = None
                     FullCustomer            = None 
-        Transactions            = None
+                    Transactions            = None
                     PurchaseTokenModel      = { CCTokens = 0m
                                                 BuyTokens = 0m
                                                 TotalPrice = 0m
@@ -104,27 +109,20 @@ let init authToken =
                     IsWeb3                  = IsWeb3
                     // Coinbase                = w3.eth.getCoinbase()
     }
-    let cmdLocalStorage             = LocalStorage.saveUserCmd { AuthModel.Token = authToken } |> Cmd.map AppMsg
-    let cmdGetCryptoCurrencies      = cmdServerCall (Server.cabinetApi.getCryptoCurrencies) () (CabinetModel.GetCryptoCurrenciesCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getCryptoCurrencies()"
-    let cmdGetTokenSale             = cmdServerCall (Server.cabinetApi.getTokenSale) () (CabinetModel.GetTokenSaleCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getTokenSale()"
-    let cmdGetFullCustomerCompleted = cmdServerCall (Server.cabinetApi.getFullCustomer) (Auth.secureVoidRequest authToken) (CabinetModel.GetFullCustomerCompleted >> CabinetModel.ServerMsg >> CabinetMsg) "getFullCustomer()"
-    let cmdTick                     = Cmd.ofMsg (Tick 0UL |> UIMsg |> AppMsg)
-    let cmdConnectWsBridge          = Cmd.ofMsg (authToken |> WsBridge.ConnectUserOnServer |> BS |> BridgeMsg)
-    let cmdNavigation               = Navigation.newUrl (Cabinet.MenuPage.Default |> MenuPage.Cabinet |> toHash) 
-    let cmd = Cmd.batch [   cmdLocalStorage 
-                            cmdGetCryptoCurrencies
+    let cmdGetCryptoCurrencies      = cmdServerCabinetCall (ServerProxy.cabinetApi.getCryptoCurrencies) () GetCryptoCurrenciesCompleted "getCryptoCurrencies()"
+    let cmdGetTokenSale             = cmdServerCabinetCall (ServerProxy.cabinetApi.getTokenSale) () GetTokenSaleCompleted "getTokenSale()"
+    let cmdGetFullCustomerCompleted = cmdServerCabinetCall (ServerProxy.cabinetApi.getFullCustomer) (Auth.secureVoidRequest authToken) GetFullCustomerCompleted "getFullCustomer()"
+    let cmdGetTransactionsCompleted = cmdServerCabinetCall (ServerProxy.cabinetApi.getTransactions) (Auth.secureVoidRequest authToken) GetTransactionsCompleted "getTransactions()"
+    let cmd = Cmd.batch [   cmdGetCryptoCurrencies
                             cmdGetTokenSale
                             cmdGetFullCustomerCompleted
-                            cmdTick
-                            cmdConnectWsBridge
-                            cmdNavigation ]
+                            cmdGetTransactionsCompleted ]
     model, cmd
 
 let update (msg: Msg) model : Model * Cmd<Msg> = 
     
     let ccTotalPrice activeSymbol cCTokens (tick: ViewModels.CurrencyPriceTick) = 
         PurchaseTokenPage.calcPrice activeSymbol tick (Option.map(fun p -> p.PriceUsd * cCTokens))
-
     let tokenTotalPrice (model: ViewModels.TokenSale option) activeSymbol tokens (tick: ViewModels.CurrencyPriceTick) =
         
         let tokensPrice (m: ViewModels.TokenSale option) = 
@@ -137,6 +135,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> =
     let tokenPrice activeSymbol ccTokens (tick: ViewModels.CurrencyPriceTick) = 
         PurchaseTokenPage.calcPrice activeSymbol tick (Option.map2(fun (m: ViewModels.TokenSale) p -> (p.PriceUsd * ccTokens) / m.TokenSaleState.PriceUsd ) model.TokenSale)
     
+
     let ccPrice activeSymbol tokens (tick: ViewModels.CurrencyPriceTick) = 
         PurchaseTokenPage.calcPrice activeSymbol tick (Option.map2(fun (m: ViewModels.TokenSale) p -> (m.TokenSaleState.PriceUsd * tokens) / p.PriceUsd ) model.TokenSale)
 
@@ -193,7 +192,7 @@ let update (msg: Msg) model : Model * Cmd<Msg> =
                 let startBlockNumber  = if endBlockNumber < 1000. then 0. else 0.
                 console.log(startBlockNumber)
 
-                let transactions = new List<Transaction>()
+                let transactions = ResizeArray<Transaction>()
 
                 for i in startBlockNumber .. endBlockNumber do
 

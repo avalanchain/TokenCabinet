@@ -30,8 +30,18 @@
     <Compile Include="LoginFlow/RegisterPage.fs" />
     <Compile Include="LoginFlow/PasswordResetPage.fs" />
     <Compile Include="LoginFlow/LoginFlowPage.fs" />
+
     <Compile Include="LocalStorage.fs" />
+    <Compile Include="WsClientSharedLibrary.fs" />
+
+    <Compile Include="ClientMsgs.fs" />
+
     <Compile Include="Inner/CabinetModel.fs" />
+
+    <Compile Include="ClientModels.fs" />
+
+    <Compile Include="Inner/ServerProxy.fs" />
+
     <Compile Include="Inner/ContactsPage.fs" />
     <Compile Include="Inner/InvestmentPage.fs" />
     <Compile Include="Inner/ReferralProgramPage.fs" />
@@ -40,12 +50,9 @@
     <Compile Include="Inner/CabinetPage.fs" />
     <Compile Include="Inner/HomePage.fs" />
     <Compile Include="Views/DashboardView.fs" />
-    <Compile Include="WsClientSharedLibrary.fs" />
-    <Compile Include="ClientMsgs.fs" />
     <Compile Include="Components/TopNavbar.fs" />
     <Compile Include="Inner/Menu.fs" />
     <Compile Include="WsClientLibrary.fs" />
-    <Compile Include="ClientModels.fs" />
     <Compile Include="PageRouter.fs" />
     <Compile Include="App.fs" />
     <Compile Include="wsBridge.fs" />

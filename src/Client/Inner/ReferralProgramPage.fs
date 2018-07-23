@@ -15,7 +15,7 @@ open Elmish.React
 open ReactBootstrap
 open Helpers
 open FormHelpers
-open CabinetModel
+open Cabinet
 open ReactCopyToClipboard
 
 

@@ -19,6 +19,7 @@ open ReactBootstrap
 open Helpers
 open FormHelpers
 open Fable
+open Cabinet
 open CabinetModel
 
 open ReactCopyToClipboard

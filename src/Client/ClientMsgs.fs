@@ -13,6 +13,7 @@ open Client
 
 open Fable
 open Fable.Core
+open Fable.Core.JsInterop
 open Fable.Import.RemoteDev
 open Fable.Import.Browser
 open Fable.Import
@@ -21,8 +22,7 @@ open JsInterop
 open Elmish.Bridge
 open Elmish.Bridge.Browser
 
-
-open Fable.Core.JsInterop
+open Client
 open Client.Page
 open LocalStorage
 
@@ -37,7 +37,7 @@ type AppMsg =
     | UnexpectedMsg     of UnexpectedMsg
     | ErrorMsg          of string * AppMsg * string
     | LoginFlowMsg      of LoginFlowPage.Msg
-    | CabinetMsg        of CabinetModel.Msg
+    | CabinetMsg        of Cabinet.Msg
 
 and AuthMsg =
     | LoggedIn      of Auth.AuthToken

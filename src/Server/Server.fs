@@ -70,7 +70,7 @@ let webApp config =
             use_error_handler errorHandler
         }
         bridgeProtocol config 
-        Router.router
+        Router.router publicPath
     ]
 
 let app config = application {

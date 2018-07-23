@@ -14,7 +14,8 @@ open Elmish.React
 
 open Shared
 open ViewModels
-open Client.CabinetModel
+open Cabinet
+open CabinetModel
 open Helpers
 open ReactBootstrap
 open FormHelpers

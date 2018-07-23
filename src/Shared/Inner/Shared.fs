@@ -172,9 +172,10 @@ module ViewModels =
         PriceAt             : DateTime
     }
 
-    type CurrencyPriceTick = { Prices: CryptoCurrencyPrice list } 
+    type CurrencyPriceTick = { 
+        Prices: CryptoCurrencyPrice list 
+    } 
 
-        
     type ETransaction = {
         TransactionHash : string
         TransactionIndex: string
@@ -186,10 +187,12 @@ module ViewModels =
         GasPrice        : string
         Value           : string
     }
+        
 
     type ETransactions = {
         Transactions: ETransaction list
     }
+
 module Route =
     /// Defines how routes are generated on server and mapped from client
     let builder typeName methodName =
