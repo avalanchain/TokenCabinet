@@ -52,7 +52,7 @@ let getTransactions (eAccount: EthAccount) = task {
                             To               = string t.To
                             Gas              = string t.Gas.Value
                             GasPrice         = string t.GasPrice.Value
-                            Value            = string t.Value.Value
+                            Value            = decimal t.Value.Value
                         } 
                         transactions.Add(et)
     let tss:ETransaction list = []

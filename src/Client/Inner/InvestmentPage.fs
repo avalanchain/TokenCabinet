@@ -53,6 +53,8 @@ let helper m mts dispatch =
                                                  else str "Get Metamask Address") ]
                             h4 [ Class "text-muted" ] 
                                [ str "Balance:" ]
+                            h3 [ ] 
+                               [ str ("0.0 " + mts.SaleToken.Symbol)  ]
                         ]
                 else
                 div []
@@ -67,7 +69,7 @@ let helper m mts dispatch =
         div [ Class "border-bottom ibox-content m-b-sm" ] [
             div [ Class "p-xs" ] 
               [
-                div [ Class "pull-left m-r-md" ]
+                div [ Class "pull-left m-r-md m" ]
                     [ img [ Class "w100"
                             Src "../lib/img/coins/eth_logo.png" ] ]    
                 h2 [ ] 
@@ -106,44 +108,46 @@ let transactions m (ts: ETransaction list) =
                 
     Ibox.btRow "TRANSACTIONS" false
         [
-            comE table 
+            div [ Class "table-responsive" ]//table-responsive
                 [
-                    thead [][
-                        tr[][
-                            th [][str "FROM" ]
-                            th [][str "TO" ]
-                            // th [][str "GAS USED" ]
-                            th [][str "TOKENS" ]
-                        ]
-                    ]
-                    tbody [ ] 
-                          [
-                            for t in ts ->
-                                tr []
-                                   [  td [ ]
-                                         [ str t.From]
-                                      td [ ]  
-                                         [
-                                           str t.To
-                                         ]
-                                    //   td [ ]  
-                                    //      [
-                                    //        str t.Gas
-                                    //      ]
-                                      td [ ]  
-                                         [
-                                           str t.Value
-                                         ]      
-                                    ]]
+                    comE table 
+                        [
+                            thead [][
+                                tr[][
+                                    th [][str "FROM" ]
+                                    th [][str "TO" ]
+                                    // th [][str "GAS USED" ]
+                                    th [ Class "text-center"  ][str "VALUE" ]
+                                ]
+                            ]
+                            tbody [ ] 
+                                  [
+                                    for t in ts ->
+                                        tr []
+                                           [  td [ ]
+                                                 [ str t.From]
+                                              td [ ]  
+                                                 [
+                                                   str t.To
+                                                 ]
+                                            //   td [ ]  
+                                            //      [
+                                            //        str t.Gas
+                                            //      ]
+                                              td [ Class "text-center"  ]  
+                                                 [
+                                                   str (string (normalizeBigInt t.Value))
+                                                 ]      
+                                            ]]
                           
-                ]
+                ]]
 ]
 
 let copiedAddress (address:string) (dispatch: PurchaseTokenMsg -> unit) = 
     comF copyToClipboard (fun o ->  o.text <- address
                                     o.onCopy <- (fun (addr, b) -> addr |> AddressCopied |> dispatch) )
         [ 
-            comF button (fun o -> o.bsClass <- "btn btn-success btn-outline pull-right"  |> Some )
+            comF button (fun o -> o.bsClass <- "btn btn-sm btn-success btn-outline  pull-right"  |> Some )
                   [ str "Copy Address" ]
         ]        // bodyUserSomeNone
 let symbolAddress m = function
@@ -156,37 +160,41 @@ let symbolAddress m = function
                     | DASH -> m.Wallet.Accounts.Dash.Address.Value    
 let compares (model: Model) (m: FullCustomer) dispatch = 
     Ibox.btCol "Crypto Addresses" "12" false [
-            comE table [
-                thead [][
-                    tr [ ][
-                        th [ Class "col-md-1 text-center" ][str "Symbol" ]
-                        th [ Class "col-md-1 text-center" ][str "Name" ]
-                        th [ Class "col-md-9 text-center" ][str "Address" ]
-                        th [ Class "col-md-11 text-center" ][str "Action" ]
-                    ]
-                ]
-                tbody [][
+            div [ Class "table-responsive" ]//table-responsive
+                [
+                    comE table [
+                        thead [][
+                            tr [ ][
+                                th [ Class "col-md-1 text-center" ][str "Symbol" ]
+                                th [ Class "col-md-1 text-center" ][str "Name" ]
+                                th [ Class "col-md-9 text-center t3" ][str "Address" ]
+                                th [ Class "col-md-11 text-center" ][str "Action" ]
+                            ]
+                        ]
+                        tbody [][
 
-                        for price in model.CurrenciesCurentPrices.Prices ->
-                          tr [ ]
-                               [ 
-                                  td [ Class "text-center" ]
-                                        [ img [ Class "w25"
-                                                Src (symbolLogo price.Symbol) ] ] 
-                                  td [ Class "text-center" ]
-                                     [ str ( string price.Symbol) ]
-                                  td [ Class "" ]
-                                    [ 
-                                      pre [ ]
-                                           [ str (symbolAddress  m price.Symbol ) ]//model
-                                    ]
-                                  td [ Class "" ]
-                                    [ 
-                                      copiedAddress (symbolAddress  m price.Symbol) dispatch
-                                    ] ]
-                               
+                                for price in model.CurrenciesCurentPrices.Prices ->
+                                  tr [ ]
+                                       [ 
+                                          td [ Class "text-center" ]
+                                                [ img [ Class "w25"
+                                                        Src (symbolLogo price.Symbol) ] ] 
+                                          td [ Class "text-center" ]
+                                             [ str ( string price.Symbol) ]
+                                          td [ Class "t3" ]
+                                            [ 
+                                              pre [ Class "tpre" ]
+                                                   [ str (symbolAddress  m price.Symbol ) ]//model
+                                            ]
+                                          td [ Class "" ]
+                                            [ 
+                                              copiedAddress (symbolAddress  m price.Symbol) dispatch
+                                            ] ]
+                                       
+                                ]
                         ]
                 ]
+            
             ]
                                                        
 

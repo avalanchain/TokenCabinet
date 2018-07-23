@@ -2,6 +2,7 @@ namespace Shared
 
 open System
 open Auth
+open System.Numerics
 
 type Counter = int
  
@@ -185,7 +186,7 @@ module ViewModels =
         To              : string
         Gas             : string
         GasPrice        : string
-        Value           : string
+        Value           : decimal
     }
         
 

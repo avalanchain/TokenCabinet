@@ -375,6 +375,14 @@ button.btn-primary.dim:active {
     } */
 }
 
+/* @media only screen and (max-width: 768px) {
+    .tpre{
+        
+        width: 170px;
+    }
+
+} */
+
 @media (min-device-width: 320px) and (max-device-width: 700px) {
     
     .project-long{
@@ -667,4 +675,13 @@ pre {
 
 .btn-w-sm {
     min-width: 60px;
+}
+
+.tpre{
+    /* width: max-content; */
+    /* max-width: 350px; */
+    
+}
+.t3{
+    /* width: 10px */
 }

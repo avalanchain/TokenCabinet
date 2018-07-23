@@ -76,11 +76,12 @@ let rMoment (date:DateTime)  = ofImport "default" "react-moment" (createObj [  "
 let bodyCurrenciesTime (m: Model) dispatch = 
             div [ Class "m-b-sm" ] 
                 [ 
-                  small [ Class "label label-primary"  ]
+                  small [ Class "label bg-muted"  ]
                         [
                           i [ Class "fa fa-clock-o" ] [ ]
-                          str " Updated: a few seconds ago"
-                          //(rMoment m.CurrenciesCurentPrices.Prices.Head.PriceAt) //str (" Updated: " + m.CurrenciesCurentPrices.Prices.Head.PriceAt.ToShortTimeString()
+                          str " Prices Updated: " 
+                          (if m.CurrenciesCurentPrices.Prices.IsEmpty then str " " else rMoment m.CurrenciesCurentPrices.Prices.Head.PriceAt )
+                          //str (" Updated: " + m.CurrenciesCurentPrices.Prices.Head.PriceAt.ToShortTimeString()
                          ] 
                     
 

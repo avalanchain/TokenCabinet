@@ -13,7 +13,7 @@ type Model = {
     Auth                   : AuthModel
     // Loading     : bool  
     CryptoCurrencies       : ViewModels.CryptoCurrency list
-    CurrenciesCurentPrices : ViewModels.CurrencyPriceTick
+    CurrenciesCurentPrices : ViewModels.CurrencyPriceTick 
     ActiveSymbol           : CryptoCurrencySymbol
 
     TokenSale              : ViewModels.TokenSale option

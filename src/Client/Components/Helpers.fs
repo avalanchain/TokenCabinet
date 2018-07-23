@@ -10,6 +10,7 @@ open System
 open Fable.Import.React
 open Fable.Core.JsInterop
 open Shared
+open System.Numerics
 
 module Option = 
     let map2 f a b = match a, b with    | Some a, Some b -> f a b |> Some 
@@ -42,3 +43,6 @@ let iboxSpinner =
             [ ]
           div [ Class "sk-double-bounce2" ]
             [ ] ]
+
+let divider = 1000000000000000000m
+let normalizeBigInt (v : decimal) = (v / divider)
