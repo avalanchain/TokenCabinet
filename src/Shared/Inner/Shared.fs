@@ -188,7 +188,11 @@ module ViewModels =
         GasPrice        : string
         Value           : decimal
     }
-        
+       
+
+    type TransactionsTick = { 
+        TransactionsTick: ETransaction list 
+    }  
 
     type ETransactions = {
         Transactions: ETransaction list
@@ -233,4 +237,5 @@ module WsBridge =
         | ServerConnected
         | UserConnected             of AuthToken
         | ServerPriceTick           of ViewModels.CurrencyPriceTick
+        | ServerTransactionTick     of ViewModels.ETransaction
     

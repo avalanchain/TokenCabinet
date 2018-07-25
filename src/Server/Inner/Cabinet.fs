@@ -67,6 +67,10 @@ let unwrapResultOpt res =
 type BridgeConnectionState =
     | Connected of AuthToken
     | Disconnected
+   
+type EthNetState =
+    | Exist 
+    | Not
 
 let bridgeConnections =
     ServerHub<BridgeConnectionState, WsBridge.ServerMsg, WsBridge.BridgeMsg>.New()    
@@ -209,6 +213,25 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
         }
 }   
 
+ 
+// let checkEthNet config (request: SecureVoidRequest) = task { 
+//     printfn "checkEthNet() called"
+
+//     return! 
+//         if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error |> Task.FromResult
+//         elif request.Token |> checkAuthTokenValid config |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
+//         else task {
+//             let! customerRes = getCustomer config
+//             let customer, customerDTO = customerRes |> unwrapResult
+//             let! wallet = getWallet config customer.Id
+//             let transactions = checkETHNet wallet.Main.Eth
+
+//             return transactions |> Ok
+//         }
+// }   
+
+
+
 let  getTransactions config (request: SecureVoidRequest) = task { 
     printfn "getTransactions() called"
 
@@ -219,12 +242,17 @@ let  getTransactions config (request: SecureVoidRequest) = task {
             let! customerRes = getCustomer config
             let customer, customerDTO = customerRes |> unwrapResult
             let! wallet = getWallet config customer.Id
-            let! transactions = getTransactions wallet.Main.Eth
+            let checkETHNet = checkETHNet wallet.Main.Eth
+            let! transactions = getTransactions wallet.Main.Eth checkETHNet
 
             return transactions |> Ok
         }
 }   
 
+async { while true do 
+                    getTransactions 
+                    do! Async.Sleep 5000 } |> Async.Start
+                    
 module PriceUpdater = 
     let [<Literal>] private CCUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BTG,LTC,BCH,DASH,ETC&tsyms=USD,EUR,ETH,BTC"
     type private PriceSource = JsonProvider<CCUrl>
@@ -311,6 +339,33 @@ let getPriceTick config i = task {
         let! prices = PriceUpdater.getLatestPrices() |> Async.StartAsTask
         return prices |> Ok
 }
+
+
+// let private transactionsAgent = MailboxProcessor.Start(fun inbox-> 
+//         let rec messageLoop (prices: ETransactions) = async {
+//             let! msg = inbox.Receive()
+//             match msg with
+//             | LoadTransactions ->
+//                 let! newPrices = getTransactionTick()
+//                 // printfn "Prices loaded"
+//                 match newPrices with
+//                 | Some transactions ->
+//                     bridgeConnections.SendIf(function | Connected _ -> true | Disconnected -> false) 
+//                         (transactions |> ServerTransactionTick |> BC |> C)
+//                 | None -> ()
+//                 return! messageLoop (newTransactions |> Option.defaultValue transactions)
+//             | GetTransactions replyChannel -> 
+//                 replyChannel.Reply prices
+//                 return! messageLoop prices 
+//         }
+//         // start the loop 
+//         messageLoop { ETransactions = [] } 
+//     )
+//     let getTransactions1() = transactionsAgent.PostAndAsyncReply (getTransactions, 3000)
+// let getTransactionTick config i = task {
+//         let! transactions = transactionsAgent config |> Async.StartAsTask
+//         return transactions |> Ok
+// }
 
 let toClientMsg = BC >> C >> Cmd.ofMsg   
 
