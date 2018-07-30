@@ -22,6 +22,7 @@ open FormHelpers
 open Shared.WalletPublic
 open Client
 open ReactCopyToClipboard
+open ReactBootstrap.ProgressBar
 
 
 importAll "../../../node_modules/react-rangeslider/lib/index.css"
@@ -105,9 +106,9 @@ let bodyP model  =
         span [ Class "text-navy"]
              [ str ("Discount 20%" )] ]
 
- 
-let discountArray = [|1000m, 10m; 2000m, 20m; 3000m, 30m; 4000m, 40m; 5000m, 50m; 6000m, 60m; 7000m, 70m; 8000m, 80m; 9000m, 90m; 10000m, 100m|]
 
+let discountArray = [|1000m, 10m; 2000m, 20m; 3000m, 30m; 4000m, 40m; 5000m, 50m; 6000m, 60m; 7000m, 70m; 8000m, 80m; 9000m, 90m; 10000m, 100m|]
+let rised = 32324
 let bonus (m: PurchaseTokenModel) = 
       div [ Class "col-sm-11" ]
           [ ul [ Class "timeline shift"
@@ -256,9 +257,9 @@ let counter (m: Model) dispatch = div [ Class ("col-md-6") ]
 let range volume = ofImport "default" "react-rangeslider" 
                             (createObj [  "value" ==> volume 
                                           "min" ==> 0
-                                          "max" ==> 1500000
+                                          "max" ==> 60_000
                                           "from" ==> 200
-                                          "to" ==> 1232434
+                                          "to" ==> 12104
                                           "type" ==> "double" 
                                           "prefix" ==> "$" 
                                           ]) []
@@ -279,10 +280,15 @@ let tokenSale (m:ViewModels.TokenSale) =
                               i [ Class "fa fa-bolt text-navy" ]
                                 [ ] ]
                         div [ Class "progress progress-mini" ]
-                            [ div [ 
-                                // HTMLAttr.Custom ("style", "width: 52%;")
-                                    Class "progress-bar-success" ]
-                                [ ] ] 
+                            [ 
+                                comF progressBar (fun p -> p.now <- 100. |> Some
+                                                           p.bsClass <- " progress-bar-success"  |> Some    )
+                                                 []
+                                // div [ 
+                                // // HTMLAttr.Custom ("style", "width: 52%;")
+                                //     Class "progress-bar-success" ]
+                                //  [ ] 
+                                 ] 
                     ]
                   div [ Class "col-md-6" ] 
                     [ 
@@ -291,10 +297,14 @@ let tokenSale (m:ViewModels.TokenSale) =
                         small [ ]
                             [ str "HardCap" ]
                         div [ Class "progress progress-mini" ]
-                            [ div [ 
-                                // HTMLAttr.Custom ("style", "width: 48%;")
-                                    Class "progress-bar" ]
-                                [ ] ]
+                            [ 
+                                comF progressBar (fun p -> p.now <- 60. |> Some)
+                                                 []
+                                // div [ 
+                                // // HTMLAttr.Custom ("style", "width: 52%;")
+                                //     Class "progress-bar-success" ]
+                                //  [ ] 
+                                 ]
                     ]
                  
                         
@@ -309,12 +319,12 @@ let tokenSale (m:ViewModels.TokenSale) =
                   div [ ]
                       [
                           h2 [ Class "no-margins" ]
-                             [ str " 1232434 ETH"  ]
+                             [ str (string rised + " ETH")  ]
                           small [ ]
-                            [ str "Counted" ]
+                            [ str "Rised" ]
                           div []
                                 [
-                                    range 1232434
+                                    range rised
                                 ] 
                       ]    
                     

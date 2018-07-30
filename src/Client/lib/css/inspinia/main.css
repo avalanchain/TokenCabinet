@@ -730,3 +730,39 @@ pre {
     width: 10px;
     height: 10px;
 }
+
+.rangeslider-horizontal .rangeslider__fill {
+    background-color: #1ab394!important;
+    border-radius: 3px!important;
+}
+
+.rangeslider-horizontal {
+    height: 8px!important;
+    border-radius: 3px!important;
+    
+    box-shadow: none!important;
+}
+
+.rangeslider-horizontal .rangeslider__handle:after {
+    display: none;
+    /* content: ' ';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 6px;
+    left: 6px;
+    border-radius: 50%;
+    background-color: #dadada;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 -1px 3px rgba(0, 0, 0, 0.4) inset; */
+}
+.rangeslider-horizontal .rangeslider__handle {
+    width: 8px!important;
+    height: 23px!important;
+    border-radius: 11px!important;
+    /* top: 50%;
+    transform: translate3d(-50%, -50%, 0); */
+}
+
+.progress-mini .progress {
+    height: 5px;
+}

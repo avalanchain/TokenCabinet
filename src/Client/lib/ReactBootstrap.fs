@@ -1494,7 +1494,8 @@ let [<Import("*","react-bootstrap/lib/ProgressBar")>] progressBar: ProgressBar.P
 module ProgressBar =
 
     type ProgressBarProps =
-        inherit Omit<React.HTMLProps<ProgressBar>, string>
+        inherit React.HTMLProps<ProgressBar>
+        abstract bsClass: string option with get, set
         abstract active: bool option with get, set
         abstract bsSize: Sizes option with get, set
         abstract bsStyle: string option with get, set
