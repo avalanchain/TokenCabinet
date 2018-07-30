@@ -235,5 +235,5 @@ module WsBridge =
         | ServerConnected
         | UserConnected             of AuthToken
         | ServerPriceTick           of ViewModels.CurrencyPriceTick
-        | ServerTransactionTick     of ViewModels.ETransaction
+        // | ServerTransactionTick     of ViewModels.ETransaction
     
