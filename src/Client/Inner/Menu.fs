@@ -22,6 +22,7 @@ open Client.Page
 
 open LoginPage
 open LoginCommon
+open Elmish.Browser
 
 module O = FSharp.Core.Option
 
@@ -110,12 +111,12 @@ let view (menuPage: Cabinet.MenuPage) (dispatch: UIMsg -> unit) =
                             ] ] 
 
 let mainView page (model: CabinetModel.Model) (dispatch: AppMsg -> unit) cabinetPageView = 
-    let fullCustomer = model.FullCustomer
+    let customer = model.FullCustomer |> O.map (fun fc -> fc.Customer)
     div [ Id "wrapper" ]
         [   view page (AppMsg.UIMsg >> dispatch)
             div [ Id "page-wrapper"
                   Class "gray-bg" ] [
-                  TopNavbar.navBar fullCustomer (AppMsg.UIMsg >> dispatch)
+                  TopNavbar.navBar customer (AppMsg.UIMsg >> dispatch)
                   div [ Class "wrapper wrapper-content animated fadeInRight"]
                       [ cabinetPageView page model (CabinetMsg >> dispatch) ]
 

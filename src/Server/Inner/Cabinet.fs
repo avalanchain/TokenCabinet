@@ -163,8 +163,6 @@ let getCustomer config = task {
             FirstName   = customer.FirstName
             LastName    = customer.LastName
             EthAddress  = customer.EthAddress
-            Password    = customer.Password
-            PasswordSalt = customer.PasswordSalt
             Avatar      = customer.Avatar
         }, customer
     let! st = getAllFromDb config Customers.Database.getAll processStatus

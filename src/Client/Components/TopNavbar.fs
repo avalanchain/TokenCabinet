@@ -7,12 +7,9 @@ open Fable.Helpers.React.Props
 open ClientMsgs
 open Shared.ViewModels
 
-let customer (fullCustomer: FullCustomer option) =
-    match fullCustomer with
-            | Some f -> f.Customer.Email
-            | None   -> "" 
+module O = Option
 
-let navBar (fullCustomer: FullCustomer option) (dispatch: UIMsg -> unit)  = 
+let navBar (customer: Customer option) (dispatch: UIMsg -> unit)  = 
         div [ Class "row border-bottom" ]
             [ nav [ Class "navbar navbar-static-top white-bg no-margins"
                     Role "navigation"
@@ -41,7 +38,7 @@ let navBar (fullCustomer: FullCustomer option) (dispatch: UIMsg -> unit)  =
                                OnClick(fun _ -> dispatch Logout)  ]
                             [ i [ Class "fa fa-envelope" ]
                                 [ ]
-                              str (customer fullCustomer) ] ]
+                              str (customer |> O.map (fun c -> c.Email) |> O.defaultValue "") ] ]
 
                       li [ ]
                          [ a [ Href "#" 

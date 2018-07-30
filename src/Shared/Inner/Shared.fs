@@ -104,8 +104,6 @@ module ViewModels =
         FirstName   : string
         LastName    : string
         EthAddress  : string
-        Password    : string
-        PasswordSalt: string
         Avatar      : string
         Email       : string
     }
