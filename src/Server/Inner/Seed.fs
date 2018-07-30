@@ -130,10 +130,12 @@ let customerPreferencesSeed connectionString =
                 Language    = CustomerPreferences.Validation.supportedLangs.[0] } ]
     lst |> seedT connectionString CustomerPreferences.Database.deleteAll CustomerPreferences.Database.insert       
 
-let customerSeed connectionString =
+let customerSeed connectionString = task {
+    let! _ = WalletsKV.Database.deleteAll connectionString
     let lst: Customers.Customer list = 
         [ createCustomer "trader@cryptoinvestor.com" "!!!ChangeMe111" "0x001002003004005006007008009" ]
-    lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert        
+    return! lst |> seedT connectionString Customers.Database.deleteAll Customers.Database.insert  
+}
 
 let walletsSeed connectionString = task {
     let! _ = WalletsKV.Database.deleteAll connectionString
