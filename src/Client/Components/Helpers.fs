@@ -36,7 +36,7 @@ let inline comF<'P> (com: React.Component<'P>) (propsFunc: 'P -> unit) (children
 let inline comE<'P> (com: React.Component<'P>) (children: ReactElement seq): ReactElement =
     createElement(com, createEmpty<'P>, children)
 
-
+let roundFour (v:decimal) = Math.Round(v, 4)
 let iboxSpinner = 
     div [ Class "sk-spinner sk-spinner-double-bounce" ]
         [ div [ Class "sk-double-bounce1" ]
@@ -45,4 +45,4 @@ let iboxSpinner =
             [ ] ]
 
 let divider = 1000000000000000000m
-let normalizeBigInt (v : decimal) = (v / divider)
+let normalizeETHValue (v : decimal) = roundFour (v / divider)

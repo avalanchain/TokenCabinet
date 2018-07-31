@@ -513,7 +513,9 @@ button.btn-primary.dim:active {
 }
 
 .btn-large-dim {
-    font-size: 30px;
+    font-size: 24px;
+    width: 85px;
+    height: 85px;
 }
 
 button.dim .name {
@@ -522,10 +524,11 @@ button.dim .name {
 
 button.dim .price {
     font-size: 12px;
+    padding-top: 2px;
 }
 
 .currencylogo{
-    width: 40px;
+    width: 35px;
     border-radius: 20px;
 }
 

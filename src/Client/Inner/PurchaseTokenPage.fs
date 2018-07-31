@@ -43,8 +43,6 @@ let calcPrice activeSymbol (tick: ViewModels.CurrencyPriceTick) f =
     |> f
     |> Option.defaultValue 0m
 
-let roundFour (v:decimal) = Math.Round(v, 4)
-
 let bodyRowSomeNone (model: Model) body =
     match model.TokenSale with
     | Some m -> Ibox.btCol "Timeline" "9" false ([ body m ])
@@ -160,13 +158,13 @@ let copiedAddress (address:string) (dispatch: PurchaseTokenMsg -> unit) =
                   [ str "Copy Address" ]
         ]        // bodyUserSomeNone
 let currenciesGroup (model: Model) dispatch = 
-        Ibox.emptyRow [ div [ Class "col-md-8" ] 
+        Ibox.emptyRow [ div [ Class "col-md-7" ] 
                             [ 
                                 bodyCurrenciesTime model dispatch
                                 div [ ] 
                                     (bodyCurrencies model dispatch) 
                             ]
-                        div [ Class "col-md-4" ] 
+                        div [ Class "col-md-5" ] 
                            [ selectedCurrency model dispatch
                              Ibox.emptyRow 
                                 [
@@ -218,7 +216,7 @@ let bodyCounter activeSymbol isWeb3 m (model:PurchaseTokenModel) dispatch =
                          ] ]
           br [ ]
           dt [ ]
-             [ str "Discount(AIM):" ]
+             [ str "Discount:" ]
           dd [ ]
              [ str "20.00" ] 
           br [ ]

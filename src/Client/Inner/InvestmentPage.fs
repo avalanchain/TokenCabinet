@@ -136,7 +136,7 @@ let transactions m (ts: ETransaction list) =
                                             //      ]
                                               td [ Class "text-center"  ]  
                                                  [
-                                                   str (string (normalizeBigInt t.Value))
+                                                   str (string (normalizeETHValue t.Value))
                                                  ]      
                                             ]]
                           
