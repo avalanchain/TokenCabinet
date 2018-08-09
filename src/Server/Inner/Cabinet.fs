@@ -34,7 +34,7 @@ let getCryptoCurrencies config () = task {
                                         Name    = cc.Name
                                         LogoUrl = cc.LogoUrl } ] |> Ok
             | Error exn ->  printfn "Data access exception: '%A'" exn
-                            exn |> InternalError |> Error
+                            InternalError(exn.Message, exn.GetType().Name) |> Error
 }
 
 let getAllFromDb<'T,'U> config (getAll: string -> Task<Result<seq<'T>, exn>>) (f: 'T -> 'U) : Task<Result<'U list, ServerError>> = task {
@@ -43,7 +43,7 @@ let getAllFromDb<'T,'U> config (getAll: string -> Task<Result<seq<'T>, exn>>) (f
     return match res with
             | Ok o -> o |> Seq.map f |> List.ofSeq |> Ok
             | Error exn ->  printfn "Data access exception: '%A'" exn
-                            exn |> InternalError |> Error
+                            InternalError(exn.Message, exn.GetType().Name) |> Error
 }
 
 let getSaleToken config = task {

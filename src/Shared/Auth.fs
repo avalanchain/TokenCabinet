@@ -18,7 +18,7 @@ module Auth =
 
     type ServerError =
         | AuthError of AuthError
-        | InternalError of exn
+        | InternalError of message: string * exnType: string
         | NotImplementedError
 
     type ServerResult<'T> = Result<'T, ServerError>
@@ -28,7 +28,7 @@ module Auth =
     type LoginFlowServerError = 
         | AccountBanned
         | DdosProtection        of blockedForRemaining: TimeSpan
-        | LoginInternalError    of exn
+        | LoginInternalError    of message: string * exnType: string
 
     type LoginError = 
         | EmailNotFoundOrPasswordIncorrect
@@ -57,7 +57,7 @@ module Auth =
         login               : LoginInfo             -> Async<LoginResult>
         register            : LoginInfo             -> Async<RegisteringResult>
         forgotPassword      : ForgotPasswordInfo    -> Async<ForgotPasswordResult>
-        resetPassword       : ResetPasswordInfo          -> Async<PasswordResetResult>
+        resetPassword       : ResetPasswordInfo     -> Async<PasswordResetResult>
     }
 
 

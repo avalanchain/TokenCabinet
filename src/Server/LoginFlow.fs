@@ -63,7 +63,7 @@ let internal checkAuthTokenValid config (AuthToken authToken) =
     }
 
 let private login config (loginInfo: LoginInfo) : Task<LoginResult> = task {
-    let internalError = LoginInternalError >> LoginServerError
+    let internalError = fun (e:exn) -> LoginInternalError(e.Message, e.GetType().Name) |> LoginServerError
 
     let! ret = taskResult {
         let! customerOpt = internalError, Customers.Database.getByEmail config.connectionString loginInfo.Email
@@ -71,7 +71,7 @@ let private login config (loginInfo: LoginInfo) : Task<LoginResult> = task {
 
         let authToken = issueAuthToken customer.Email  
         let! code = internalError, saveAuthToken config.connectionString authToken customer.Id 
-        let! _    = if code = 0 then Ok () else (new Exception("Auth Token issuing failed") ) |> internalError |> Error
+        let! _    = if code = 1 then Ok () else (new Exception("Auth Token issueing failed with code " + code.ToString()) ) |> internalError |> Error
 
         return authToken 
     }
@@ -80,17 +80,17 @@ let private login config (loginInfo: LoginInfo) : Task<LoginResult> = task {
 }
 
 let private register config (loginInfo: LoginInfo) : Task<RegisteringResult> = task {  // TODO: Change this!!!
-    let internalError = LoginInternalError >> RegisteringServerError
+    let internalError = fun (e:exn) -> LoginInternalError(e.Message, e.GetType().Name) |> RegisteringServerError
 
     let customer = createCustomer loginInfo.Email loginInfo.Password ""
 
     let! ret = taskResult {
         let! code = internalError, Customers.Database.insert config.connectionString customer
-        let! _    = if code = 0 then Ok () else (new Exception("Error while creating customer record") ) |> internalError |> Error
+        let! _    = if code = 1 then Ok () else (new Exception("Error while creating customer record") ) |> internalError |> Error
 
         let authToken = issueAuthToken customer.Email  
         let! code = internalError, saveAuthToken config.connectionString authToken customer.Id 
-        let! _    = if code = 0 then Ok () else (new Exception(sprintf "Error when saving authToken, Code: '%d'" code) ) |> internalError |> Error
+        let! _    = if code = 1 then Ok () else (new Exception(sprintf "Error when saving authToken, Code: '%d'" code) ) |> internalError |> Error
 
         return authToken
     }
@@ -114,7 +114,7 @@ let internal isResetTokenValid (PwdResetToken pwdResetToken) =
     pwdResetToken |> AuthJwt.checkValid |> Option.isSome
 
 let private forgotPassword config (forgotPasswordInfo: ForgotPasswordInfo): Task<ForgotPasswordResult> = task { 
-    let internalError = LoginInternalError >> ForgotPasswordServerError
+    let internalError = fun (e:exn) -> LoginInternalError(e.Message, e.GetType().Name) |> ForgotPasswordServerError
     let notFoundError = sprintf "Customer Email not found: '%s'" forgotPasswordInfo.Email |> EmailNotRegistered
 
     let! ret = taskResult {
@@ -123,7 +123,7 @@ let private forgotPassword config (forgotPasswordInfo: ForgotPasswordInfo): Task
 
         let resetToken      = issueResetToken forgotPasswordInfo.Email
         let! code           = internalError, saveResetToken config.connectionString resetToken customer.Id
-        let! _              = if code = 0 then Ok () else (new Exception("Reset Token issuing failed") ) |> internalError |> Error
+        let! _              = if code = 1 then Ok () else (new Exception("Reset Token issuing failed") ) |> internalError |> Error
 
         let! mailerResult   = taskResult {  do! internalError, config.resetPasswordEmailer forgotPasswordInfo resetToken
                                             return "Reset email sent" }
@@ -137,7 +137,7 @@ let private forgotPassword config (forgotPasswordInfo: ForgotPasswordInfo): Task
 let private resetPassword config (resetPasswordInfo: ResetPasswordInfo): Task<PasswordResetResult> = task {
     let notFoundError = ResetTokenNotRecognized resetPasswordInfo.PwdResetToken 
     let tokenError    = ResetTokenExpired resetPasswordInfo.PwdResetToken 
-    let internalError = LoginInternalError >> PasswordResetServerError
+    let internalError = fun (e:exn) -> LoginInternalError(e.Message, e.GetType().Name) |> PasswordResetServerError
 
     let! ret = taskResult {
         let! _                  = if isResetTokenValid resetPasswordInfo.PwdResetToken then Ok () else Error tokenError
@@ -149,10 +149,10 @@ let private resetPassword config (resetPasswordInfo: ResetPasswordInfo): Task<Pa
         
         let authToken = issueAuthToken customer.Email  
         let! code = internalError, saveAuthToken config.connectionString authToken customer.Id 
-        let! _    = if code = 0 then Ok () else (new Exception("Auth Token issuing failed") ) |> internalError |> Error
+        let! _    = if code = 1 then Ok () else (new Exception("Auth Token issuing failed") ) |> internalError |> Error
 
         let! code = internalError, PwdResetTokenInfos.Database.update config.connectionString { pwdResetToken with Expires = DateTime.Now }
-        let! _    = if code = 0 then Ok () else (new Exception("Reset Token update failed") ) |> internalError |> Error
+        let! _    = if code <= 1 then Ok () else (new Exception("Reset Token update failed") ) |> internalError |> Error
 
         return authToken
     }
