@@ -27,7 +27,7 @@ module Database =
     use connection = new SqliteConnection(connectionString)
     querySingle connection "SELECT Id, Email, FirstName, LastName, EthAddress, Password, PasswordSalt, Avatar, CustomerTier FROM Customers WHERE Id=@Id" (Some <| dict ["id" => id])
 
-  let getByEmail connectionString email : Task<Result<Customer option, exn>> =
+  let getByEmail connectionString (email: string) : Task<Result<Customer option, exn>> =
     use connection = new SqliteConnection(connectionString)
     querySingle connection "SELECT Id, Email, FirstName, LastName, EthAddress, Password, PasswordSalt, Avatar, CustomerTier FROM Customers WHERE Email=@email LIMIT 1" (Some <| dict ["email" => email])
 

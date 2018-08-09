@@ -53,3 +53,5 @@ dotnet saturn gen WalletKV WalletsKV CustomerId:string Wallet:string
 dotnet saturn gen FullCustomer FullCustomers Id:guid CustomerTier:string
 
 dotnet saturn gen AuthToken AuthTokens AuthToken:string CustomerId:string Issued:datetime Expires:datetime
+
+dotnet saturn gen.model PwdResetTokenInfo PwdResetTokenInfos PwdResetToken:string CustomerId:string Issued:datetime Expires:datetime

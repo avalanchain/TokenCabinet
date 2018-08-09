@@ -56,7 +56,7 @@ module Result =
         member __.Bind(m, f) = Result.bind f m
         /// Binding to (Error, Option<'T>) tuple in order to make interop with functions returning Option<'T> easier
         /// Having error as the first parameter is surprisingly more natural in usage
-        member __.Bind((error, m): ('E * Option<'T>), f) = m |> ofOption error |> Result.bind f
+        member __.Bind((error: 'E, m: Option<'T>), f) = m |> ofOption error |> Result.bind f
 
         member __.Combine(m, f) = Result.bind f m
 

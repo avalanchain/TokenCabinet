@@ -33,7 +33,7 @@ open Web3Types
 
 [<Emit("window.web3")>]
 let web3: Web3 = jsNative
-let IsWeb3 = isNull web3
+let IsWeb3 = isNull web3 |> not
 
 // console.log (sprintf "IsW3: '%A'" IsWeb3)
 

@@ -83,7 +83,8 @@ let app config = application {
     use_config (fun _ -> config)
 }
 
-let config = { connectionString = "DataSource=database.sqlite" }
+let config = {  connectionString        = "DataSource=database.sqlite" 
+                resetPasswordEmailer   = fun fpi prt -> printfn "Emailed '%A' for '%A'" prt fpi |> Ok |> Task.FromResult    } // Add emailer API
 
 // Seeding
 try

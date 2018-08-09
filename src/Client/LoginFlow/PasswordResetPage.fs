@@ -66,13 +66,14 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         match res with
         | Ok authToken -> { model with TryingToReset = false }, Cmd.none, UserPasswordReset authToken
         | Error e -> match e with 
-                        | ValidationErrors (emailErrors, pwdErrors) -> { model with ResettingErrors = emailErrors @ pwdErrors; TryingToReset = false }, Cmd.none, NoOp
+                        | ResetTokenNotRecognized (PwdResetToken rt) -> { model with ResettingErrors = [ "Token not recognized: '" + rt + "'" ]; TryingToReset = false }, Cmd.none, NoOp
+                        | ResetTokenExpired       (PwdResetToken rt) -> { model with ResettingErrors = [ "Token not recognized: '" + rt + "'" ]; TryingToReset = false }, Cmd.none, NoOp
                         | PasswordResetServerError e -> { model with ResettingErrors = handleLoginFlowServerError e; TryingToReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with    PasswordValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword
                         PasswordConfValidationErrors = InputValidators.passwordConfValidation model.InputPasswordConf model.InputPassword }, Cmd.none, NoOp
     | RegisterClicked ->
-        { model with TryingToReset = true }, Cmd.none, ResetPassword { PwdResetToken = model.PwdResetToken; Password = model.InputPassword } // TODO: hash password
+        { model with TryingToReset = true }, Cmd.none, ResetPassword { PwdResetToken = PwdResetToken model.PwdResetToken; Password = model.InputPassword } // TODO: hash password
 
 
 let view model (dispatch: Msg -> unit) =

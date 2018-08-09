@@ -3,12 +3,12 @@ namespace Shared
 open System
 module Auth =
 
-    type AuthToken = AuthToken of string
-        with member __.Token = match __ with | AuthToken t -> t
+    type AuthToken      = AuthToken of string
+    type PwdResetToken  = PwdResetToken of string
 
-    type LoginInfo = { Email: string; Password: string } // TODO: Send password hash only!!!
-    type ResetPasswordInfo = { PwdResetToken: string; Password: string } // TODO: Send password hash only!!!
-    type ForgotPasswordInfo = { UserName: string }
+    type LoginInfo          = { Email: string; Password: string }                    // TODO: Send password hash only!!!
+    type ResetPasswordInfo  = { PwdResetToken: PwdResetToken; Password: string }    // TODO: Send password hash only!!!
+    type ForgotPasswordInfo = { Email: string }
 
     // possible authentication/authorization errors     
     type AuthError = 
@@ -27,8 +27,8 @@ module Auth =
     // possible errors when logging in
     type LoginFlowServerError = 
         | AccountBanned
-        | DdosProtection of blockedForRemaining: TimeSpan
-        | LoginInternalError  of exn
+        | DdosProtection        of blockedForRemaining: TimeSpan
+        | LoginInternalError    of exn
 
     type LoginError = 
         | EmailNotFoundOrPasswordIncorrect
@@ -36,15 +36,17 @@ module Auth =
 
     type RegisteringError = 
         | EmailAlreadyRegistered
-        | ValidationErrors of email: string list * password: string list
-        | RegisteringServerError of LoginFlowServerError
+        | ValidationErrors          of email: string list * password: string list
+        | RegisteringServerError    of LoginFlowServerError
 
     type ForgotPasswordError = 
+        | EmailNotRegistered        of email: string
         | ForgotPasswordServerError of LoginFlowServerError
 
-    type PasswordResetError = 
-        | ValidationErrors of email: string list * password: string list
-        | PasswordResetServerError of LoginFlowServerError        
+    type PasswordResetError =
+        | ResetTokenNotRecognized   of PwdResetToken
+        | ResetTokenExpired         of PwdResetToken
+        | PasswordResetServerError  of LoginFlowServerError        
 
     type LoginResult          = ServerResult<Result<AuthToken, LoginError>>
     type RegisteringResult    = ServerResult<Result<AuthToken, RegisteringError>>

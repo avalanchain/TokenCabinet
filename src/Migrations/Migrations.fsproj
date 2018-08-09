@@ -25,6 +25,7 @@
     <Compile Include="201807061726.WalletItem.fs" />
     <Compile Include="201807061841.WalletKV.fs" />
     <Compile Include="201807062319.AuthToken.fs" />
+    <Compile Include="201808071352.PwdResetTokenInfo.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

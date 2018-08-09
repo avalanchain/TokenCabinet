@@ -9,7 +9,7 @@ open Newtonsoft.Json
 type UserRights =
    { UserName : string }
 
-let private createPassPhrase() =
+let internal createPassPhrase() =
     let crypto = System.Security.Cryptography.RandomNumberGenerator.Create()
     let randomNumber = Array.init 32 byte
     crypto.GetBytes(randomNumber)
@@ -24,10 +24,10 @@ let private passPhrase =
         File.WriteAllBytes(fi.FullName,passPhrase)
     File.ReadAllBytes(fi.FullName)
 
-let private encodeString (payload:string) =
+let internal encodeString (payload:string) =
     Jose.JWT.Encode(payload, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)
 
-let private decodeString (jwt:string) =
+let internal decodeString (jwt:string) =
     Jose.JWT.Decode(jwt, passPhrase, Jose.JweAlgorithm.A256KW, Jose.JweEncryption.A256CBC_HS512)
 
 let encode token =

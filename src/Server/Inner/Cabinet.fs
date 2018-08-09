@@ -24,6 +24,8 @@ open Customer.Transactions
 open Customer
 open LoginFlow
 
+open ServerUtils.TaskResult
+
 let getCryptoCurrencies config () = task { 
     printfn "getCryptoCurrencies() called"
     let! res = CryptoCurrencies.Database.getAll(config.connectionString) 
@@ -183,32 +185,34 @@ let getWallet config (customerId: Guid) = task {
                 }
 }
 
-let  getFullCustomer config (request: SecureVoidRequest) = task { 
+let getAllWalletAddresses config (env: NetworkEnv) = task {
+    let! walletsRes = WalletsKV.Database.getAll config.connectionString 
+    let wallets = walletsRes |> unwrapResult
+    return wallets |> Seq.map (fun wkv -> 
+                                    let (wallet: Wallet) = wkv.Wallet |> Json.fromJson
+                                    (wallet.PublicPart env).Accounts.Eth.Address )
+}
+
+let  getFullCustomer config (request: SecureVoidRequest): Task<Result<FullCustomer, ServerError>> = taskResult { 
     printfn "getFullCustomer() called"
 
-    return! 
-        if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error |> Task.FromResult
-        elif request.Token |> checkAuthTokenValid config |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
-        else task {
-            let! customerPreferenceRes = getCustomerPreferences config
-            let customerPreference = customerPreferenceRes |> unwrapResult
+    do! checkAuthTokenValid config request.Token
 
-            let! customerRes = getCustomer config
-            let customer, customerDTO = customerRes |> unwrapResult
+    let! customerPreference = getCustomerPreferences config
+    let! customer, customerDTO = getCustomer config
 
-            let! wallet = getWallet config customer.Id
+    let! wallet = getWallet config customer.Id |> Task.map Ok
 
-            let fullCustomer =
-                {   Customer = customer
-                    IsVerified = false
-                    VerificationEvent = None
-                    CustomerPreference = customerPreference
-                    CustomerTier =  if customerDTO.CustomerTier |> System.String.IsNullOrWhiteSpace then Unassigned
-                                    else (getUnionCaseFromString<CustomerTier> customerDTO.CustomerTier).Value
-                    Wallet = wallet.PublicPart TestEnv
-                }
-            return fullCustomer |> Ok
+    let fullCustomer =
+        {   Customer = customer
+            IsVerified = false
+            VerificationEvent = None
+            CustomerPreference = customerPreference
+            CustomerTier =  if customerDTO.CustomerTier |> System.String.IsNullOrWhiteSpace then Unassigned
+                            else (getUnionCaseFromString<CustomerTier> customerDTO.CustomerTier).Value
+            Wallet = wallet.PublicPart TestEnv
         }
+    return fullCustomer
 }   
 
  
@@ -230,26 +234,26 @@ let  getFullCustomer config (request: SecureVoidRequest) = task {
 
 
 
-let  getTransactions config (request: SecureVoidRequest) = task { 
+let getTransactions config (request: SecureVoidRequest) = taskResult { 
     printfn "getTransactions() called"
 
-    return! 
-        if request.Token |> isTokenValid |> not then TokenInvalid |> AuthError |> Error |> Task.FromResult
-        elif request.Token |> checkAuthTokenValid config |> not then UserDoesNotHaveAccess |> AuthError |> Error |> Task.FromResult
-        else task {
-            let! customerRes = getCustomer config
-            let customer, customerDTO = customerRes |> unwrapResult
-            let! wallet = getWallet config customer.Id
-            let checkETHNet = checkETHNet wallet.Main.Eth
-            let! transactions = getTransactions wallet.Main.Eth checkETHNet
+    do! checkAuthTokenValid config request.Token // TODO: Finish implementation
 
-            return transactions |> Ok
-        }
+    // let! customerRes = getCustomer config
+    // let customer, customerDTO = customerRes |> unwrapResult
+    // let! wallet = getWallet config customer.Id
+    // let checkETHNet = checkETHNet wallet.Main.Eth
+    let! allAddresses = getAllWalletAddresses config NetworkEnv.TestEnv |> Task.map Ok
+    let! transactions = getTransactions2 allAddresses |> Task.map Ok
+
+    // return transactions 
+    return []
 }   
 
-async { while true do 
-                    getTransactions 
-                    do! Async.Sleep 5000 } |> Async.Start
+// TODO: Implement
+// async { while true do 
+//                     getTransactions  
+//                     do! Async.Sleep 5000 } |> Async.Start
                     
 module PriceUpdater = 
     let [<Literal>] private CCUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,BTG,LTC,BCH,DASH,ETC&tsyms=USD,EUR,ETH,BTC"
@@ -376,9 +380,9 @@ let bridgeUpdate config msg state =
     match msg with
     | Closed                -> Disconnected, Cmd.none
     | ConnectUser authToken ->
-        if checkAuthTokenValid config authToken then 
-            Connected authToken, UserConnected authToken |> toClientMsg
-        else state, ErrorResponse(TokenInvalid |> AuthError, msg) |> toClientMsg
+        match checkAuthTokenValid config authToken |> Async.AwaitTask |> Async.RunSynchronously with // TODO: Make it async
+        | Ok _ -> Connected authToken, UserConnected authToken |> toClientMsg
+        | Error _ -> state, ErrorResponse(TokenInvalid |> AuthError, msg) |> toClientMsg
     | DisconnectUser        -> Disconnected, Cmd.none
 
 let cabinetProtocol config =

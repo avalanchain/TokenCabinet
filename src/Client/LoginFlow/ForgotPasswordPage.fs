@@ -58,12 +58,13 @@ let update (msg: Msg) model : Model * Cmd<Msg> * ExternalMsg =
         match res with
         | Ok _      -> { model with ShowSuccessPage = true; TryingToSendReset = false }, Cmd.none, NoOp
         | Error e   -> match e with 
+                        | ForgotPasswordError.EmailNotRegistered email    -> { model with ForgotPasswordErrors = [ "Email '" + email + "' not registered" ]; TryingToSendReset = false }, Cmd.none, NoOp  
                         | ForgotPasswordError.ForgotPasswordServerError e -> { model with ForgotPasswordErrors = handleLoginFlowServerError e; TryingToSendReset = false }, Cmd.none, NoOp
     | UpdateValidationErrors -> 
         { model with EmailValidationErrors = InputValidators.emailValidation model.InputEmail }, Cmd.none, NoOp
     | PasswordResetClicked validation ->
         match validation with  
-        | Valid when model.EmailStartedTyping -> { model with TryingToSendReset = true }, Cmd.none, ForgotPassword { UserName = model.InputEmail } // TODO: hash password
+        | Valid when model.EmailStartedTyping -> { model with TryingToSendReset = true }, Cmd.none, ForgotPassword { Email = model.InputEmail } // TODO: hash password
         | Valid
         | InValid -> model, Cmd.none, NoOp
 
